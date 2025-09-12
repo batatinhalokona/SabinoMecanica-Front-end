@@ -1,0 +1,55 @@
+/* Container principal da tela de login */
+.login-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;                 /* Ocupa a tela toda verticalmente */
+  background-color: #f5f5f5;      /* Fundo cinza claro */
+}
+
+/* Título do login */
+.login-container h2 {
+  margin-bottom: 1rem;
+  color: #1976d2;                 /* Azul igual ao restante do sistema */
+}
+
+/* Formulário */
+.login-form {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  width: 300px;
+}
+
+/* Campos de input */
+.login-form input {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Botão de login */
+.login-form button {
+  width: 100%;
+  padding: 0.5rem;
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.login-form button:hover {
+  background-color: #115293;
+}
+
+/* Mensagem de erro */
+.login-error {
+  color: red;
+  margin-top: 0.5rem;
+  text-align: center;
+}

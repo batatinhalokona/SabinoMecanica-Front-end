@@ -1,35 +1,39 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// Importa os componentes necessários
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import NavBar from "./components/NavBar";       // Componente de navegação superior
+import Footer from "./components/Footer";       // Componente de rodapé (se quiser, pode personalizar depois)
+import { useEffect } from "react";
 
+// Componente principal que envolve todas as telas internas
 function App() {
-  const [count, setCount] = useState(0)
+  const isHome = location.pathname === "/home";  // Hook que pega a rota atual
+  const navigate = useNavigate();               // Hook para redirecionamento
+
+  // Recupera o usuário logado do localStorage
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+  // Proteção de rotas: Se tentar acessar qualquer página sem estar logado, redireciona para o Login
+  useEffect(() => {
+    if (!usuario && location.pathname !== "/login") {
+      navigate("/login");
+    }
+  }, [usuario, location, navigate]);
+
+  // Condição para ocultar a NavBar e o Footer somente na tela de Login
+  const isLoginPage = location.pathname === "/login";
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      {/* Exibe a NavBar apenas se não estiver na tela de login */}
+      {!isLoginPage && !isHome && <NavBar />}
+
+      {/* Outlet = espaço onde o conteúdo da rota vai aparecer (ex: Home, Serviços, etc) */}
+      <Outlet />
+
+      {/* Exibe o Footer apenas fora da tela de login */}
+      {!isLoginPage && <Footer />}
     </>
-  )
+  );
 }
 
-export default App
+export default App;
