@@ -16,6 +16,7 @@ import RotaPrivada from './router/RotaPrivada';      // Importa a proteção de 
 
 // Importa o CSS global (se tiver)
 import './index.css';
+import './App.css';
 
 // Cria todas as rotas da aplicação
 const router = createBrowserRouter([

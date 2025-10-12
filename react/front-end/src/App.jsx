@@ -1,38 +1,32 @@
-// Importa os componentes necessários
+// src/App.jsx
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import NavBar from "./components/NavBar";       // Componente de navegação superior
-import Footer from "./components/Footer";       // Componente de rodapé (se quiser, pode personalizar depois)
+import NavBar from "./components/NavBar";
+import Footer from "./components/Footer";
 import { useEffect } from "react";
 
-// Componente principal que envolve todas as telas internas
 function App() {
-  const location = useLocation();           // <-- usar o hook corretamente
-  const isHome = location.pathname === "/home";
-  const isLoginPage = location.pathname === "/login";
-  const navigate = useNavigate();               // Hook para redirecionamento
+  const location = useLocation();                // ✅ useLocation correto
+  const navigate = useNavigate();
 
-  // Recupera o usuário logado do localStorage
   const usuario = JSON.parse(localStorage.getItem("usuario"));
 
-  // Proteção de rotas: Se tentar acessar qualquer página sem estar logado, redireciona para o Login
+  const isLoginPage = location.pathname === "/login";   // ✅ declare só uma vez
+  const isHome = location.pathname === "/home";         // (se precisar usar em estilo/condições)
+
   useEffect(() => {
     if (!usuario && location.pathname !== "/login") {
       navigate("/login");
     }
-    // Dependências: usar apenas o que é estável
-  }, [usuario, location.pathname, navigate]);
-  // Condição para ocultar a NavBar e o Footer somente na tela de Login
-  const isLoginPage = location.pathname === "/login";
+  }, [usuario, location.pathname, navigate]); // ✅ dep. corretas
 
   return (
     <>
-      {/* Exibe a NavBar apenas se não estiver na tela de login */}
-      {!isLoginPage && !isHome && <NavBar />}
+      {/* Exibe NavBar em todas as páginas, exceto login */}
+      {!isLoginPage && <NavBar />}
 
-      {/* Outlet = espaço onde o conteúdo da rota vai aparecer (ex: Home, Serviços, etc) */}
       <Outlet />
 
-      {/* Exibe o Footer apenas fora da tela de login */}
+      {/* Exibe Footer em todas as páginas, exceto login */}
       {!isLoginPage && <Footer />}
     </>
   );
