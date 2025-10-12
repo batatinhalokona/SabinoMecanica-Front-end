@@ -2,10 +2,15 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import "./Pages.css";
+import api from "../api/api";
+
 
 
 // Componente Fotos e Anotações
 export default function FotosAnotacoes() {
+
+  const response = await api.post("/login", { email, senha });
+
   // Estado para armazenar a lista de fotos/anotações
   const [registros, setRegistros] = useState([]);
 
@@ -28,7 +33,8 @@ export default function FotosAnotacoes() {
   // Função para buscar registros no JSON Server
   const buscarRegistros = async () => {
     try {
-      const resposta = await axios.get("http://localhost:3001/fotosAnotacoes");
+      const response = await api.get("/fotosAnotacoes");
+
       setRegistros(resposta.data);
     } catch (err) {
       setErro("Erro ao buscar registros");

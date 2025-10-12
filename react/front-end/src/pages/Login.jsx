@@ -2,12 +2,17 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import api from "../api/api";
+
 
 // Importa o CSS específico da tela de login
 import "./Login.css";
 
 // Componente de Login
 export default function Login() {
+
+  const response = await api.post("/login", { email, senha });
+
   // Estados para guardar os valores dos campos de email e senha
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
@@ -25,9 +30,8 @@ export default function Login() {
 
     try {
       // Faz uma requisição GET para buscar usuários com esse email e senha
-      const response = await axios.get("http://localhost:3000/usuarios", {
-        params: { email, senha },
-      });
+      const response = await api.post("/login", { email, senha });
+
 
       // Se encontrou algum usuário válido
       if (response.data.length > 0) {

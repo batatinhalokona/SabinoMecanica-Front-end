@@ -2,10 +2,14 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import "./Pages.css";
+import api from "../api/api";
+
 
 
 // Componente de Serviços
 export default function Servicos() {
+  const response = await api.post("/login", { email, senha });
+
   // Estados para armazenar os serviços e possíveis mensagens de erro
   const [servicos, setServicos] = useState([]);
   const [erro, setErro] = useState("");

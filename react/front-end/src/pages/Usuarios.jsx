@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import api from "../api/api";
+
 
 export default function Servicos() {
+
+  const response = await api.post("/login", { email, senha });
+
   // Pegando o usuário logado no localStorage
   const usuario = JSON.parse(localStorage.getItem("usuario"));
 

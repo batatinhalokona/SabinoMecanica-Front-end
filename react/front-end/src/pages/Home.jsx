@@ -1,8 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import "./Home.css";
+import api from "../api/api";
+
 
 export default function Home() {
+
+  const response = await api.post("/login", { email, senha });
   const navigate = useNavigate();
   const usuario = JSON.parse(localStorage.getItem("usuario"));
 

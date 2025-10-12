@@ -2,9 +2,12 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import "./Pages.css"; // Estilo global para formulários e tabelas
+import api from "../api/api";
+
 
 // Componente de Clientes
 export default function Clientes() {
+  const response = await api.post("/login", { email, senha });
   const [clientes, setClientes] = useState([]);
   const [erro, setErro] = useState("");
   const [form, setForm] = useState({
@@ -20,7 +23,8 @@ export default function Clientes() {
 
   const buscarClientes = async () => {
     try {
-      const resposta = await axios.get("http://localhost:3001/clientes");
+      const response = await api.get("/servicos");
+
       setClientes(resposta.data);
     } catch (err) {
       setErro("Erro ao buscar clientes");

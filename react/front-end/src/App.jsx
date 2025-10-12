@@ -6,7 +6,9 @@ import { useEffect } from "react";
 
 // Componente principal que envolve todas as telas internas
 function App() {
-  const isHome = location.pathname === "/home";  // Hook que pega a rota atual
+  const location = useLocation();           // <-- usar o hook corretamente
+  const isHome = location.pathname === "/home";
+  const isLoginPage = location.pathname === "/login";
   const navigate = useNavigate();               // Hook para redirecionamento
 
   // Recupera o usuário logado do localStorage
@@ -17,8 +19,8 @@ function App() {
     if (!usuario && location.pathname !== "/login") {
       navigate("/login");
     }
-  }, [usuario, location, navigate]);
-
+    // Dependências: usar apenas o que é estável
+  }, [usuario, location.pathname, navigate]);
   // Condição para ocultar a NavBar e o Footer somente na tela de Login
   const isLoginPage = location.pathname === "/login";
 
