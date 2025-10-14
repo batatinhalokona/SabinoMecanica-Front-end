@@ -1,12 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import api from "../api/api";
-
 
 export default function Servicos() {
-
-  const response = await api.post("/login", { email, senha });
-
   // Pegando o usuário logado no localStorage
   const usuario = JSON.parse(localStorage.getItem("usuario"));
 
@@ -20,10 +15,10 @@ export default function Servicos() {
     valor: "",
     duracao: "",
     categoria: "",
-    clienteId: usuario?.tipo === "cliente" ? usuario.id : "" // Se for cliente, salva o ID
+    clienteId: usuario?.tipo === "cliente" ? usuario.id : "", // Se for cliente, salva o ID
   });
 
-  // Buscar os serviços do back
+  // Buscar os serviços do backend (JSON Server ou API)
   useEffect(() => {
     buscarServicos();
   }, []);
@@ -34,7 +29,7 @@ export default function Servicos() {
 
       // Se o usuário for cliente, filtra apenas os dele
       const dadosFiltrados =
-        usuario.tipo === "cliente"
+        usuario?.tipo === "cliente"
           ? resposta.data.filter((s) => s.clienteId === usuario.id)
           : resposta.data;
 
@@ -71,7 +66,7 @@ export default function Servicos() {
       valor: "",
       duracao: "",
       categoria: "",
-      clienteId: usuario?.tipo === "cliente" ? usuario.id : ""
+      clienteId: usuario?.tipo === "cliente" ? usuario.id : "",
     });
     setEditandoId(null);
   };
@@ -99,7 +94,7 @@ export default function Servicos() {
       {erro && <p style={{ color: "red" }}>{erro}</p>}
 
       {/* Só mostra o formulário para gerentes */}
-      {usuario.tipo === "gerente" && (
+      {usuario?.tipo === "gerente" && (
         <>
           <h3>{editandoId ? "Editar Serviço" : "Cadastrar Novo Serviço"}</h3>
           <form onSubmit={salvarServico}>
@@ -143,9 +138,13 @@ export default function Servicos() {
               onChange={handleChange}
               required
             />
-            <button type="submit">{editandoId ? "Atualizar" : "Cadastrar"}</button>
+            <button type="submit">
+              {editandoId ? "Atualizar" : "Cadastrar"}
+            </button>
             {editandoId && (
-              <button type="button" onClick={cancelarEdicao}>Cancelar</button>
+              <button type="button" onClick={cancelarEdicao}>
+                Cancelar
+              </button>
             )}
           </form>
           <hr />
@@ -164,7 +163,7 @@ export default function Servicos() {
               <th>Duração</th>
               <th>Categoria</th>
               {/* Ações só aparecem para gerente */}
-              {usuario.tipo === "gerente" && <th>Ações</th>}
+              {usuario?.tipo === "gerente" && <th>Ações</th>}
             </tr>
           </thead>
           <tbody>
@@ -175,10 +174,12 @@ export default function Servicos() {
                 <td>R$ {s.valor}</td>
                 <td>{s.duracao}</td>
                 <td>{s.categoria}</td>
-                {usuario.tipo === "gerente" && (
+                {usuario?.tipo === "gerente" && (
                   <td>
                     <button onClick={() => handleEditar(s)}>Editar</button>
-                    <button onClick={() => excluirServico(s.id)}>Excluir</button>
+                    <button onClick={() => excluirServico(s.id)}>
+                      Excluir
+                    </button>
                   </td>
                 )}
               </tr>

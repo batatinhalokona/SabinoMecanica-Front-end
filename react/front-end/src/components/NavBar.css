@@ -1,47 +1,101 @@
-
-/* Estilo principal da NavBar */
+/* ===== ESTILO GERAL ===== */
 .navbar {
-  background-color: #222;           /* Fundo escuro */
-  color: white;                     /* Cor padrão do texto */
-  padding: 0.8rem 2rem;             /* Espaçamento interno */
-  display: flex;                    /* Layout flexível */
-  align-items: center;              /* Alinhamento vertical */
-  justify-content: space-between;   /* Espaço entre links e botão logout */
+  background-color: #1e293b; /* Azul escuro profissional */
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
-/* Container dos links de navegação */
+.navbar-logo {
+  font-size: 1.4rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.navbar-logo span {
+  color: #38bdf8; /* Azul claro destaque */
+}
+
+/* ===== LINKS ===== */
 .navbar-links {
   display: flex;
-  gap: 1.5rem;                      /* Espaçamento entre os links */
+  gap: 1.5rem;
+  align-items: center;
 }
 
-/* Estilo padrão para todos os links */
-.navbar-links .nav-link {
-  color: #ccc;                      /* Cor dos links (cinza claro) */
-  text-decoration: none;            /* Remove o sublinhado */
-  font-weight: 500;                 /* Deixa o texto um pouco mais forte */
-  transition: color 0.2s ease;      /* Animação suave de cor no hover */
+.navbar-links a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: 0.2s;
 }
 
-/* Efeito ao passar o mouse ou quando o link estiver ativo */
-.navbar-links .nav-link:hover {
-  color: #fff;                      /* Branco ao passar o mouse */
-  border-bottom: 2px solid #f2f2f2; /* Linha fina por baixo para destacar */
+.navbar-links a:hover {
+  color: #38bdf8;
+  transform: scale(1.05);
 }
 
-/* Estilo do botão de logout */
-.navbar-logout {
-  background-color: #c62828;         /* Vermelho escuro */
-  color: white;                      /* Texto branco */
-  border: none;                      /* Sem borda */
-  padding: 0.5rem 1rem;              /* Espaçamento interno */
-  cursor: pointer;                   /* Mãozinha ao passar o mouse */
-  border-radius: 4px;                /* Cantos arredondados */
-  font-size: 0.9rem;                 /* Tamanho do texto */
-  transition: background-color 0.2s; /* Animação de cor no hover */
+/* ===== BOTÃO SAIR ===== */
+.logout {
+  background-color: #ef4444;
+  border: none;
+  color: #fff;
+  padding: 0.4rem 0.9rem;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s;
 }
 
-/* Efeito ao passar o mouse no botão de sair */
-.navbar-logout:hover {
-  background-color: #b71c1c;         /* Tom mais escuro ao passar o mouse */
+.logout:hover {
+  background-color: #dc2626;
+  transform: scale(1.05);
+}
+
+/* ===== MENU MOBILE ===== */
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+
+/* ===== RESPONSIVO ===== */
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: block;
+  }
+
+  .navbar-links {
+    display: none;
+    flex-direction: column;
+    background-color: #1e293b;
+    position: absolute;
+    top: 60px;
+    right: 0;
+    width: 200px;
+    padding: 1rem;
+    border-left: 2px solid #38bdf8;
+  }
+
+  .navbar-links.ativo {
+    display: flex;
+  }
+
+  .navbar-links a,
+  .logout {
+    width: 100%;
+    text-align: left;
+  }
 }

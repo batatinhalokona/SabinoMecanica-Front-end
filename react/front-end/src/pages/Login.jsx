@@ -1,51 +1,66 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../api/api";
 import "./Login.css";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
-  const [erro, setErro] = useState("");
   const navigate = useNavigate();
+  const [form, setForm] = useState({ email: "", senha: "" });
+  const [erro, setErro] = useState("");
 
-  const handleLogin = async (e) => {
+  // Atualiza os campos do formulário
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  // Faz o login (apenas o dono da oficina)
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setErro("");
 
-    try {
-      const response = await api.post("/login", { email, senha });
-      if (response && response.data) {
-        const usuarioLogado = response.data.usuario || response.data;
-        localStorage.setItem("usuario", JSON.stringify(usuarioLogado));
-        navigate("/home");
-        return;
-      }
-    } catch (err) {
-      console.warn("API de login indisponível, usando fallback:", err?.message || err);
-      if (email === "admin" && senha === "123") {
-        const usuarioLogado = { id: 0, nome: "Administrador (mock)", email };
-        localStorage.setItem("usuario", JSON.stringify(usuarioLogado));
-        navigate("/home");
-        return;
-      }
-      setErro("Email ou senha inválidos (e backend indisponível).");
+    // Aqui você define seu e-mail e senha fixos
+    const emailCorreto = "sabino@oficina.com";
+    const senhaCorreta = "12345";
+
+    if (form.email === emailCorreto && form.senha === senhaCorreta) {
+      const usuario = { nome: "Bruno Sabino", cargo: "Dono", email: form.email };
+      localStorage.setItem("usuario", JSON.stringify(usuario));
+      navigate("/home"); // Redireciona para o painel principal
+    } else {
+      setErro("E-mail ou senha incorretos!");
     }
   };
 
   return (
     <div className="login-container">
-      <h1>Entrar</h1>
-      <form onSubmit={handleLogin}>
-        <label>Email</label>
-        <input value={email} onChange={(e)=>setEmail(e.target.value)} required />
+      <div className="login-box">
+        <h1>🔧 Oficina Sabino</h1>
+        <p className="login-subtitle">Acesso restrito ao gerente</p>
 
-        <label>Senha</label>
-        <input type="password" value={senha} onChange={(e)=>setSenha(e.target.value)} required />
+        <form onSubmit={handleSubmit}>
+          <input
+            type="email"
+            name="email"
+            placeholder="E-mail"
+            value={form.email}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="password"
+            name="senha"
+            placeholder="Senha"
+            value={form.senha}
+            onChange={handleChange}
+            required
+          />
+          {erro && <p className="erro">{erro}</p>}
+          <button type="submit">Entrar</button>
+        </form>
 
-        <button type="submit">Entrar</button>
-        {erro && <p className="login-error">{erro}</p>}
-      </form>
+        <p className="login-info">
+          <strong>Usuário:</strong> sabino@oficina.com <br />
+          <strong>Senha:</strong> 12345
+        </p>
+      </div>
     </div>
   );
 }

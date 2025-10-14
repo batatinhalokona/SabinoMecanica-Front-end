@@ -9,9 +9,9 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import App from './App';                     // Layout base com NavBar e Footer
 import Login from './pages/Login';           // Tela de login
 import Home from './pages/Home';             // Tela inicial com os 3 cards
-import Servicos from './pages/Servicos';     // Tela de Serviços
-import Clientes from './pages/Clientes';     // Tela de Clientes
-import FotosAnotacoes from './pages/FotosAnotacoes'; // Tela de Fotos e Anotações
+import Servicos from './pages/Servicos/Servicos';     // Tela de Serviços
+import Clientes from './pages/Clientes/Clientes';     // Tela de Clientes
+import FotosAnotacoes from './pages/Registro/Registro'; // Tela de Fotos e Anotações
 import RotaPrivada from './router/RotaPrivada';      // Importa a proteção de rotas
 
 // Importa o CSS global (se tiver)
@@ -33,7 +33,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: '/servicos',
+        path: '/Servicos',
         element: (
           <RotaPrivada>
             <Servicos />
@@ -49,7 +49,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: '/fotos',
+        path: '/Registro',
         element: (
           <RotaPrivada>
             <FotosAnotacoes />

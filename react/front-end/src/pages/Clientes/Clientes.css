@@ -1,0 +1,53 @@
+.clientes-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.clientes-menu {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.clientes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.2rem;
+  margin-top: 1.5rem;
+}
+
+.cliente-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  text-decoration: none;
+  color: #111;
+  transition: 0.2s;
+}
+
+.cliente-card:hover {
+  transform: translateY(-5px);
+}
+
+.andamento-card {
+  border-left: 6px solid #007bff;
+}
+
+.pendente-card {
+  border-left: 6px solid #ffcc00;
+}
+
+.historico-card {
+  border-left: 6px solid #00cc66;
+}
+
+/* Responsivo */
+@media screen and (max-width: 768px) {
+  .clientes-menu,
+  .clientes-grid {
+    grid-template-columns: 1fr;
+  }
+}
