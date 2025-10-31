@@ -1,41 +1,66 @@
-import { Link, useNavigate } from "react-router-dom";
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { FaTools, FaUsers, FaWarehouse, FaCamera } from "react-icons/fa";
 import "./Home.css";
+import logoHome from "../assets/logohome.png"; // tua logo
 
 export default function Home() {
   const navigate = useNavigate();
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
 
-  // Função para sair (logout)
+  if (!usuario) {
+    navigate("/");
+    return null;
+  }
+
   const handleLogout = () => {
-    localStorage.removeItem("usuario"); // Remove o usuário salvo
-    navigate("/login"); // Redireciona para o login
+    localStorage.removeItem("usuario");
+    navigate("/");
   };
 
   return (
     <div className="home-container">
-      {/* Botão de Logout no topo */}
-      <button className="logout-btn" onClick={handleLogout}>
-        🚪 Sair
-      </button>
+      {/* ======= TOPO ======= */}
+      <header className="home-header">
+        <img src={logoHome} alt="Logo Oficina Sabino" className="logo-home" />
+        <div className="home-user">
+          <p>
+            Bem-vindo, <strong>{usuario.nome}</strong>!
+          </p>
+          <button onClick={handleLogout}>Sair</button>
+        </div>
+      </header>
 
-      <h1>🏠 Painel da Oficina Sabino</h1>
-      <p>Bem-vindo! Escolha uma área para gerenciar:</p>
+      {/* ======= CARDS ======= */}
+      <main className="home-main">
+        <div className="card" onClick={() => navigate("/servicos")}>
+          <h2>
+            <FaTools /> Serviços
+          </h2>
+          <p>Gerencie serviços, descrições, valores e datas.</p>
+        </div>
 
-      <div className="home-menu">
-        <Link to="/servicos" className="home-card servico-card">
-          <h2>🧰 Serviços</h2>
-          <p>Gerencie serviços em andamento, garantias e históricos.</p>
-        </Link>
+        <div className="card" onClick={() => navigate("/clientes")}>
+          <h2>
+            <FaUsers /> Clientes
+          </h2>
+          <p>Cadastre e mantenha o controle dos clientes.</p>
+        </div>
 
-        <Link to="/clientes" className="home-card cliente-card">
-          <h2>👤 Clientes</h2>
-          <p>Acompanhe os clientes, pendentes e históricos de atendimento.</p>
-        </Link>
+        <div className="card" onClick={() => navigate("/estoque")}>
+          <h2>
+            <FaWarehouse /> Estoque
+          </h2>
+          <p>Peças novas, usadas e óleo em um só lugar.</p>
+        </div>
 
-        <Link to="/registro" className="home-card registro-card">
-          <h2>📋 Registro</h2>
-          <p>Cadastre novos clientes, serviços e carros.</p>
-        </Link>
-      </div>
+        <div className="card" onClick={() => navigate("/registro")}>
+          <h2>
+            <FaCamera /> Registro
+          </h2>
+          <p>Fotos e anotações rápidas dos serviços.</p>
+        </div>
+      </main>
     </div>
   );
 }

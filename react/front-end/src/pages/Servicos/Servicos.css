@@ -1,45 +1,140 @@
 .servicos-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #cfc8b8;
+  min-height: 100vh;
+  font-family: "Poppins", sans-serif;
+  padding: 30px 40px;
+  overflow: hidden;
+}
+
+/* Cabeçalho central */
+.servicos-header {
   text-align: center;
+  color: #1a3326;
+  margin-bottom: 40px;
 }
 
-.servicos-menu {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.2rem;
-  margin-top: 2rem;
+.servicos-header h1 {
+  font-size: 2rem;
+  margin-bottom: 10px;
 }
 
-.servico-card {
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
-  text-decoration: none;
-  color: #111;
-  transition: 0.2s;
+.servicos-header p {
+  font-size: 1rem;
+  color: #333;
 }
 
-.servico-card:hover {
-  transform: translateY(-5px);
+/* Área principal com imagem e cards */
+.servicos-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 60px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.8s ease;
 }
 
-.andamento-card {
-  border-left: 6px solid #007bff;
+/* Quando o estado animar = true */
+.servicos-content.animar {
+  opacity: 1;
+  transform: translateY(0);
 }
 
-.garantia-card {
-  border-left: 6px solid #ff6600;
+/* Imagem do carro */
+.servicos-imagem {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  transform: translateX(-80px);
+  opacity: 0;
+  transition: all 1s ease;
 }
 
-.historico-card {
-  border-left: 6px solid #00cc66;
+.servicos-content.animar .servicos-imagem {
+  transform: translateX(0);
+  opacity: 1;
 }
 
-@media screen and (max-width: 768px) {
-  .servicos-menu {
-    grid-template-columns: 1fr;
+.servicos-imagem img {
+  width: 80%;
+  max-width: 380px;
+  filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.25));
+  transition: transform 0.3s ease;
+}
+
+.servicos-imagem img:hover {
+  transform: scale(1.03);
+}
+
+/* Cards */
+.servicos-cards {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: flex-start;
+  transform: translateX(80px);
+  opacity: 0;
+  transition: all 1s ease;
+}
+
+.servicos-content.animar .servicos-cards {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.card {
+  width: 320px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 2px solid rgba(26, 51, 38, 0.25);
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  background: rgba(26, 51, 38, 0.85);
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.card h2 {
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+}
+
+.card p {
+  font-size: 0.9rem;
+  color: #222;
+}
+
+/* Responsividade */
+@media (max-width: 900px) {
+  .servicos-content {
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .servicos-imagem {
+    justify-content: center;
+  }
+
+  .servicos-imagem img {
+    width: 65%;
+    max-width: 300px;
+  }
+
+  .servicos-cards {
+    align-items: center;
+  }
+
+  .card {
+    width: 280px;
   }
 }

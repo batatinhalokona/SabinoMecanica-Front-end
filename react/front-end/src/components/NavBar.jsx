@@ -40,6 +40,10 @@ export default function NavBar() {
         <Link to="/registro" onClick={() => setMenuAberto(false)}>
           📋 Registro
         </Link>
+        <Link to="/estoque" onClick={() => setMenuAberto(false)}>
+          📦 Estoque
+        </Link>
+
         <button className="logout" onClick={handleLogout}>
           🚪 Sair
         </button>
