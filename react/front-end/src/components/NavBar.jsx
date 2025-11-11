@@ -37,11 +37,17 @@ export default function NavBar() {
         <Link to="/clientes" onClick={() => setMenuAberto(false)}>
           👤 Clientes
         </Link>
-        <Link to="/registro" onClick={() => setMenuAberto(false)}>
-          📋 Registro
+        <Link to="/categorias" onClick={() => setMenuAberto(false)}>
+          📋 Categorias
         </Link>
-        <Link to="/estoque" onClick={() => setMenuAberto(false)}>
-          📦 Estoque
+        <Link to="/carros" onClick={() => setMenuAberto(false)}>
+          📦 Carros
+        </Link>
+         <Link to="/movtoEntradas" onClick={() => setMenuAberto(false)}>
+          📦 Entradas
+        </Link>
+         <Link to="/despesas" onClick={() => setMenuAberto(false)}>
+          📦 Despesas
         </Link>
 
         <button className="logout" onClick={handleLogout}>

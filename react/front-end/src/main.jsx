@@ -23,35 +23,19 @@ import Home from "./pages/Home";
 // ============================
 // Importa páginas de Serviços
 // ============================
-import Servicos from "./pages/Servicos/Servicos";
-import ServicoAndamento from "./pages/Servicos/ServicoAndamento";
-import ServicoGarantia from "./pages/Servicos/ServicoGarantia";
-import ServicoHistorico from "./pages/Servicos/ServicoHistorico";
-
+import Servicos from "./pages/Servico";
 // ============================
 // Importa páginas de Clientes
 // ============================
-import Clientes from "./pages/Clientes/Clientes";
-import ClientesAndamentos from "./pages/Clientes/ClientesAndamentos";
-import ClientesPendentes from "./pages/Clientes/ClientesPendentes";
-import ClientesHistorico from "./pages/Clientes/ClientesHistorico";
-
+import Clientes from "./pages/Clientes";
+// ============================
+// Importa páginas de Carros
+// ============================
+import Carros from "./pages/Carros";
 // ============================
 // Importa páginas de Registro
 // ============================
-import Registro from "./pages/Registro/Registro";
-import NovoCliente from "./pages/Registro/NovoCliente";
-import NovoServico from "./pages/Registro/NovoServico";
-import NovoCarro from "./pages/Registro/NovoCarro";
-
-// ============================
-// Importa páginas de Estoque
-// ============================
-import Estoque from "./pages/Estoque/Estoque";
-import EstoqueNova from "./pages/Estoque/EstoqueNova";
-import EstoqueUsada from "./pages/Estoque/EstoqueUsada";
-import EstoqueOleo from "./pages/Estoque/EstoqueOleo";
-
+import Categorias from "./pages/Categorias";
 // ============================
 // Importa CSS global
 // ============================
@@ -78,146 +62,46 @@ const router = createBrowserRouter([
 
       // ====== Clientes ======
       {
-        path: "/clientes",
+        path: "/api/clientes",
         element: (
           <RotaPrivada>
             <Clientes />
           </RotaPrivada>
         ),
       },
-      {
-        path: "/clientes/andamento",
-        element: (
-          <RotaPrivada>
-            <ClientesAndamentos />
-          </RotaPrivada>
-        ),
-      },
-      {
-        path: "/clientes/pendentes",
-        element: (
-          <RotaPrivada>
-            <ClientesPendentes />
-          </RotaPrivada>
-        ),
-      },
-      {
-        path: "/clientes/historico",
-        element: (
-          <RotaPrivada>
-            <ClientesHistorico />
-          </RotaPrivada>
-        ),
-      },
-
       // ====== Serviços ======
       {
-        path: "/servicos",
+        path: "/api/servicos",
         element: (
           <RotaPrivada>
             <Servicos />
           </RotaPrivada>
         ),
       },
-      {
-        path: "/servicos/andamento",
-        element: (
-          <RotaPrivada>
-            <ServicoAndamento />
-          </RotaPrivada>
-        ),
-      },
-      {
-        path: "/servicos/garantia",
-        element: (
-          <RotaPrivada>
-            <ServicoGarantia />
-          </RotaPrivada>
-        ),
-      },
-      {
-        path: "/servicos/historico",
-        element: (
-          <RotaPrivada>
-            <ServicoHistorico />
-          </RotaPrivada>
-        ),
-      },
 
       // ====== Registro ======
       {
-        path: "/registro",
+        path: "/api/Carros",
         element: (
           <RotaPrivada>
-            <Registro />
+            <Carros />
           </RotaPrivada>
         ),
       },
       {
-        path: "/registro/cliente",
+        path: "/api/categorias",
         element: (
           <RotaPrivada>
-            <NovoCliente />
+            <Categorias />
           </RotaPrivada>
         ),
       },
-      {
-        path: "/registro/servico",
-        element: (
-          <RotaPrivada>
-            <NovoServico />
-          </RotaPrivada>
-        ),
-      },
-      {
-        path: "/registro/carro",
-        element: (
-          <RotaPrivada>
-            <NovoCarro />
-          </RotaPrivada>
-        ),
-      },
-
-      // ====== Estoque ======
-      {
-        path: "/estoque",
-        element: (
-          <RotaPrivada>
-            <Estoque />
-          </RotaPrivada>
-        ),
-      },
-      {
-        path: "/estoque/novas",
-        element: (
-          <RotaPrivada>
-            <EstoqueNova />
-          </RotaPrivada>
-        ),
-      },
-      {
-        path: "/estoque/usadas",
-        element: (
-          <RotaPrivada>
-            <EstoqueUsada />
-          </RotaPrivada>
-        ),
-      },
-      {
-        path: "/estoque/oleo",
-        element: (
-          <RotaPrivada>
-            <EstoqueOleo />
-          </RotaPrivada>
-        ),
-      },
-    ],
-  },
-
   // ====== Login ======
   {
     path: "/login",
     element: <Login />,
+  },
+    ], // Closing bracket for children array
   },
 ]);
 
