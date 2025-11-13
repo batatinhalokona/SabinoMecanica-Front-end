@@ -20,7 +20,7 @@ export default function Clientes() {
 
         <Link to="/clientes/historico" className="cliente-card historico-card">
           <h2>📜 Histórico de Clientes</h2>
-          <p>Visualize serviços já concluídos e finalizados.</p>
+          <p>Visualize serviços já concluídos e finalizados. </p>
         </Link>
       </div>
     </div>
