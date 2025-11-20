@@ -1,120 +1,146 @@
-/* Remove qualquer branco do formulário e containers internos */
-.login-box,
-.login-box form,
-.login-box input,
-.login-overlay {
-  background-color: transparent !important;
-  background: transparent !important;
-}
-
-/* Fundo geral com a arte */
-.login-background {
-  height: 100vh;
-  background-image: url("../assets/logo-oficina-sabino.jpeg");
-  background-size: contain;        /* mostra a logo inteira */
-  background-repeat: no-repeat;
-  background-position: center;
-  background-color: #cfc8b8;       /* cor da logo nas bordas */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-family: "Poppins", sans-serif;
-}
-
-/* Centralização */
-.login-overlay {
-  width: 100%;
+/* reset mínimo para evitar gaps */
+html, body, #root {
   height: 100%;
+  margin: 0;
+}
+
+/* ===== FUNDO ===== */
+.login-background {
+  min-height: 100vh;
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
   display: flex;
   justify-content: center;
   align-items: center;
-  background: none;
+
+  position: relative;
+  font-family: "Poppins", sans-serif;
+  background-color: #111; /* fallback caso a imagem falhe */
 }
 
-/* Formulário transparente e limpo */
+/* overlay escuro para contraste */
+.login-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 32px; /* garante espaçamento em telas pequenas */
+}
+
+/* ===== CAIXA ===== */
 .login-box {
-  background: none;
-  border: none;
-  box-shadow: none;
+  position: relative;
+  z-index: 2;
+  width: 360px;
+  max-width: calc(100% - 48px); /* responsivo */
+  padding: 26px 24px;
+  border-radius: 14px;
+  /* vidro mais translúcido (sem branco forte) */
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
   text-align: center;
-  width: 340px;
-  color: #000;
+  color: #b12d2d;
+}
+.login-form{
+  padding: 26px 24px;
+  align-items: center;
+  width: 360px;
+  max-width: calc(100% - 48px);
+  box-shadow: 0 10px 20px;
+  color: #00b38f;
+  background-color:  rgba(255,255,255,0.10);
 }
 
-/* Título principal */
-.login-box h1 {
-  font-size: 1.8rem;
-  margin-bottom: 8px;
-  color: #ffffff;
-  text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
+/* título */
+.login-title {
+  margin: 0 0 18px 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #f7f7f7;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.6);
 }
 
-/* Subtítulo */
-.login-subtitle {
-  font-size: 0.95rem;
-  color: #f1f1f1;
-  margin-bottom: 25px;
-  text-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
-}
-
-/* === CAMPOS DE ENTRADA === */
-/* Estado normal (sem foco): translúcido */
-.login-box input {
+/* form alinhado dentro da caixa */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   width: 100%;
-  padding: 10px;
-  margin-bottom: 15px;
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  border-radius: 8px;
-  font-size: 1rem;
-  background-color: rgba(0, 0, 0, 0.35); /* fundo translúcido */
-  color: #000; /* texto preto */
+
+}
+
+/* inputs — menos "branco", mais translúcido */
+.login-form input {
+  width: 100%;
+  padding: 5px 5px;
+  border-radius: 5px;
+  border: 1px solid rgba(255,255,255,0.25);
+
+  /* deixa totalmente transparente */
+  background: rgba(255, 255, 255, 0); 
+  backdrop-filter: blur(3px);
+
+  color: #ffffff;
+  font-size: 0.98rem;
   outline: none;
-  transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+  transition: all 0.18s ease;
 }
 
-/* Placeholder */
-.login-box input::placeholder {
-  color: rgba(0, 0, 0, 0.6);
+.login-form input::placeholder {
+  color: rgba(255, 255, 255, 0.568);
 }
 
-/* Estado de foco (clicado): fundo branco */
-.login-box input:focus {
-  background-color: #ffffff; /* fundo branco */
-  border-color: #1a3326; /* borda verde Sabino */
-  color: #000; /* texto preto */
+.login-form input:focus {
+  background: rgba(255,255,255,0.10); /* leve brilho ao focar */
+  border-color: #00d4b0;
+  box-shadow: 0 0 8px rgba(0,210,170,0.4);
 }
 
-/* Mensagem de erro */
-.erro {
-  color: #ff4d4d;
-  font-size: 0.9rem;
-  margin-bottom: 10px;
-  text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
-}
-
-/* === BOTÃO ENTRAR === */
-.login-box button {
+/* botão estilizado */
+.btn-submit {
   width: 100%;
   padding: 12px;
-  background-color: rgba(26, 51, 38, 0.9); /* verde escuro Sabino */
-  color: white;
-  border: none;
   border-radius: 8px;
-  font-size: 1rem;
-  font-weight: bold;
+  border: none;
+  background: linear-gradient(90deg, #00b38f, #00d4b0);
+  color: #fff;
+  font-weight: 700;
   cursor: pointer;
-  transition: 0.3s;
-  box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
+  transition: transform 0.12s ease, filter 0.12s ease;
 }
 
-.login-box button:hover {
-  background-color: rgba(26, 51, 38, 1);
+.btn-submit:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.02);
 }
 
-/* === TEXTO INFORMATIVO (usuário e senha padrão) === */
-.login-info {
-  margin-top: 20px;
+/* erro */
+.erro {
+  color: #ff7b7b;
   font-size: 0.9rem;
-  color: #ffffff;
-  text-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
+  font-weight: 600;
+  text-align: left;
+}
+
+/* info abaixo */
+.login-info {
+  margin-top: 14px;
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.85);
+  opacity: 0.95;
+}
+
+/* responsividade simples */
+@media (max-width: 420px) {
+  .login-box { width: 100%; padding: 20px; border-radius: 12px; }
+  .login-title { font-size: 1.15rem; }
 }
