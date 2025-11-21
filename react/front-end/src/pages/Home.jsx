@@ -22,7 +22,7 @@ export default function Home() {
     <div className="home-container">
       {/* ======= TOPO ======= */}
       <header className="home-header">
-        <img src={logoHome} alt="Logo Oficina Sabino" className="logo-home" />
+        🔧 <span>Sabino Mecânica</span>
         <div className="home-user">
           <p>
             Bem-vindo, <strong>{usuario.nome}</strong>!
