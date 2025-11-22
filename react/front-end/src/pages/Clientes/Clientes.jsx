@@ -1,28 +1,52 @@
-import { Link } from "react-router-dom";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import "./Clientes.css";
 
+// ATENÇÃO: agora o caminho está CORRETO (sobe duas pastas)
+import clienteImg from "../../assets/clientes-vintage.png";
+
 export default function Clientes() {
+  const navigate = useNavigate();
+
   return (
-    <div className="clientes-container">
-      <h1>Gerenciamento de Clientes</h1>
-      <p>Selecione uma das opções abaixo:</p>
+    <div className="clientes-root">
+      {/* ------------------ CABEÇALHO ------------------ */}
+      <header className="clientes-header">
+        <h1 className="clientes-titulo">👥 Clientes da Oficina Sabino</h1>
+        <p className="clientes-subtitulo">
+          Gerencie cadastros, contatos, pendências e histórico de atendimento.
+        </p>
+      </header>
 
-      <div className="clientes-menu">
-        <Link to="/clientes/andamento" className="cliente-card andamento-card">
-          <h2>🔧 Clientes em Andamento</h2>
-          <p>Veja os clientes que estão com serviços em execução.</p>
-        </Link>
+      {/* ------------------ CONTEÚDO ------------------ */}
+      <main className="clientes-main">
+        {/* ======== IMAGEM LADO ESQUERDO ======== */}
+        <div className="clientes-img-container">
+          <img
+            src={clienteImg}
+            alt="Ilustração de cliente da oficina"
+            className="clientes-img"
+          />
+        </div>
 
-        <Link to="/clientes/pendentes" className="cliente-card pendente-card">
-          <h2>💸 Clientes Pendentes</h2>
-          <p>Clientes com pagamentos em aberto ou em atraso.</p>
-        </Link>
+        {/* ======== CARDS LADO DIREITO ======== */}
+        <section className="clientes-cards-container">
+          <div className="clientes-card" onClick={() => navigate("/clientes")}>
+            <h2>🔧 Clientes em Atendimento</h2>
+            <p>Veja os clientes que possuem serviços em execução.</p>
+          </div>
 
-        <Link to="/clientes/historico" className="cliente-card historico-card">
-          <h2>📜 Histórico de Clientes</h2>
-          <p>Visualize serviços já concluídos e finalizados. </p>
-        </Link>
-      </div>
+          <div className="clientes-card" onClick={() => navigate("/clientes")}>
+            <h2>💰 Clientes Pendentes</h2>
+            <p>Clientes com serviços ou pagamentos em aberto/atraso.</p>
+          </div>
+
+          <div className="clientes-card" onClick={() => navigate("/clientes")}>
+            <h2>📜 Histórico de Clientes</h2>
+            <p>Visualize atendimentos finalizados e serviços anteriores.</p>
+          </div>
+        </section>
+      </main>
     </div>
   );
 }

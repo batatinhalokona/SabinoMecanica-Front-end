@@ -1,53 +1,132 @@
-.clientes-container {
-  max-width: 1200px;
+/* ======= FUNDO E ESTRUTURA GERAL ======= */
+
+.clientes-root {
+  width: 100%;
+  min-height: 100vh;
+  background-color: #d6cbb1; /* Fundo areia igual Serviços/Home */
+  padding: 24px 16px 40px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* ======= CABEÇALHO ======= */
+
+.clientes-header {
+  max-width: 1100px;
+  margin: 0 auto 24px auto;
+  text-align: center;
+  color: #1f2933;
+}
+
+.clientes-titulo {
+  font-size: 2rem;
+  margin-bottom: 4px;
+}
+
+.clientes-subtitulo {
+  font-size: 1rem;
+  color: #374151;
+}
+
+/* ======= CONTEÚDO (2 COLUNAS) ======= */
+
+.clientes-main {
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 2rem;
+  display: flex;
+  gap: 25px;
+  align-items: center;
+  padding-top: 15px;
+  flex-wrap: wrap;
+  /* animação de entrada deslizando */
+  animation: clientes-slide-in 0.45s ease-out;
 }
 
-.clientes-menu {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
-  margin-top: 2rem;
+/* Animação: vem levemente da direita com fade */
+@keyframes clientes-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
-.clientes-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.2rem;
-  margin-top: 1.5rem;
+/* ======= IMAGEM (ESQUERDA, RECORTADA) ======= */
+
+.clientes-img-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
 }
 
-.cliente-card {
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  padding: 1rem;
-  text-decoration: none;
-  color: #111;
-  transition: 0.2s;
+.clientes-img {
+  max-width: 380px;
+  width: 100%;
+  opacity: 0.9;
+  filter: saturate(0.6) contrast(1.25)
+    drop-shadow(0 12px 18px rgba(0, 0, 0, 0.25));
+  object-fit: contain;
+  /* “recorta” a imagem puxando um pouco pra esquerda */
+  transform: translateX(-40px);
 }
 
-.cliente-card:hover {
-  transform: translateY(-5px);
+/* ======= CARDS (DIREITA) ======= */
+
+.clientes-cards-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
-.andamento-card {
-  border-left: 6px solid #007bff;
+.clientes-card {
+  background-color: #ffffff;
+  padding: 18px 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  transition: 0.18s ease;
 }
 
-.pendente-card {
-  border-left: 6px solid #ffcc00;
+/* Hover: card “desliza” levemente pra direita, igual botão chamativo */
+.clientes-card:hover {
+  transform: translateX(6px);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.18);
 }
 
-.historico-card {
-  border-left: 6px solid #00cc66;
+.clientes-card h2 {
+  font-size: 1.2rem;
+  color: #08301e; /* Verde escuro */
+  margin-bottom: 6px;
 }
 
-/* Responsivo */
-@media screen and (max-width: 768px) {
-  .clientes-menu,
-  .clientes-grid {
-    grid-template-columns: 1fr;
+.clientes-card p {
+  font-size: 0.95rem;
+  color: #4b5563;
+  margin: 0;
+}
+
+/* ======= RESPONSIVO ======= */
+
+@media (max-width: 768px) {
+  .clientes-main {
+    gap: 18px;
+    justify-content: center;
+  }
+
+  .clientes-img {
+    max-width: 260px;
+    /* no celular a gente puxa menos pra esquerda pra não cortar demais */
+    transform: translateX(-10px);
+  }
+
+  .clientes-titulo {
+    font-size: 1.7rem;
+  }
+
+  .clientes-card h2 {
+    font-size: 1.05rem;
   }
 }
