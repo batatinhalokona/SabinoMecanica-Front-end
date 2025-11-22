@@ -1,188 +1,119 @@
 import React, { useEffect, useState } from "react";
+import { FaTools, FaUsers, FaWarehouse, FaSignOutAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-
-// Ícones
-import { FaTools, FaUsers, FaWarehouse, FaCamera } from "react-icons/fa";
-
-// Estilo
+import api from "../api/api";
 import "./Home.css";
 
-// API backend configurada
-import api from "../api/api";
-
 export default function Home() {
+  const [servicos, setServicos] = useState([]);
+  const [erro, setErro] = useState(null);
   const navigate = useNavigate();
 
-  // Estado de serviços
-  const [servicos, setServicos] = useState([]);
-  const [carregando, setCarregando] = useState(true);
-  const [erro, setErro] = useState("");
-
-  // Usuário logado
-  const usuario = JSON.parse(localStorage.getItem("usuario"));
-
-  // Logout
-  const handleLogout = () => {
-    localStorage.removeItem("usuario");
-    navigate("/login");
-  };
-
-  // Buscar serviços
   useEffect(() => {
-    if (!usuario) {
-      navigate("/login");
-      return;
-    }
-
-    async function buscarServicos() {
+    const buscarServicos = async () => {
       try {
-        setCarregando(true);
-        setErro("");
-
-        const resp = await api.get("/servico");
-        const lista = resp.data || [];
-
-        const emAndamento = lista.filter((s) => {
-          const status = (s.status || s.situacao || "").toString().toUpperCase();
-          return (
-            status.includes("ANDAMENTO") ||
-            status.includes("EM_ANDAMENTO") ||
-            status.includes("PENDENTE") ||
-            status.includes("ABERTO")
-          );
-        });
-
-        setServicos(emAndamento.length > 0 ? emAndamento : lista);
-      } catch (e) {
-        setErro("Erro ao carregar serviços.");
-      } finally {
-        setCarregando(false);
+        const response = await api.get("/api/servicos"); // <-- AQUI IGUAL AO BACK
+        setServicos(response.data);
+        setErro(null);
+      } catch (error) {
+        console.error("Erro ao buscar serviços:", error);
+        setErro("Não foi possível carregar os serviços.");
       }
-    }
+    };
 
     buscarServicos();
-  }, [usuario, navigate]);
+  }, []);
 
-  if (!usuario) return null;
+  const handleLogout = () => {
+    localStorage.removeItem("usuario");
+    navigate("/"); // volta pra tela de login
+  };
+
+  // Se você quiser considerar "em andamento" = data_fim == null:
+  const servicosEmAndamento = servicos.filter(
+    (servico) => servico.data_fim === null
+  );
 
   return (
-    <div className="home-root-claro">
-      {/* =================== HEADER =================== */}
-      <header className="home-header-claro">
-        <div className="home-header-textos">
-          <h1 className="home-header-titulo">Painel da Oficina Sabino</h1>
-          <p className="home-header-subtitulo">
-            Acompanhe serviços e acesse rapidamente os setores.
-          </p>
-          <p className="home-header-usuario">
-            Olá, <strong>{usuario.nome || "Gerente"}</strong>
-          </p>
+    <div className="home-container">
+      <header className="home-header">
+        <div className="home-header-left">
+          <h1>Oficina Sabino</h1>
+          <span>Painel principal</span>
         </div>
 
-        <button className="home-sair-btn" onClick={handleLogout}>
-          Sair
+        <button className="logout-button" onClick={handleLogout}>
+          <FaSignOutAlt className="logout-icon" />
+          <span>Sair</span>
         </button>
       </header>
 
-      {/* =================== CONTEÚDO =================== */}
-      <main className="home-main-claro">
-        {/* ======== SERVIÇOS EM ANDAMENTO ======== */}
-        <section className="home-servicos-section">
-          <h2 className="home-section-title">Serviços em andamento</h2>
-          <p className="home-section-subtitle">
-            Veja rapidamente os serviços que estão em execução.
-          </p>
+      <main className="home-main">
+        {/* cards de navegação */}
+        <section className="cards-section">
+          <div className="home-card" onClick={() => navigate("/servicos")}>
+            <FaTools className="card-icon" />
+            <h2>Serviços</h2>
+            <p>Gerencie serviços em andamento e concluídos.</p>
+          </div>
 
-          {carregando && <p className="home-info-text">Carregando...</p>}
-          {erro && <p className="home-error-text">{erro}</p>}
+          <div className="home-card" onClick={() => navigate("/clientes")}>
+            <FaUsers className="card-icon" />
+            <h2>Clientes</h2>
+            <p>Cadastre e consulte clientes.</p>
+          </div>
 
-          {!carregando && !erro && servicos.length === 0 && (
-            <p className="home-info-text">Nenhum serviço em andamento.</p>
-          )}
-
-          {!carregando && !erro && servicos.length > 0 && (
-            <div className="home-servicos-lista">
-              {servicos.slice(0, 5).map((s) => (
-                <div key={s.id || s.codigo} className="home-servico-card">
-                  <div className="home-servico-linha">
-                    <span className="home-servico-label">Cliente:</span>
-                    <span className="home-servico-valor">
-                      {s.cliente?.nome || s.nomeCliente || "—"}
-                    </span>
-                  </div>
-
-                  <div className="home-servico-linha">
-                    <span className="home-servico-label">Serviço:</span>
-                    <span className="home-servico-valor">
-                      {s.descricao || s.servico || "—"}
-                    </span>
-                  </div>
-
-                  <div className="home-servico-linha">
-                    <span className="home-servico-label">Veículo:</span>
-                    <span className="home-servico-valor">
-                      {s.modelo || s.carro || s.veiculo || "—"}
-                    </span>
-                  </div>
-
-                  <div className="home-servico-footer">
-                    <span className="home-servico-status">
-                      {(s.status || s.situacao || "Em andamento").toString()}
-                    </span>
-
-                    <span className="home-servico-data">
-                      {s.data || s.dataEntrada || ""}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          <button
-            className="home-ver-todos-btn"
-            onClick={() => navigate("/servicos")}
-          >
-            Ver todos os serviços
-          </button>
+          <div className="home-card" onClick={() => navigate("/estoque")}>
+            <FaWarehouse className="card-icon" />
+            <h2>Estoque</h2>
+            <p>Controle peças e materiais da oficina.</p>
+          </div>
         </section>
 
-        {/* ======== CARDS ACESSOS RÁPIDOS ======== */}
-        <section className="home-cards-area-claro">
-          <h2 className="home-cards-title-claro">Acessos rápidos</h2>
+        {/* serviços em andamento */}
+        <section className="servicos-section">
+          <h2>Serviços em andamento</h2>
 
-          <div className="home-cards-grid-claro">
-            <div className="home-card-claro" onClick={() => navigate("/servicos")}>
-              <div className="home-card-icon-wrapper-claro">
-                <FaTools className="home-card-icon-claro" />
-              </div>
-              <h3 className="home-card-title-claro">Serviços</h3>
-              <p className="home-card-text-claro">Gerencie os serviços.</p>
-            </div>
+          {erro && <p className="erro-texto">{erro}</p>}
 
-            <div className="home-card-claro" onClick={() => navigate("/clientes")}>
-              <div className="home-card-icon-wrapper-claro">
-                <FaUsers className="home-card-icon-claro" />
-              </div>
-              <h3 className="home-card-title-claro">Clientes</h3>
-              <p className="home-card-text-claro">Cadastre e consulte clientes.</p>
-            </div>
+          {!erro && servicosEmAndamento.length === 0 && (
+            <p className="sem-servicos">
+              Nenhum serviço em andamento no momento.
+            </p>
+          )}
 
-            <div className="home-card-claro" onClick={() => navigate("/registro")}>
-              <div className="home-card-icon-wrapper-claro">
-                <FaCamera className="home-card-icon-claro" />
-              </div>
-              <h3 className="home-card-title-claro">Registro</h3>
-              <p className="home-card-text-claro">Fotos e anotações.</p>
-            </div>
+          <div className="servicos-lista">
+            {servicosEmAndamento.map((servico) => (
+              <div key={servico.id} className="servico-card">
+                <div className="servico-linha">
+                  <span className="servico-label">Cliente:</span>
+                  <span className="servico-valor">
+                    {servico.cliente ? servico.cliente.nome : "—"}
+                  </span>
+                </div>
 
-            <div className="home-card-claro" onClick={() => navigate("/estoque")}>
-              <div className="home-card-icon-wrapper-claro">
-                <FaWarehouse className="home-card-icon-claro" />
+                <div className="servico-linha">
+                  <span className="servico-label">Descrição:</span>
+                  <span className="servico-valor">{servico.descricao}</span>
+                </div>
+
+                <div className="servico-linha">
+                  <span className="servico-label">Valor total:</span>
+                  <span className="servico-valor">
+                    R$ {Number(servico.valor_total || 0).toFixed(2)}
+                  </span>
+                </div>
+
+                <div className="servico-linha">
+                  <span className="servico-label">Início:</span>
+                  <span className="servico-valor">
+                    {servico.data_ini
+                      ? new Date(servico.data_ini).toLocaleDateString()
+                      : "—"}
+                  </span>
+                </div>
               </div>
-              <h3 className="home-card-title-claro">Estoque</h3>
-              <p className="home-card-text-claro">Peças e produtos.</p>
-            </div>
+            ))}
           </div>
         </section>
       </main>

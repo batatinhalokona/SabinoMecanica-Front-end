@@ -1,52 +1,144 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { FaUserPlus, FaUsers } from "react-icons/fa";
+import api from "../api/api";
 import "./Clientes.css";
 
-// ATENÇÃO: agora o caminho está CORRETO (sobe duas pastas)
-import clienteImg from "../../assets/clientes-vintage.png";
-
 export default function Clientes() {
-  const navigate = useNavigate();
+  const [clientes, setClientes] = useState([]);
+  const [nome, setNome] = useState("");
+  const [cpf, setCpf] = useState("");
+  const [telefone, setTelefone] = useState("");
+  const [erro, setErro] = useState(null);
+
+  const carregarClientes = async () => {
+    try {
+      const response = await api.get("/api/clientes"); // <-- IGUAL AO BACK
+      setClientes(response.data);
+      setErro(null);
+    } catch (error) {
+      console.error("Erro ao buscar clientes:", error);
+      setErro("Não foi possível carregar os clientes.");
+    }
+  };
+
+  useEffect(() => {
+    carregarClientes();
+  }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const novoCliente = {
+      nome,
+      cpf,
+      telefone,
+      endereco: null, // por enquanto não vamos mexer com endereço
+    };
+
+    try {
+      await api.post("/api/clientes", novoCliente);
+      setNome("");
+      setCpf("");
+      setTelefone("");
+      carregarClientes(); // recarrega lista
+    } catch (error) {
+      console.error("Erro ao salvar cliente:", error);
+      setErro("Erro ao salvar cliente.");
+    }
+  };
 
   return (
-    <div className="clientes-root">
-      {/* ------------------ CABEÇALHO ------------------ */}
-      <header className="clientes-header">
-        <h1 className="clientes-titulo">👥 Clientes da Oficina Sabino</h1>
-        <p className="clientes-subtitulo">
-          Gerencie cadastros, contatos, pendências e histórico de atendimento.
-        </p>
-      </header>
+    <div className="clientes-container">
+      <div className="clientes-content">
+        <section className="clientes-info">
+          <h1>Clientes</h1>
+          <p className="clientes-subtitulo">
+            Cadastre e gerencie os clientes da Oficina Sabino.
+          </p>
 
-      {/* ------------------ CONTEÚDO ------------------ */}
-      <main className="clientes-main">
-        {/* ======== IMAGEM LADO ESQUERDO ======== */}
-        <div className="clientes-img-container">
-          <img
-            src={clienteImg}
-            alt="Ilustração de cliente da oficina"
-            className="clientes-img"
-          />
-        </div>
+          <div className="clientes-cards-row">
+            <div className="clientes-card">
+              <FaUsers className="clientes-card-icon" />
+              <h2>Lista de clientes</h2>
+              <p>Veja todos os clientes cadastrados.</p>
+            </div>
 
-        {/* ======== CARDS LADO DIREITO ======== */}
-        <section className="clientes-cards-container">
-          <div className="clientes-card" onClick={() => navigate("/clientes")}>
-            <h2>🔧 Clientes em Atendimento</h2>
-            <p>Veja os clientes que possuem serviços em execução.</p>
+            <div className="clientes-card">
+              <FaUserPlus className="clientes-card-icon" />
+              <h2>Novo cliente</h2>
+              <p>Cadastre rapidamente um novo cliente.</p>
+            </div>
           </div>
 
-          <div className="clientes-card" onClick={() => navigate("/clientes")}>
-            <h2>💰 Clientes Pendentes</h2>
-            <p>Clientes com serviços ou pagamentos em aberto/atraso.</p>
-          </div>
+          <form className="clientes-form" onSubmit={handleSubmit}>
+            <div className="form-grupo">
+              <label>Nome do cliente</label>
+              <input
+                type="text"
+                placeholder="Ex.: João da Silva"
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+              />
+            </div>
 
-          <div className="clientes-card" onClick={() => navigate("/clientes")}>
-            <h2>📜 Histórico de Clientes</h2>
-            <p>Visualize atendimentos finalizados e serviços anteriores.</p>
+            <div className="form-grupo">
+              <label>CPF</label>
+              <input
+                type="text"
+                placeholder="000.000.000-00"
+                value={cpf}
+                onChange={(e) => setCpf(e.target.value)}
+              />
+            </div>
+
+            <div className="form-grupo">
+              <label>Telefone</label>
+              <input
+                type="text"
+                placeholder="(48) 99999-9999"
+                value={telefone}
+                onChange={(e) => setTelefone(e.target.value)}
+              />
+            </div>
+
+            <button type="submit" className="clientes-botao-salvar">
+              Salvar cliente
+            </button>
+          </form>
+
+          {erro && <p className="erro-texto">{erro}</p>}
+
+          {/* tabela simples de clientes */}
+          <div className="clientes-lista">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>CPF</th>
+                  <th>Telefone</th>
+                </tr>
+              </thead>
+              <tbody>
+                {clientes.map((c) => (
+                  <tr key={c.id}>
+                    <td>{c.nome}</td>
+                    <td>{c.cpf}</td>
+                    <td>{c.telefone}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </section>
-      </main>
+
+        <section className="clientes-imagem">
+          <div className="carro-placeholder">
+            <span className="carro-texto">
+              Aqui depois vamos colocar a imagem do carro estilizado
+            </span>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }
