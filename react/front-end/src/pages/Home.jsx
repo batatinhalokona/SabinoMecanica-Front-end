@@ -7,13 +7,13 @@ import { FaTools, FaUsers, FaWarehouse, FaCamera } from "react-icons/fa";
 // Estilo
 import "./Home.css";
 
-// API backend (axios configurado)
+// API backend configurada
 import api from "../api/api";
 
 export default function Home() {
   const navigate = useNavigate();
 
-  // Estados
+  // Estado de serviços
   const [servicos, setServicos] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
@@ -27,7 +27,7 @@ export default function Home() {
     navigate("/login");
   };
 
-  // Buscar serviços em andamento
+  // Buscar serviços
   useEffect(() => {
     if (!usuario) {
       navigate("/login");
@@ -38,10 +38,10 @@ export default function Home() {
       try {
         setCarregando(true);
         setErro("");
+
         const resp = await api.get("/servico");
         const lista = resp.data || [];
 
-        // Filtrar status
         const emAndamento = lista.filter((s) => {
           const status = (s.status || s.situacao || "").toString().toUpperCase();
           return (
@@ -54,7 +54,6 @@ export default function Home() {
 
         setServicos(emAndamento.length > 0 ? emAndamento : lista);
       } catch (e) {
-        console.log(e);
         setErro("Erro ao carregar serviços.");
       } finally {
         setCarregando(false);
@@ -73,10 +72,10 @@ export default function Home() {
         <div className="home-header-textos">
           <h1 className="home-header-titulo">Painel da Oficina Sabino</h1>
           <p className="home-header-subtitulo">
-            Acompanhe os serviços em andamento e acesse rapidamente os setores.
+            Acompanhe serviços e acesse rapidamente os setores.
           </p>
           <p className="home-header-usuario">
-            Olá, <strong>{usuario.nome || "Gerente"}</strong> 👋
+            Olá, <strong>{usuario.nome || "Gerente"}</strong>
           </p>
         </div>
 
@@ -87,11 +86,11 @@ export default function Home() {
 
       {/* =================== CONTEÚDO =================== */}
       <main className="home-main-claro">
-        {/* ========== COLUNA ESQUERDA (Serviços) ========== */}
+        {/* ======== SERVIÇOS EM ANDAMENTO ======== */}
         <section className="home-servicos-section">
           <h2 className="home-section-title">Serviços em andamento</h2>
           <p className="home-section-subtitle">
-            Veja os principais serviços sendo executados agora.
+            Veja rapidamente os serviços que estão em execução.
           </p>
 
           {carregando && <p className="home-info-text">Carregando...</p>}
@@ -148,7 +147,7 @@ export default function Home() {
           </button>
         </section>
 
-        {/* ========== COLUNA DIREITA (Acessos rápidos) ========== */}
+        {/* ======== CARDS ACESSOS RÁPIDOS ======== */}
         <section className="home-cards-area-claro">
           <h2 className="home-cards-title-claro">Acessos rápidos</h2>
 
@@ -158,7 +157,7 @@ export default function Home() {
                 <FaTools className="home-card-icon-claro" />
               </div>
               <h3 className="home-card-title-claro">Serviços</h3>
-              <p className="home-card-text-claro">Gerencie os serviços da oficina.</p>
+              <p className="home-card-text-claro">Gerencie os serviços.</p>
             </div>
 
             <div className="home-card-claro" onClick={() => navigate("/clientes")}>
@@ -166,7 +165,7 @@ export default function Home() {
                 <FaUsers className="home-card-icon-claro" />
               </div>
               <h3 className="home-card-title-claro">Clientes</h3>
-              <p className="home-card-text-claro">Controle de clientes e contatos.</p>
+              <p className="home-card-text-claro">Cadastre e consulte clientes.</p>
             </div>
 
             <div className="home-card-claro" onClick={() => navigate("/registro")}>
@@ -174,7 +173,7 @@ export default function Home() {
                 <FaCamera className="home-card-icon-claro" />
               </div>
               <h3 className="home-card-title-claro">Registro</h3>
-              <p className="home-card-text-claro">Fotos e anotações rápidas.</p>
+              <p className="home-card-text-claro">Fotos e anotações.</p>
             </div>
 
             <div className="home-card-claro" onClick={() => navigate("/estoque")}>
@@ -182,7 +181,7 @@ export default function Home() {
                 <FaWarehouse className="home-card-icon-claro" />
               </div>
               <h3 className="home-card-title-claro">Estoque</h3>
-              <p className="home-card-text-claro">Peças e óleo da oficina.</p>
+              <p className="home-card-text-claro">Peças e produtos.</p>
             </div>
           </div>
         </section>

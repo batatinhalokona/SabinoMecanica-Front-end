@@ -1,11 +1,23 @@
-/* =================== FUNDO E ESTRUTURA =================== */
+/* =================== FUNDO E BASE =================== */
 
 .home-root-claro {
   width: 100%;
   min-height: 100vh;
-  background-color: #d6cbb1;
+  background-color: #d6cbb1; /* COR AREIA */
   padding: 24px 16px 40px;
   font-family: Arial, Helvetica, sans-serif;
+  animation: home-fade-in 0.35s ease-out;
+}
+
+@keyframes home-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* =================== HEADER =================== */
@@ -18,11 +30,11 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 10px;
+  color: #1f2933;
 }
 
 .home-header-textos {
   text-align: left;
-  color: #1f2933;
 }
 
 .home-header-titulo {
@@ -41,7 +53,7 @@
   color: #4b5563;
 }
 
-/* BOTÃO SAIR */
+/* ======== BOTÃO SAIR ======== */
 
 .home-sair-btn {
   padding: 8px 14px;
@@ -61,7 +73,7 @@
   box-shadow: 0 3px 8px rgba(239, 68, 68, 0.5);
 }
 
-/* =================== CONTEÚDO =================== */
+/* =================== CONTEÚDO (2 COLUNAS) =================== */
 
 .home-main-claro {
   max-width: 1100px;
@@ -69,9 +81,10 @@
   display: flex;
   flex-wrap: wrap;
   gap: 24px;
+  align-items: flex-start;
 }
 
-/* ===== COLUNA ESQUERDA (Serviços) ===== */
+/* =================== SERVIÇOS (ESQUERDA) =================== */
 
 .home-servicos-section {
   flex: 1 1 380px;
@@ -103,7 +116,8 @@
   color: #b91c1c;
 }
 
-/* Lista de serviços */
+/* ====== LISTA DE SERVIÇOS ====== */
+
 .home-servicos-lista {
   display: flex;
   flex-direction: column;
@@ -117,6 +131,12 @@
   border-radius: 10px;
   padding: 10px 12px;
   border: 1px solid #e5e7eb;
+  transition: 0.15s ease;
+}
+
+.home-servico-card:hover {
+  transform: translateX(3px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 
 .home-servico-linha {
@@ -136,10 +156,13 @@
   color: #374151;
 }
 
+/* ====== STATUS E DATA ====== */
+
 .home-servico-footer {
   margin-top: 6px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
 }
 
 .home-servico-status {
@@ -155,6 +178,8 @@
   font-size: 0.8rem;
   color: #6b7280;
 }
+
+/* ====== BOTÃO VER TODOS ====== */
 
 .home-ver-todos-btn {
   margin-top: 4px;
@@ -175,7 +200,7 @@
   box-shadow: 0 3px 10px rgba(22, 101, 52, 0.5);
 }
 
-/* ===== COLUNA DIREITA (Acessos rápidos) ===== */
+/* =================== CARDS ACESSOS RÁPIDOS (DIREITA) =================== */
 
 .home-cards-area-claro {
   flex: 1 1 280px;
@@ -250,5 +275,13 @@
   .home-header-claro {
     flex-direction: column;
     text-align: center;
+  }
+
+  .home-main-claro {
+    gap: 18px;
+  }
+
+  .home-servicos-section {
+    padding: 14px 12px 16px 12px;
   }
 }
