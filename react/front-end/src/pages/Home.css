@@ -1,287 +1,186 @@
-/* =================== FUNDO E BASE =================== */
+/* src/pages/Home.css */
 
-.home-root-claro {
-  width: 100%;
+/* Container geral da home ocupando a tela toda */
+.home-container {
   min-height: 100vh;
-  background-color: #d6cbb1; /* COR AREIA */
-  padding: 24px 16px 40px;
-  font-family: Arial, Helvetica, sans-serif;
-  animation: home-fade-in 0.35s ease-out;
-}
-
-@keyframes home-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* =================== HEADER =================== */
-
-.home-header-claro {
-  max-width: 1100px;
-  margin: 0 auto 24px auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  color: #1f2933;
-}
-
-.home-header-textos {
-  text-align: left;
-}
-
-.home-header-titulo {
-  font-size: 1.8rem;
-  margin-bottom: 4px;
-}
-
-.home-header-subtitulo {
-  font-size: 1rem;
-  color: #374151;
-  margin-bottom: 4px;
-}
-
-.home-header-usuario {
-  font-size: 0.95rem;
-  color: #4b5563;
-}
-
-/* ======== BOTÃO SAIR ======== */
-
-.home-sair-btn {
-  padding: 8px 14px;
-  border-radius: 999px;
-  border: 1px solid #b91c1c;
-  background-color: #dc2626;
-  color: #ffffff;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.15s;
-}
-
-.home-sair-btn:hover {
-  background-color: #ef4444;
-  transform: translateY(-1px);
-  box-shadow: 0 3px 8px rgba(239, 68, 68, 0.5);
-}
-
-/* =================== CONTEÚDO (2 COLUNAS) =================== */
-
-.home-main-claro {
-  max-width: 1100px;
-  margin: 0 auto;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
-  align-items: flex-start;
-}
-
-/* =================== SERVIÇOS (ESQUERDA) =================== */
-
-.home-servicos-section {
-  flex: 1 1 380px;
-  background-color: #ffffff;
-  border-radius: 12px;
-  padding: 18px 18px 20px 18px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-}
-
-.home-section-title {
-  font-size: 1.3rem;
-  margin-bottom: 4px;
-  color: #1f2933;
-}
-
-.home-section-subtitle {
-  font-size: 0.95rem;
-  color: #4b5563;
-  margin-bottom: 12px;
-}
-
-.home-info-text {
-  font-size: 0.9rem;
-  color: #4b5563;
-}
-
-.home-error-text {
-  font-size: 0.9rem;
-  color: #b91c1c;
-}
-
-/* ====== LISTA DE SERVIÇOS ====== */
-
-.home-servicos-lista {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-top: 8px;
-  margin-bottom: 12px;
+  background: linear-gradient(135deg, #0f172a, #111827); /* fundo escuro azulado */
+  color: #f9fafb;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-.home-servico-card {
-  background-color: #f9fafb;
-  border-radius: 10px;
-  padding: 10px 12px;
-  border: 1px solid #e5e7eb;
-  transition: 0.15s ease;
-}
-
-.home-servico-card:hover {
-  transform: translateX(3px);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-}
-
-.home-servico-linha {
+/* Cabeçalho no topo */
+.home-header {
   display: flex;
-  gap: 4px;
-  margin-bottom: 3px;
-}
-
-.home-servico-label {
-  font-weight: 600;
-  font-size: 0.85rem;
-  color: #111827;
-}
-
-.home-servico-valor {
-  font-size: 0.85rem;
-  color: #374151;
-}
-
-/* ====== STATUS E DATA ====== */
-
-.home-servico-footer {
-  margin-top: 6px;
-  display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
+  padding: 16px 32px;
+  border-bottom: 1px solid #1f2933;
 }
 
-.home-servico-status {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #065f46;
-  background-color: #d1fae5;
-  padding: 2px 8px;
-  border-radius: 999px;
-}
-
-.home-servico-data {
-  font-size: 0.8rem;
-  color: #6b7280;
-}
-
-/* ====== BOTÃO VER TODOS ====== */
-
-.home-ver-todos-btn {
-  margin-top: 4px;
-  padding: 8px 14px;
-  border-radius: 999px;
-  border: 1px solid #14532d;
-  background-color: #14532d;
-  color: #f9fafb;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.15s;
-}
-
-.home-ver-todos-btn:hover {
-  background-color: #166534;
-  transform: translateY(-1px);
-  box-shadow: 0 3px 10px rgba(22, 101, 52, 0.5);
-}
-
-/* =================== CARDS ACESSOS RÁPIDOS (DIREITA) =================== */
-
-.home-cards-area-claro {
-  flex: 1 1 280px;
-}
-
-.home-cards-title-claro {
-  font-size: 1.1rem;
-  margin-bottom: 10px;
-  color: #1f2933;
-}
-
-.home-cards-grid-claro {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-}
-
-.home-card-claro {
-  background-color: #ffffff;
-  border-radius: 12px;
-  padding: 12px 14px;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  cursor: pointer;
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  transition: 0.15s ease;
-}
-
-.home-card-claro:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-}
-
-.home-card-icon-wrapper-claro {
-  width: 38px;
-  height: 38px;
-  border-radius: 999px;
-  background-color: #14532d;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.home-card-icon-claro {
-  font-size: 1.2rem;
-  color: #f9fafb;
-}
-
-.home-card-title-claro {
-  font-size: 1rem;
-  font-weight: 600;
+.home-header-left h1 {
   margin: 0;
-  color: #1f2933;
+  font-size: 24px;
 }
 
-.home-card-text-claro {
-  font-size: 0.85rem;
-  margin-top: 2px;
-  color: #4b5563;
+.home-header-left span {
+  font-size: 14px;
+  color: #9ca3af;
 }
 
-/* =================== RESPONSIVO =================== */
+/* Botão de logout */
+.logout-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background-color: #ef4444;
+  border: none;
+  color: #f9fafb;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
 
-@media (max-width: 768px) {
-  .home-sair-btn {
-    width: 100%;
-    text-align: center;
+.logout-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.logout-icon {
+  font-size: 18px;
+}
+
+/* Conteúdo principal abaixo do cabeçalho */
+.home-main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1.2fr 2fr;
+  gap: 24px;
+  padding: 24px 32px;
+}
+
+/* Seção dos cards de navegação (esquerda) */
+.cards-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Card padrão da home (Serviços, Clientes, Estoque) */
+.home-card {
+  background: rgba(15, 23, 42, 0.9);
+  border-radius: 16px;
+  padding: 16px;
+  border: 1px solid #1f2937;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.home-card:hover {
+  transform: translateY(-2px);
+  border-color: #3b82f6;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Ícone dentro do card */
+.card-icon {
+  font-size: 28px;
+}
+
+/* Título do card */
+.home-card h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+/* Texto do card */
+.home-card p {
+  margin: 4px 0 0 0;
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+/* Seção de serviços em andamento (direita) */
+.servicos-section {
+  background: rgba(15, 23, 42, 0.95);
+  border-radius: 16px;
+  padding: 16px;
+  border: 1px solid #1f2937;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Título da seção de serviços */
+.servicos-section h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+/* Texto de erro */
+.erro-texto {
+  color: #f97373;
+  font-size: 14px;
+}
+
+/* Texto quando não há serviços */
+.sem-servicos {
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+/* Lista com os cards de serviços */
+.servicos-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+/* Card individual de serviço */
+.servico-card {
+  background: #020617;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #1f2937;
+}
+
+/* Linha dentro do card de serviço */
+.servico-linha {
+  display: flex;
+  gap: 8px;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+/* Label (nome do campo) */
+.servico-label {
+  font-weight: 600;
+}
+
+/* Valor do campo */
+.servico-valor {
+  color: #e5e7eb;
+}
+
+/* Responsivo para telas menores */
+@media (max-width: 900px) {
+  .home-main {
+    grid-template-columns: 1fr;
   }
 
-  .home-header-claro {
-    flex-direction: column;
-    text-align: center;
+  .servicos-section {
+    order: 1;
   }
 
-  .home-main-claro {
-    gap: 18px;
-  }
-
-  .home-servicos-section {
-    padding: 14px 12px 16px 12px;
+  .cards-section {
+    order: 2;
   }
 }

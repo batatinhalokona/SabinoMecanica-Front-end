@@ -1,9 +1,11 @@
 // src/api/api.js
 import axios from "axios";
 
-// Configura a URL base para o backend Java
+// Instância do Axios apontando para o backend Java (Spring Boot)
 const api = axios.create({
-  baseURL: "http://localhost:8080/api", // ajusta depois conforme suas rotas do Spring
+  // IMPORTANTE: não colocar /api aqui,
+  // porque nas chamadas usamos "/api/clientes", "/api/servicos", etc.
+  baseURL: "http://localhost:8080",
 });
 
 export default api;

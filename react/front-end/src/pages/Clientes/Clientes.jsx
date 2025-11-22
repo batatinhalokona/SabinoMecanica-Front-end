@@ -1,18 +1,24 @@
+// src/pages/Clientes/Clientes.jsx
 import React, { useEffect, useState } from "react";
 import { FaUserPlus, FaUsers } from "react-icons/fa";
-import api from "../api/api";
+// IMPORTANTE: aqui precisa subir duas pastas até src/api/api.js
+import api from "../../api/api";
 import "./Clientes.css";
 
 export default function Clientes() {
+  // Lista de clientes vindos do backend
   const [clientes, setClientes] = useState([]);
+  // Campos do formulário
   const [nome, setNome] = useState("");
   const [cpf, setCpf] = useState("");
   const [telefone, setTelefone] = useState("");
+  // Mensagem de erro
   const [erro, setErro] = useState(null);
 
+  // Função para carregar clientes da API
   const carregarClientes = async () => {
     try {
-      const response = await api.get("/api/clientes"); // <-- IGUAL AO BACK
+      const response = await api.get("/api/clientes");
       setClientes(response.data);
       setErro(null);
     } catch (error) {
@@ -21,10 +27,12 @@ export default function Clientes() {
     }
   };
 
+  // Carrega clientes ao montar o componente
   useEffect(() => {
     carregarClientes();
   }, []);
 
+  // Envio do formulário de novo cliente
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -32,15 +40,17 @@ export default function Clientes() {
       nome,
       cpf,
       telefone,
-      endereco: null, // por enquanto não vamos mexer com endereço
+      endereco: null, // por enquanto não usamos endereço
     };
 
     try {
       await api.post("/api/clientes", novoCliente);
+      // Limpa campos
       setNome("");
       setCpf("");
       setTelefone("");
-      carregarClientes(); // recarrega lista
+      // Recarrega lista
+      carregarClientes();
     } catch (error) {
       console.error("Erro ao salvar cliente:", error);
       setErro("Erro ao salvar cliente.");
@@ -50,6 +60,7 @@ export default function Clientes() {
   return (
     <div className="clientes-container">
       <div className="clientes-content">
+        {/* Lado esquerdo: formulário + cards */}
         <section className="clientes-info">
           <h1>Clientes</h1>
           <p className="clientes-subtitulo">
@@ -60,7 +71,7 @@ export default function Clientes() {
             <div className="clientes-card">
               <FaUsers className="clientes-card-icon" />
               <h2>Lista de clientes</h2>
-              <p>Veja todos os clientes cadastrados.</p>
+              <p>Veja os clientes cadastrados e seus dados básicos.</p>
             </div>
 
             <div className="clientes-card">
@@ -70,6 +81,7 @@ export default function Clientes() {
             </div>
           </div>
 
+          {/* Formulário de cadastro */}
           <form className="clientes-form" onSubmit={handleSubmit}>
             <div className="form-grupo">
               <label>Nome do cliente</label>
@@ -108,7 +120,7 @@ export default function Clientes() {
 
           {erro && <p className="erro-texto">{erro}</p>}
 
-          {/* tabela simples de clientes */}
+          {/* Tabela simples com a lista de clientes */}
           <div className="clientes-lista">
             <table>
               <thead>
@@ -131,6 +143,7 @@ export default function Clientes() {
           </div>
         </section>
 
+        {/* Lado direito: área pra imagem estilo carro */}
         <section className="clientes-imagem">
           <div className="carro-placeholder">
             <span className="carro-texto">
