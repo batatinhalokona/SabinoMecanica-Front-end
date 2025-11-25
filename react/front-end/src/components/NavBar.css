@@ -1,101 +1,161 @@
-/* ===== ESTILO GERAL ===== */
+/* ============================
+   NAVBAR PRINCIPAL
+============================ */
 .navbar {
-  background-color: #1e293b; /* Azul escuro profissional */
-  color: #fff;
+  width: 100%;
+  height: 70px;
+  background: #123324; /* verde bem escuro */
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 0.8rem 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  justify-content: space-between;
+  padding: 0 26px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 1000;
 }
 
-.navbar-logo {
-  font-size: 1.4rem;
-  font-weight: bold;
-  cursor: pointer;
+/* ============================
+   LADO ESQUERDO - LOGO
+============================ */
+.navbar-left {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 8px;
 }
 
-.navbar-logo span {
-  color: #38bdf8; /* Azul claro destaque */
+.navbar-logo-icon {
+  font-size: 1.3rem;
+  color: #f9fafb;
 }
 
-/* ===== LINKS ===== */
+.navbar-logo-text {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #f9fafb;
+}
+
+
+
+/* ============================
+   LINKS DA NAVBAR (LADO DIREITO)
+============================ */
 .navbar-links {
+  list-style: none;
   display: flex;
-  gap: 1.5rem;
+  gap: 18px;
+  margin-right: 16px;
+}
+
+.navbar-links li {
+  display: flex;
+}
+
+/* Link base */
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #f0f4f8;
+  text-decoration: none;
+  font-size: 0.95rem;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 500;
+  transition: 0.2s ease;
+}
+
+.nav-icon {
+  font-size: 1rem;
+}
+
+/* Hover dos links */
+.nav-link:hover {
+  background: rgba(248, 250, 252, 0.1);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.45);
+}
+
+/* Link ativo */
+.nav-link.active {
+  background: #f97316; /* laranja */
+  color: #111827;
+  box-shadow: 0 0 10px rgba(249, 115, 22, 0.8);
+}
+
+/* ============================
+   BOTÃO SAIR
+============================ */
+.navbar-right {
+  display: flex;
   align-items: center;
 }
 
-.navbar-links a {
-  color: #fff;
-  text-decoration: none;
-  font-size: 1rem;
-  transition: 0.2s;
-}
-
-.navbar-links a:hover {
-  color: #38bdf8;
-  transform: scale(1.05);
-}
-
-/* ===== BOTÃO SAIR ===== */
-.logout {
-  background-color: #ef4444;
+.btn-sair {
+  background: #dc2626;
+  color: #f9fafb;
   border: none;
-  color: #fff;
-  padding: 0.4rem 0.9rem;
-  border-radius: 6px;
-  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-weight: 600;
   cursor: pointer;
-  transition: 0.2s;
+  transition: 0.2s ease-in-out;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.65);
 }
 
-.logout:hover {
-  background-color: #dc2626;
-  transform: scale(1.05);
+.btn-sair:hover {
+  background: #b91c1c;
+  box-shadow: 0 0 12px rgba(248, 113, 113, 0.9);
+  transform: translateY(-1px);
 }
 
-/* ===== MENU MOBILE ===== */
-.menu-toggle {
-  display: none;
-  background: none;
-  border: none;
-  color: #fff;
-  font-size: 1.8rem;
-  cursor: pointer;
-}
-
-/* ===== RESPONSIVO ===== */
-@media (max-width: 768px) {
-  .menu-toggle {
-    display: block;
+/* ============================
+   RESPONSIVO
+============================ */
+@media (max-width: 950px) {
+  .navbar {
+    padding: 0 14px;
   }
 
   .navbar-links {
-    display: none;
-    flex-direction: column;
-    background-color: #1e293b;
-    position: absolute;
-    top: 60px;
-    right: 0;
-    width: 200px;
-    padding: 1rem;
-    border-left: 2px solid #38bdf8;
+    gap: 10px;
+    margin-right: 8px;
   }
 
-  .navbar-links.ativo {
-    display: flex;
+  .nav-link {
+    padding: 5px 8px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 750px) {
+  .navbar {
+    flex-wrap: wrap;
+    height: auto;
+    gap: 8px;
+    padding: 8px 12px;
   }
 
-  .navbar-links a,
-  .logout {
+  .navbar-center {
+    order: 3;
     width: 100%;
-    text-align: left;
+    margin-top: 4px;
+    justify-content: center;
+  }
+
+  .navbar-links {
+    order: 2;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .navbar-right {
+    order: 4;
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .btn-sair {
+    padding: 6px 14px;
   }
 }

@@ -5,59 +5,42 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
-// ============================
-// Layout base e rotas protegidas
-// ============================
-import App from "./App"; 
+// Layout base + rota privada
+import App from "./App";
 import RotaPrivada from "./router/RotaPrivada";
 
-// ============================
 // Páginas principais
-// ============================
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 
-// ============================
-// Páginas de Clientes (APENAS UMA)
-// ============================
+// Páginas de Clientes
 import Clientes from "./pages/Clientes/Clientes";
 
-// ============================
 // Páginas de Serviços
-// ============================
 import Servicos from "./pages/Servicos/Servicos";
 import ServicoAndamento from "./pages/Servicos/ServicoAndamento";
 import ServicoGarantia from "./pages/Servicos/ServicoGarantia";
 import ServicoHistorico from "./pages/Servicos/ServicoHistorico";
 
-// ============================
-// Páginas de Registro (APENAS UMA)
-// ============================
+// Páginas de Registro
 import Registro from "./pages/Registro/Registro";
 
-// ============================
-// Páginas de Estoque (APENAS UMA)
-// ============================
+// Páginas de Estoque
 import Estoque from "./pages/Estoque/Estoque";
 
-// ============================
-// CSS Global
-// ============================
+// Nova página de Carros
+import Carros from "./pages/Carros/Carros";
+
+// CSS global
 import "./index.css";
 import "./App.css";
 
-// ============================
 // Rotas
-// ============================
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />, // Layout principal
+    element: <App />,
     children: [
-      // ====== Login ======
-      { path: "/login", element: <Login /> },
-
-      // ====== Home ======
       {
         path: "/home",
         element: (
@@ -66,8 +49,6 @@ const router = createBrowserRouter([
           </RotaPrivada>
         ),
       },
-
-      // ====== Clientes ======
       {
         path: "/clientes",
         element: (
@@ -76,28 +57,6 @@ const router = createBrowserRouter([
           </RotaPrivada>
         ),
       },
-
-      // ====== Registro ======
-      {
-        path: "/registro",
-        element: (
-          <RotaPrivada>
-            <Registro />
-          </RotaPrivada>
-        ),
-      },
-
-      // ====== Estoque ======
-      {
-        path: "/estoque",
-        element: (
-          <RotaPrivada>
-            <Estoque />
-          </RotaPrivada>
-        ),
-      },
-
-      // ====== Serviços ======
       {
         path: "/servicos",
         element: (
@@ -130,13 +89,38 @@ const router = createBrowserRouter([
           </RotaPrivada>
         ),
       },
+      {
+        path: "/registro",
+        element: (
+          <RotaPrivada>
+            <Registro />
+          </RotaPrivada>
+        ),
+      },
+      {
+        path: "/estoque",
+        element: (
+          <RotaPrivada>
+            <Estoque />
+          </RotaPrivada>
+        ),
+      },
+      {
+        path: "/carros",
+        element: (
+          <RotaPrivada>
+            <Carros />
+          </RotaPrivada>
+        ),
+      },
     ],
+  },
+  {
+    path: "/login",
+    element: <Login />,
   },
 ]);
 
-// ============================
-// Renderização
-// ============================
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <RouterProvider router={router} />

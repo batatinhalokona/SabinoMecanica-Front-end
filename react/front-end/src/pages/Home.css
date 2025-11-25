@@ -1,200 +1,232 @@
-/* fundo geral, igual estilo Serviços/Clientes */
-.home-page {
-  min-height: 100vh;
-  background-color: #d3c4a3;
-  font-family: Arial, Helvetica, sans-serif;
-  padding-top: 70px; /* espaço da navbar fixa */
-  position: relative;
-}
-
-/* botão de sair no topo direito */
-.home-logout {
-  position: absolute;
-  top: 80px;
-  right: 32px;
+/* ============================
+   CONTAINER PRINCIPAL
+============================ */
+.home-container {
+  width: 100%;
+  min-height: calc(100vh - 70px);
   display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 999px;
-  border: none;
-  background-color: #7f1d1d;
-  color: #ffffff;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 3px 8px rgba(15, 23, 42, 0.4);
-  transition: transform 0.15s ease, box-shadow 0.15s ease,
-    background-color 0.15s ease;
+  flex-direction: column;
+  background-color: #d8ccb3; /* fundo padrão */
 }
 
-.home-logout:hover {
-  background-color: #b91c1c;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.5);
+/* ============================
+   CONTEÚDO COM ANIMAÇÃO
+============================ */
+.home-content {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding-inline: 24px;
+  padding-bottom: 40px;
 }
 
-.home-logout-icon {
-  font-size: 0.9rem;
+/* animação lateral igual outras telas */
+.page-transition-side {
+  opacity: 0;
+  transform: translateX(35px);
+  animation: home-slide 0.45s ease-out forwards;
 }
 
-/* cabeçalho centralizado */
+@keyframes home-slide {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ============================
+   CABEÇALHO
+============================ */
 .home-header {
   text-align: center;
-  margin-bottom: 18px;
+  margin-top: 26px;
+  margin-bottom: 20px;
 }
 
-.home-title {
-  margin: 0;
+.home-header h1 {
   font-size: 2rem;
+  font-weight: 700;
   color: #1f2933;
 }
 
-.home-title-icon {
-  margin-right: 8px;
-}
-
-.home-subtitle {
-  margin-top: 4px;
-  font-size: 0.9rem;
+.home-header p {
+  font-size: 0.98rem;
   color: #374151;
 }
 
-/* conteúdo central: cards à esquerda, serviços à direita */
-.home-content {
-  max-width: 900px; /* mesmo enquadramento da tela de Clientes */
-  margin: 0 auto 32px auto;
-  display: grid;
-  grid-template-columns: 1.1fr 1.7fr;
-  gap: 28px;
-  padding: 0 16px;
-  align-items: flex-start;
+/* ============================
+   GRID DE CARDS
+============================ */
+.home-grid {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  justify-content: center;
 }
 
-/* coluna de cards */
-.home-cards-area {
+/* ============================
+   CARDS DETALHADOS
+============================ */
+.home-card {
+  background: #ffffff;
+  width: 240px;
+  min-height: 140px;
+  border-radius: 14px;
+  padding: 16px 14px;
+  cursor: pointer;
+
   display: flex;
   flex-direction: column;
-  gap: 14px;
-}
+  justify-content: flex-start;
+  text-align: left;
 
-/* card branco, estilo Serviços */
-.home-card {
-  background-color: #ffffff;
-  border-radius: 14px;
-  box-shadow: 0 3px 8px rgba(15, 23, 42, 0.18);
-  padding: 12px 14px;
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  position: relative;
+  overflow: hidden;
+
+  /* Detalhes de borda e sombra */
+  border: 1px dashed rgba(100, 100, 100, 0.3);
+  box-shadow:
+    2px 2px 4px rgba(0, 0, 0, 0.25),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.5),
+    inset -2px -2px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.2s ease;
 }
 
 .home-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 12px rgba(15, 23, 42, 0.28);
+  transform: translateY(-5px);
+  border-color: #22c55e;
+  box-shadow:
+    0 7px 16px rgba(0, 0, 0, 0.35),
+    inset 1px 1px 4px rgba(255, 255, 255, 0.7),
+    inset -1px -1px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* cabeçalho do card (ícone + título) */
-.home-card-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+/* detalhe tipo "placa metálica" no canto */
+.home-card::before {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  top: 6px;
+  right: 6px;
+  background: linear-gradient(45deg, #888, #ccc, #888);
+  box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.5);
 }
 
-.home-card-header h2 {
-  margin: 0;
-  font-size: 1.05rem;
-  color: #14532d;
+/* ============================
+   ÍCONE DOS CARDS
+============================ */
+.icone-card-home {
+  font-size: 2.2rem;
+  margin-bottom: 8px;
+  background: linear-gradient(90deg, #0284c7, #22c55e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.home-card-icon {
-  font-size: 1.3rem;
+/* ============================
+   TÍTULO E TEXTO DOS CARDS
+============================ */
+.home-card h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 4px;
 }
 
-.home-card-text {
-  margin: 4px 0 0 0;
-  font-size: 0.85rem;
+.home-card p {
+  font-size: 0.88rem;
   color: #4b5563;
 }
 
-/* coluna de serviços em andamento */
-.home-servicos-area {
-  background-color: #ffffff;
-  border-radius: 14px;
-  box-shadow: 0 3px 8px rgba(15, 23, 42, 0.18);
-  padding: 14px 16px;
+/* ============================
+   SEÇÃO SERVIÇOS EM ANDAMENTO
+============================ */
+.home-servicos-section {
+  margin-top: 30px;
+  background: rgba(255, 255, 255, 0.88);
+  border-radius: 16px;
+  padding: 18px 16px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+  border-left: 6px solid #0ea5e9;
+  border-right: 6px solid #22c55e;
 }
 
-.home-servicos-titulo {
-  margin: 0 0 8px 0;
-  font-size: 1.15rem;
-  color: #14532d;
+.home-servicos-section h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 4px;
 }
 
-/* mensagens */
-.home-erro {
-  margin-top: 4px;
-  font-size: 0.85rem;
-  color: #b91c1c;
-}
-
-.home-sem-servicos {
-  margin-top: 4px;
-  font-size: 0.85rem;
+.home-servicos-descricao {
+  font-size: 0.9rem;
   color: #4b5563;
+  margin-bottom: 12px;
 }
 
-/* lista de serviços */
+/* lista */
 .home-servicos-lista {
-  margin-top: 8px;
-  max-height: 260px;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
-/* cada serviço */
 .home-servico-card {
+  background: #f9fafb;
   border-radius: 10px;
-  border: 1px solid #e5e7eb;
-  padding: 8px 10px;
-  background-color: #f9fafb;
+  padding: 10px 12px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.25);
+  border-left: 4px solid #0ea5e9;
 }
 
-/* linhas dentro do card de serviço */
-.home-servico-linha {
+/* cabeçalho de cada serviço */
+.home-servico-header {
   display: flex;
-  gap: 6px;
-  font-size: 0.85rem;
-  margin-bottom: 2px;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
 }
 
-.home-servico-label {
-  font-weight: 600;
-  color: #374151;
-}
-
-.home-servico-valor {
+.home-servico-header strong {
+  font-size: 1rem;
   color: #111827;
 }
 
-/* responsivo: igual padrão das outras telas */
+.home-servico-status {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(34, 197, 94, 0.12);
+  color: #15803d;
+}
+
+/* linhas de info */
+.home-servico-linha {
+  font-size: 0.88rem;
+  color: #374151;
+}
+
+/* texto vazio */
+.texto-vazio-home {
+  font-size: 0.9rem;
+  color: #374151;
+  margin-top: 4px;
+}
+
+/* ============================
+   RESPONSIVO
+============================ */
 @media (max-width: 900px) {
-  .home-content {
-    grid-template-columns: 1fr;
-    gap: 20px;
+  .home-card {
+    width: 90%;
   }
 
-  .home-servicos-area {
-    order: 1;
-  }
-
-  .home-cards-area {
-    order: 2;
-  }
-
-  .home-logout {
-    top: 76px;
-    right: 16px;
+  .home-servicos-section {
+    margin-top: 24px;
+    padding: 14px 12px;
   }
 }
