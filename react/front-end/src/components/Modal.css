@@ -1,0 +1,91 @@
+/* Fundo escurecido atrás do modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.65);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  animation: fadeIn 0.25s ease-out;
+}
+
+/* Caixa do modal */
+.modal-container {
+  width: 90%;
+  max-width: 620px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: slideInScale 0.30s ease-out;
+}
+
+/* Header do modal */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  background: linear-gradient(90deg, #0ea5e9, #22c55e);
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.modal-close {
+  border: none;
+  background: transparent;
+  font-size: 1.2rem;
+  cursor: pointer;
+  font-weight: bold;
+  color: #0f172a;
+  transition: transform 0.15s ease;
+}
+
+.modal-close:hover {
+  transform: scale(1.2);
+}
+
+/* Conteúdo do modal */
+.modal-content {
+  padding: 18px 22px;
+  font-size: 0.95rem;
+  color: #111827;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+/* Animações */
+@keyframes slideInScale {
+  from {
+    transform: translateY(40px) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0px) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Responsivo */
+@media (max-width: 500px) {
+  .modal-container {
+    max-width: 380px;
+  }
+}

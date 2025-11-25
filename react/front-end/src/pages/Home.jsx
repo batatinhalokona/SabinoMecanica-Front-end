@@ -1,31 +1,28 @@
 // src/pages/Home.jsx
 import React, { useEffect, useState } from "react";
-// Ícones para os cards e botão sair
-import { FaTools, FaUsers, FaWarehouse, FaSignOutAlt } from "react-icons/fa";
-// Hook para navegação entre rotas
+import {
+  FaTools,
+  FaUsers,
+  FaWarehouse,
+  FaSignOutAlt,
+  FaHome,
+  FaClipboardList, // ícone para Registro
+} from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-// Nossa instância do Axios configurada
 import api from "../api/api";
-// Estilos específicos da Home
 import "./Home.css";
 
 export default function Home() {
-  // Lista completa de serviços vindos do backend
   const [servicos, setServicos] = useState([]);
-  // Texto de erro (se der problema na API)
   const [erro, setErro] = useState(null);
-  // Hook de navegação
   const navigate = useNavigate();
 
-  // Busca os serviços no backend quando a Home carrega
+  // carrega todos os serviços do backend
   useEffect(() => {
     const buscarServicos = async () => {
       try {
-        // Chamada para o endpoint do Spring Boot
         const response = await api.get("/api/servicos");
-        // Salva todos os serviços recebidos
         setServicos(response.data);
-        // Limpa erro, caso tivesse
         setErro(null);
       } catch (error) {
         console.error("Erro ao buscar serviços:", error);
@@ -36,114 +33,145 @@ export default function Home() {
     buscarServicos();
   }, []);
 
-  // Filtra apenas serviços em andamento (data_fim == null)
+  // considera em andamento quando data_fim é null
   const servicosEmAndamento = servicos.filter(
     (servico) => servico.data_fim === null
   );
 
-  // Função de logout da Home (limpa localStorage e volta pro login)
   const handleLogout = () => {
     localStorage.removeItem("usuario");
-    navigate("/login");
+    navigate("/"); // ajuste pra /login se for o teu caso
   };
 
   return (
-    // Container geral da página Home
-    <div className="home-container">
-      {/* Cabeçalho com título e botão de sair */}
-      <header className="home-header">
-        <div className="home-header-left">
-          <h1>Oficina Sabino</h1>
-          <span>Painel principal</span>
-        </div>
+    <div className="home-page">
+      {/* botão de sair no topo direito */}
+      <button className="home-logout" onClick={handleLogout}>
+        <FaSignOutAlt className="home-logout-icon" />
+        <span>Sair</span>
+      </button>
 
-        <button className="logout-button" onClick={handleLogout}>
-          <FaSignOutAlt className="logout-icon" />
-          <span>Sair</span>
-        </button>
+      {/* cabeçalho centralizado */}
+      <header className="home-header">
+        <h1 className="home-title">
+          <span className="home-title-icon">
+            <FaHome />
+          </span>
+          Painel da Oficina Sabino
+        </h1>
+        <p className="home-subtitle">
+          Acompanhe os serviços em andamento e acesse as principais áreas da
+          oficina.
+        </p>
       </header>
 
-      {/* Área principal: cards à esquerda e serviços à direita */}
-      <main className="home-main">
-        {/* Coluna de cards de navegação */}
-        <section className="cards-section">
-          {/* Card Serviços */}
+      <main className="home-content">
+        {/* coluna esquerda: cards de navegação */}
+        <section className="home-cards-area">
+          {/* Serviços */}
           <div
             className="home-card"
             onClick={() => navigate("/servicos")}
           >
-            <FaTools className="card-icon" />
-            <div>
+            <div className="home-card-header">
+              <span className="home-card-icon">
+                <FaTools />
+              </span>
               <h2>Serviços</h2>
-              <p>Gerencie serviços em andamento e concluídos.</p>
             </div>
+            <p className="home-card-text">
+              Gerencie serviços em andamento, concluídos e em garantia.
+            </p>
           </div>
 
-          {/* Card Clientes */}
+          {/* Clientes */}
           <div
             className="home-card"
             onClick={() => navigate("/clientes")}
           >
-            <FaUsers className="card-icon" />
-            <div>
+            <div className="home-card-header">
+              <span className="home-card-icon">
+                <FaUsers />
+              </span>
               <h2>Clientes</h2>
-              <p>Cadastre e consulte os dados dos seus clientes.</p>
             </div>
+            <p className="home-card-text">
+              Cadastre e consulte os clientes da Oficina Sabino.
+            </p>
           </div>
 
-          {/* Card Estoque */}
+          {/* Registro */}
+          <div
+            className="home-card"
+            onClick={() => navigate("/registro")}
+          >
+            <div className="home-card-header">
+              <span className="home-card-icon">
+                <FaClipboardList />
+              </span>
+              <h2>Registro</h2>
+            </div>
+            <p className="home-card-text">
+              Registre novos serviços, carros e informações gerais.
+            </p>
+          </div>
+
+          {/* Estoque */}
           <div
             className="home-card"
             onClick={() => navigate("/estoque")}
           >
-            <FaWarehouse className="card-icon" />
-            <div>
+            <div className="home-card-header">
+              <span className="home-card-icon">
+                <FaWarehouse />
+              </span>
               <h2>Estoque</h2>
-              <p>Controle peças novas, usadas e óleos da oficina.</p>
             </div>
+            <p className="home-card-text">
+              Visualize peças novas, usadas e óleos disponíveis.
+            </p>
           </div>
         </section>
 
-        {/* Coluna de serviços em andamento */}
-        <section className="servicos-section">
-          <h2>Serviços em andamento</h2>
+        {/* coluna direita: serviços em andamento */}
+        <section className="home-servicos-area">
+          <h2 className="home-servicos-titulo">Serviços em andamento</h2>
 
-          {/* Mensagem de erro (caso a API falhe) */}
-          {erro && <p className="erro-texto">{erro}</p>}
+          {erro && <p className="home-erro">{erro}</p>}
 
-          {/* Mensagem caso não tenha serviços em andamento */}
           {!erro && servicosEmAndamento.length === 0 && (
-            <p className="sem-servicos">
+            <p className="home-sem-servicos">
               Nenhum serviço em andamento no momento.
             </p>
           )}
 
-          {/* Lista dos serviços em andamento */}
-          <div className="servicos-lista">
+          <div className="home-servicos-lista">
             {servicosEmAndamento.map((servico) => (
-              <div key={servico.id} className="servico-card">
-                <div className="servico-linha">
-                  <span className="servico-label">Cliente:</span>
-                  <span className="servico-valor">
+              <div key={servico.id} className="home-servico-card">
+                <div className="home-servico-linha">
+                  <span className="home-servico-label">Cliente:</span>
+                  <span className="home-servico-valor">
                     {servico.cliente ? servico.cliente.nome : "—"}
                   </span>
                 </div>
 
-                <div className="servico-linha">
-                  <span className="servico-label">Descrição:</span>
-                  <span className="servico-valor">{servico.descricao}</span>
+                <div className="home-servico-linha">
+                  <span className="home-servico-label">Descrição:</span>
+                  <span className="home-servico-valor">
+                    {servico.descricao}
+                  </span>
                 </div>
 
-                <div className="servico-linha">
-                  <span className="servico-label">Valor total:</span>
-                  <span className="servico-valor">
+                <div className="home-servico-linha">
+                  <span className="home-servico-label">Valor total:</span>
+                  <span className="home-servico-valor">
                     R$ {Number(servico.valor_total || 0).toFixed(2)}
                   </span>
                 </div>
 
-                <div className="servico-linha">
-                  <span className="servico-label">Início:</span>
-                  <span className="servico-valor">
+                <div className="home-servico-linha">
+                  <span className="home-servico-label">Início:</span>
+                  <span className="home-servico-valor">
                     {servico.data_ini
                       ? new Date(servico.data_ini).toLocaleDateString()
                       : "—"}

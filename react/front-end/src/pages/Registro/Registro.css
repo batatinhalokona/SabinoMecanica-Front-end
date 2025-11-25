@@ -1,109 +1,286 @@
+/* =======================
+   CONTAINER PRINCIPAL
+======================= */
 .registro-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  width: 100%;
+  min-height: calc(100vh - 70px);
+  display: flex;
+  flex-direction: column;
+  background-color: #d8ccb3; /* mesmo visual da oficina */
 }
 
-/* ===== MENU PRINCIPAL ===== */
-.registro-menu {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.2rem;
-  margin-top: 2rem;
+/* =======================
+   TÍTULO + ANIMAÇÃO
+======================= */
+.registro-titulo {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-top: 26px;
+  margin-bottom: 20px;
+  color: #1f2933;
+}
+
+.registro-content {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding-bottom: 40px;
+  padding-inline: 24px;
+}
+
+.animar-registro {
+  opacity: 0;
+  transform: translateX(35px);
+  animation: registro-slide 0.45s ease-out forwards;
+}
+
+@keyframes registro-slide {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* =======================
+   GRID DE CARDS
+======================= */
+.registro-grid {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  justify-content: center;
+  margin-top: 14px;
 }
 
 .registro-card {
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
-  text-decoration: none;
-  color: #111;
-  transition: 0.2s;
+  background: #ffffff;
+  width: 240px;
+  height: 130px;
+  border-radius: 12px;
+  padding: 16px 14px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .registro-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-4px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.32);
 }
 
-.cliente-card {
-  border-left: 6px solid #007bff;
+.icon-reg {
+  font-size: 2rem;
+  background: linear-gradient(90deg, #0ea5e9, #22c55e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.servico-card {
-  border-left: 6px solid #ffcc00;
+.registro-card p {
+  margin-top: 6px;
+  font-size: 1rem;
+  color: #111827;
 }
 
-.carro-card {
-  border-left: 6px solid #00cc66;
-}
-
-/* ===== FORMULÁRIOS ===== */
-.registro-form {
-  max-width: 600px;
-  margin: 3vh auto;
-  background: #fff;
-  padding: 2rem;
+/* =======================
+   BUSCA
+======================= */
+.registro-busca {
+  margin-top: 30px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  padding: 8px 12px;
   border-radius: 10px;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-  text-align: left;
+  border: 1px solid #bcbcbc;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+}
+
+.registro-busca input {
+  border: none;
+  outline: none;
+  flex: 1;
+  font-size: 0.95rem;
+  background: transparent;
+  color: #1f2933;
+}
+
+/* =======================
+   TÍTULOS
+======================= */
+.registro-subtitulo {
+  margin-top: 25px;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #111827;
+  margin-bottom: 10px;
+}
+
+.registro-vazio {
+  color: #374151;
+  font-size: 0.95rem;
+  margin-bottom: 10px;
+}
+
+/* =======================
+   LISTA DE FOTOS
+======================= */
+.registro-fotos-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+.registro-foto-card {
+  width: 180px;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
+  padding: 8px;
+  text-align: center;
+  position: relative;
+  border-left: 5px solid #0ea5e9;
+}
+
+.registro-foto-card img {
+  width: 100%;
+  height: 130px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.registro-foto-card p {
+  color: #111827;
+  font-size: 0.85rem;
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+/* =======================
+   LISTA DE NOTAS
+======================= */
+.registro-nota-card {
+  width: 100%;
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  border-left: 5px solid #22c55e;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+
+.registro-nota-card strong {
+  color: #111827;
+  font-size: 1rem;
+}
+
+.registro-nota-card p {
+  font-size: 0.9rem;
+  color: #374151;
+}
+
+/* =======================
+   BOTÃO DE EXCLUIR
+======================= */
+.btn-delete {
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  background: none;
+  color: #ef4444;
+  transition: transform 0.12s ease;
+}
+
+.btn-delete:hover {
+  transform: scale(1.25);
+}
+
+/* =======================
+   FORMULÁRIOS NOS MODAIS
+======================= */
+.registro-form input,
+.registro-form textarea {
+  border-radius: 8px;
+  border: 1px solid #bcbcbc;
+  padding: 8px 10px;
+  font-size: 0.9rem;
+  background: #f9fafb;
+  color: #111827;
+}
+
+.registro-form input:focus,
+.registro-form textarea:focus {
+  outline: none;
+  border-color: #0ea5e9;
 }
 
 .registro-form label {
-  display: block;
-  margin-top: 1rem;
-  font-weight: 600;
+  font-size: 0.95rem;
+  color: #374151;
+  font-weight: 500;
+  margin-top: 8px;
 }
 
-.registro-form input,
 .registro-form textarea {
-  width: 100%;
-  padding: 0.8rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  margin-top: 0.4rem;
+  height: 120px;
+  resize: none;
 }
 
-.registro-form button {
-  width: 100%;
-  margin-top: 1.5rem;
-  padding: 0.9rem;
-  background: #111;
-  color: #fff;
+/* =======================
+   BOTÃO PRINCIPAL
+======================= */
+.btn-principal {
+  margin-top: 14px;
   border: none;
-  border-radius: 8px;
+  border-radius: 999px;
+  padding: 10px;
+  font-size: 0.95rem;
   font-weight: 600;
+  background: linear-gradient(90deg, #0ea5e9, #22c55e);
+  color: #0f172a;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 
-.registro-form button:hover {
-  background: #222;
+.btn-principal:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(34, 197, 94, 0.4);
 }
 
-/* ===== BOTÃO VOLTAR ===== */
-.voltar-btn {
-  background: none;
-  border: none;
-  color: #007bff;
-  font-size: 1rem;
-  cursor: pointer;
-  margin-bottom: 1rem;
-  transition: 0.2s;
-}
-
-.voltar-btn:hover {
-  text-decoration: underline;
-}
-
-/* ===== RESPONSIVO ===== */
-@media screen and (max-width: 768px) {
-  .registro-menu {
-    grid-template-columns: 1fr;
+/* =======================
+   RESPONSIVIDADE
+======================= */
+@media (max-width: 900px) {
+  .registro-grid {
+    flex-direction: column;
+    align-items: center;
   }
 
-  .registro-form {
-    padding: 1.2rem;
+  .registro-card {
+    width: 90%;
+    height: 120px;
+  }
+
+  .registro-foto-card {
+    width: 48%;
+  }
+}
+
+@media (max-width: 600px) {
+  .registro-foto-card {
+    width: 100%;
   }
 }

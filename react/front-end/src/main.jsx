@@ -3,25 +3,27 @@
 // ============================
 import React from "react";
 import ReactDOM from "react-dom/client";
-import {
-  RouterProvider,
-  createBrowserRouter,
-} from "react-router-dom";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
 // ============================
-// Importa o layout base e rotas protegidas
+// Layout base e rotas protegidas
 // ============================
-import App from "./App"; // Layout com Navbar + Footer + <Outlet />
+import App from "./App"; 
 import RotaPrivada from "./router/RotaPrivada";
 
 // ============================
-// Importa páginas principais
+// Páginas principais
 // ============================
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 
 // ============================
-// Importa páginas de Serviços
+// Páginas de Clientes (APENAS UMA)
+// ============================
+import Clientes from "./pages/Clientes/Clientes";
+
+// ============================
+// Páginas de Serviços
 // ============================
 import Servicos from "./pages/Servicos/Servicos";
 import ServicoAndamento from "./pages/Servicos/ServicoAndamento";
@@ -29,44 +31,33 @@ import ServicoGarantia from "./pages/Servicos/ServicoGarantia";
 import ServicoHistorico from "./pages/Servicos/ServicoHistorico";
 
 // ============================
-// Importa páginas de Clientes
-// ============================
-import Clientes from "./pages/Clientes/Clientes";
-import ClientesAndamentos from "./pages/Clientes/ClientesAndamentos";
-import ClientesPendentes from "./pages/Clientes/ClientesPendentes";
-import ClientesHistorico from "./pages/Clientes/ClientesHistorico";
-
-// ============================
-// Importa páginas de Registro
+// Páginas de Registro (APENAS UMA)
 // ============================
 import Registro from "./pages/Registro/Registro";
-import NovoCliente from "./pages/Registro/NovoCliente";
-import NovoServico from "./pages/Registro/NovoServico";
-import NovoCarro from "./pages/Registro/NovoCarro";
 
 // ============================
-// Importa páginas de Estoque
+// Páginas de Estoque (APENAS UMA)
 // ============================
 import Estoque from "./pages/Estoque/Estoque";
-import EstoqueNova from "./pages/Estoque/EstoqueNova";
-import EstoqueUsada from "./pages/Estoque/EstoqueUsada";
-import EstoqueOleo from "./pages/Estoque/EstoqueOleo";
 
 // ============================
-// Importa CSS global
+// CSS Global
 // ============================
 import "./index.css";
 import "./App.css";
 
 // ============================
-// Cria o roteador principal
+// Rotas
 // ============================
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />, // Layout base com Navbar, Footer e Outlet
+    element: <App />, // Layout principal
     children: [
-      // ====== Página Inicial ======
+      // ====== Login ======
+      { path: "/login", element: <Login /> },
+
+      // ====== Home ======
       {
         path: "/home",
         element: (
@@ -85,27 +76,23 @@ const router = createBrowserRouter([
           </RotaPrivada>
         ),
       },
+
+      // ====== Registro ======
       {
-        path: "/clientes/andamento",
+        path: "/registro",
         element: (
           <RotaPrivada>
-            <ClientesAndamentos />
+            <Registro />
           </RotaPrivada>
         ),
       },
+
+      // ====== Estoque ======
       {
-        path: "/clientes/pendentes",
+        path: "/estoque",
         element: (
           <RotaPrivada>
-            <ClientesPendentes />
-          </RotaPrivada>
-        ),
-      },
-      {
-        path: "/clientes/historico",
-        element: (
-          <RotaPrivada>
-            <ClientesHistorico />
+            <Estoque />
           </RotaPrivada>
         ),
       },
@@ -143,86 +130,12 @@ const router = createBrowserRouter([
           </RotaPrivada>
         ),
       },
-
-      // ====== Registro ======
-      {
-        path: "/registro",
-        element: (
-          <RotaPrivada>
-            <Registro />
-          </RotaPrivada>
-        ),
-      },
-      {
-        path: "/registro/cliente",
-        element: (
-          <RotaPrivada>
-            <NovoCliente />
-          </RotaPrivada>
-        ),
-      },
-      {
-        path: "/registro/servico",
-        element: (
-          <RotaPrivada>
-            <NovoServico />
-          </RotaPrivada>
-        ),
-      },
-      {
-        path: "/registro/carro",
-        element: (
-          <RotaPrivada>
-            <NovoCarro />
-          </RotaPrivada>
-        ),
-      },
-
-      // ====== Estoque ======
-      {
-        path: "/estoque",
-        element: (
-          <RotaPrivada>
-            <Estoque />
-          </RotaPrivada>
-        ),
-      },
-      {
-        path: "/estoque/novas",
-        element: (
-          <RotaPrivada>
-            <EstoqueNova />
-          </RotaPrivada>
-        ),
-      },
-      {
-        path: "/estoque/usadas",
-        element: (
-          <RotaPrivada>
-            <EstoqueUsada />
-          </RotaPrivada>
-        ),
-      },
-      {
-        path: "/estoque/oleo",
-        element: (
-          <RotaPrivada>
-            <EstoqueOleo />
-          </RotaPrivada>
-        ),
-      },
     ],
-  },
-
-  // ====== Login ======
-  {
-    path: "/login",
-    element: <Login />,
   },
 ]);
 
 // ============================
-// Renderiza a aplicação
+// Renderização
 // ============================
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

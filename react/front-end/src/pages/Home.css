@@ -1,186 +1,200 @@
-/* src/pages/Home.css */
-
-/* Container geral da home ocupando a tela toda */
-.home-container {
+/* fundo geral, igual estilo Serviços/Clientes */
+.home-page {
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background: linear-gradient(135deg, #0f172a, #111827); /* fundo escuro azulado */
-  color: #f9fafb;
+  background-color: #d3c4a3;
   font-family: Arial, Helvetica, sans-serif;
+  padding-top: 70px; /* espaço da navbar fixa */
+  position: relative;
 }
 
-/* Cabeçalho no topo */
-.home-header {
+/* botão de sair no topo direito */
+.home-logout {
+  position: absolute;
+  top: 80px;
+  right: 32px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 16px 32px;
-  border-bottom: 1px solid #1f2933;
-}
-
-.home-header-left h1 {
-  margin: 0;
-  font-size: 24px;
-}
-
-.home-header-left span {
-  font-size: 14px;
-  color: #9ca3af;
-}
-
-/* Botão de logout */
-.logout-button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
+  gap: 6px;
+  padding: 6px 12px;
   border-radius: 999px;
-  background-color: #ef4444;
   border: none;
-  color: #f9fafb;
-  cursor: pointer;
+  background-color: #7f1d1d;
+  color: #ffffff;
+  font-size: 0.85rem;
   font-weight: 600;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(15, 23, 42, 0.4);
+  transition: transform 0.15s ease, box-shadow 0.15s ease,
+    background-color 0.15s ease;
 }
 
-.logout-button:hover {
+.home-logout:hover {
+  background-color: #b91c1c;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.5);
 }
 
-.logout-icon {
-  font-size: 18px;
+.home-logout-icon {
+  font-size: 0.9rem;
 }
 
-/* Conteúdo principal abaixo do cabeçalho */
-.home-main {
-  flex: 1;
+/* cabeçalho centralizado */
+.home-header {
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.home-title {
+  margin: 0;
+  font-size: 2rem;
+  color: #1f2933;
+}
+
+.home-title-icon {
+  margin-right: 8px;
+}
+
+.home-subtitle {
+  margin-top: 4px;
+  font-size: 0.9rem;
+  color: #374151;
+}
+
+/* conteúdo central: cards à esquerda, serviços à direita */
+.home-content {
+  max-width: 900px; /* mesmo enquadramento da tela de Clientes */
+  margin: 0 auto 32px auto;
   display: grid;
-  grid-template-columns: 1.2fr 2fr;
-  gap: 24px;
-  padding: 24px 32px;
+  grid-template-columns: 1.1fr 1.7fr;
+  gap: 28px;
+  padding: 0 16px;
+  align-items: flex-start;
 }
 
-/* Seção dos cards de navegação (esquerda) */
-.cards-section {
+/* coluna de cards */
+.home-cards-area {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
 
-/* Card padrão da home (Serviços, Clientes, Estoque) */
+/* card branco, estilo Serviços */
 .home-card {
-  background: rgba(15, 23, 42, 0.9);
-  border-radius: 16px;
-  padding: 16px;
-  border: 1px solid #1f2937;
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  background-color: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 3px 8px rgba(15, 23, 42, 0.18);
+  padding: 12px 14px;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .home-card:hover {
   transform: translateY(-2px);
-  border-color: #3b82f6;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 5px 12px rgba(15, 23, 42, 0.28);
 }
 
-/* Ícone dentro do card */
-.card-icon {
-  font-size: 28px;
-}
-
-/* Título do card */
-.home-card h2 {
-  margin: 0;
-  font-size: 18px;
-}
-
-/* Texto do card */
-.home-card p {
-  margin: 4px 0 0 0;
-  font-size: 13px;
-  color: #9ca3af;
-}
-
-/* Seção de serviços em andamento (direita) */
-.servicos-section {
-  background: rgba(15, 23, 42, 0.95);
-  border-radius: 16px;
-  padding: 16px;
-  border: 1px solid #1f2937;
+/* cabeçalho do card (ícone + título) */
+.home-card-header {
   display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-/* Título da seção de serviços */
-.servicos-section h2 {
-  margin: 0;
-  font-size: 20px;
-}
-
-/* Texto de erro */
-.erro-texto {
-  color: #f97373;
-  font-size: 14px;
-}
-
-/* Texto quando não há serviços */
-.sem-servicos {
-  color: #9ca3af;
-  font-size: 14px;
-}
-
-/* Lista com os cards de serviços */
-.servicos-lista {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  max-height: 60vh;
-  overflow-y: auto;
-}
-
-/* Card individual de serviço */
-.servico-card {
-  background: #020617;
-  padding: 12px;
-  border-radius: 12px;
-  border: 1px solid #1f2937;
-}
-
-/* Linha dentro do card de serviço */
-.servico-linha {
-  display: flex;
+  align-items: center;
   gap: 8px;
-  font-size: 14px;
-  margin-bottom: 4px;
 }
 
-/* Label (nome do campo) */
-.servico-label {
+.home-card-header h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  color: #14532d;
+}
+
+.home-card-icon {
+  font-size: 1.3rem;
+}
+
+.home-card-text {
+  margin: 4px 0 0 0;
+  font-size: 0.85rem;
+  color: #4b5563;
+}
+
+/* coluna de serviços em andamento */
+.home-servicos-area {
+  background-color: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 3px 8px rgba(15, 23, 42, 0.18);
+  padding: 14px 16px;
+}
+
+.home-servicos-titulo {
+  margin: 0 0 8px 0;
+  font-size: 1.15rem;
+  color: #14532d;
+}
+
+/* mensagens */
+.home-erro {
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: #b91c1c;
+}
+
+.home-sem-servicos {
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: #4b5563;
+}
+
+/* lista de serviços */
+.home-servicos-lista {
+  margin-top: 8px;
+  max-height: 260px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* cada serviço */
+.home-servico-card {
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  padding: 8px 10px;
+  background-color: #f9fafb;
+}
+
+/* linhas dentro do card de serviço */
+.home-servico-linha {
+  display: flex;
+  gap: 6px;
+  font-size: 0.85rem;
+  margin-bottom: 2px;
+}
+
+.home-servico-label {
   font-weight: 600;
+  color: #374151;
 }
 
-/* Valor do campo */
-.servico-valor {
-  color: #e5e7eb;
+.home-servico-valor {
+  color: #111827;
 }
 
-/* Responsivo para telas menores */
+/* responsivo: igual padrão das outras telas */
 @media (max-width: 900px) {
-  .home-main {
+  .home-content {
     grid-template-columns: 1fr;
+    gap: 20px;
   }
 
-  .servicos-section {
+  .home-servicos-area {
     order: 1;
   }
 
-  .cards-section {
+  .home-cards-area {
     order: 2;
+  }
+
+  .home-logout {
+    top: 76px;
+    right: 16px;
   }
 }

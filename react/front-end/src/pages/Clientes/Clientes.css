@@ -1,205 +1,243 @@
-/* src/pages/Clientes/Clientes.css */
-
-/* Container geral da página de clientes */
+/* =======================
+   CONTAINER PRINCIPAL
+======================= */
 .clientes-container {
-  min-height: 100vh;
+  width: 100%;
+  min-height: calc(100vh - 70px);
   display: flex;
-  justify-content: center;
-  align-items: center;
-  background: linear-gradient(135deg, #0f172a, #111827); /* mesmo fundo da Home */
-  color: #f9fafb;
-  font-family: Arial, Helvetica, sans-serif;
-  padding: 24px;
+  flex-direction: column;
+  background-color: #d8ccb3; /* Padrão da Oficina */
 }
 
-/* conteúdo central */
+/* =======================
+   CABEÇALHO / TÍTULO
+======================= */
+.titulo-clientes {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-top: 26px;
+  margin-bottom: 20px;
+  color: #1f2933;
+}
+
 .clientes-content {
   width: 100%;
   max-width: 1100px;
-  background: rgba(15, 23, 42, 0.95);
-  border-radius: 24px;
-  border: 1px solid #1f2937;
-  display: grid;
-  grid-template-columns: 1.5fr 1fr;
-  overflow: hidden;
+  margin: 0 auto;
+  padding-bottom: 30px;
+  padding-inline: 24px;
 }
 
-/* coluna esquerda */
-.clientes-info {
-  padding: 24px 28px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.page-transition-side {
+  opacity: 0;
+  transform: translateX(35px);
+  animation: slide-page 0.45s ease-out forwards;
 }
 
-/* título */
-.clientes-info h1 {
-  margin: 0;
-  font-size: 24px;
+@keyframes slide-page {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
-/* subtítulo */
-.clientes-subtitulo {
-  margin: 0;
-  font-size: 14px;
-  color: #9ca3af;
-}
-
-/* linha com dois cards (lista + novo) */
-.clientes-cards-row {
-  display: flex;
-  gap: 12px;
-}
-
-/* card de clientes */
-.clientes-card {
-  flex: 1;
-  background: #020617;
-  border-radius: 16px;
-  padding: 12px;
-  border: 1px solid #1f2937;
-}
-
-/* ícone do card */
-.clientes-card-icon {
-  font-size: 22px;
-  margin-bottom: 8px;
-}
-
-/* título do card */
-.clientes-card h2 {
-  margin: 0;
-  font-size: 16px;
-}
-
-/* texto do card */
-.clientes-card p {
-  margin: 4px 0 0 0;
-  font-size: 13px;
-  color: #9ca3af;
-}
-
-/* formulário */
-.clientes-form {
-  margin-top: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-/* grupo label + input */
-.form-grupo {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-/* label */
-.form-grupo label {
-  font-size: 13px;
-}
-
-/* input */
-.form-grupo input {
-  padding: 8px 10px;
-  border-radius: 8px;
-  border: 1px solid #374151;
-  background: #020617;
-  color: #f9fafb;
-  font-size: 14px;
-}
-
-/* botão salvar */
-.clientes-botao-salvar {
-  margin-top: 8px;
-  padding: 10px 16px;
-  border-radius: 999px;
-  border: none;
-  background-color: #3b82f6;
-  color: #f9fafb;
-  font-weight: 600;
-  font-size: 14px;
-  cursor: pointer;
-  align-self: flex-start;
-  transition: transform 0.15s ease, box-shadow 0.15s ease,
-    background-color 0.15s ease;
-}
-
-.clientes-botao-salvar:hover {
-  background-color: #2563eb;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
-}
-
-/* texto de erro */
-.erro-texto {
-  margin-top: 8px;
-  font-size: 14px;
-  color: #f97373;
-}
-
-/* tabela de clientes */
-.clientes-lista {
-  margin-top: 12px;
-  background: #020617;
-  border-radius: 12px;
-  border: 1px solid #1f2937;
-  padding: 12px;
-}
-
-.clientes-lista table {
+/* =======================
+   CARDS DE AÇÕES
+======================= */
+.clientes-grid {
   width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
-}
-
-.clientes-lista th,
-.clientes-lista td {
-  padding: 8px;
-  text-align: left;
-}
-
-.clientes-lista thead {
-  border-bottom: 1px solid #374151;
-}
-
-.clientes-lista tbody tr:nth-child(even) {
-  background: rgba(15, 23, 42, 0.8);
-}
-
-/* coluna direita: imagem */
-.clientes-imagem {
-  position: relative;
-  background: radial-gradient(circle at top, #1f2937 0, #020617 60%);
   display: flex;
-  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 18px;
   justify-content: center;
+  margin-top: 14px;
 }
 
-/* placeholder da imagem do carro */
-.carro-placeholder {
-  width: 90%;
-  height: 70%;
-  border-radius: 24px;
-  border: 1px dashed #4b5563;
+.clientes-card {
+  background: #ffffff;
+  width: 240px;
+  height: 130px;
+  border-radius: 12px;
+  padding: 16px 14px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.clientes-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.32);
+}
+
+.icone-card {
+  font-size: 2rem;
+  background: linear-gradient(90deg, #0ea5e9, #22c55e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.clientes-card p {
+  margin-top: 6px;
+  font-size: 1rem;
+  color: #111827;
+}
+
+/* =======================
+   ÁREA DO HISTÓRICO
+======================= */
+.clientes-historico-area {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto 40px;
+  padding-inline: 24px;
+}
+
+.subtitulo-historico {
+  margin-top: 22px;
+  font-weight: 700;
+  font-size: 1.4rem;
+  color: #111827;
+  margin-bottom: 14px;
+}
+
+/* =======================
+   BUSCA DO HISTÓRICO
+======================= */
+.area-busca-clientes {
   display: flex;
   align-items: center;
-  justify-content: center;
-  opacity: 0.85;
+  gap: 8px;
+  background: #ffffff;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid #bcbcbc;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+  margin-bottom: 16px;
 }
 
-.carro-texto {
-  font-size: 14px;
-  color: #9ca3af;
+.area-busca-clientes input {
+  border: none;
+  outline: none;
+  flex: 1;
+  font-size: 0.95rem;
+  background: transparent;
+  color: #1f2933;
 }
 
-/* responsivo */
+/* =======================
+   LISTA DO HISTÓRICO
+======================= */
+.card-cliente-historico {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  border-left: 5px solid #0ea5e9;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
+}
+
+.card-cliente-historico strong {
+  font-size: 1rem;
+  color: #111827;
+}
+
+.card-cliente-historico p {
+  font-size: 0.88rem;
+  color: #374151;
+}
+
+/* =======================
+   BOTÃO EDITAR (FUTURO)
+======================= */
+.btn-mini-edit {
+  border: none;
+  cursor: pointer;
+  background: none;
+  color: #0ea5e9;
+  font-size: 1.3rem;
+  transition: transform 0.12s ease;
+}
+
+.btn-mini-edit:hover {
+  transform: scale(1.25);
+}
+
+/* =======================
+   BOTÕES MINI (MODAIS)
+======================= */
+.btn-mini {
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(90deg, #0ea5e9, #22c55e);
+  padding: 8px 10px;
+  border-radius: 999px;
+  color: #0f172a;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: transform 0.1s ease;
+}
+
+.btn-mini:hover {
+  transform: translateY(-2px);
+}
+
+/* =======================
+   ESTILOS GENERAIS
+======================= */
+.modal-form input {
+  border-radius: 8px;
+  border: 1px solid #bcbcbc;
+  padding: 8px 10px;
+  font-size: 0.9rem;
+  background: #f9fafb;
+  color: #111827;
+}
+
+.modal-form input:focus {
+  outline: none;
+  border-color: #0ea5e9;
+}
+
+.modal-form label {
+  font-size: 0.95rem;
+  color: #374151;
+  font-weight: 500;
+  margin-top: 8px;
+}
+
+.texto-vazio {
+  padding: 4px;
+  color: #374151;
+  font-size: 0.9rem;
+}
+
+/* =======================
+   RESPONSIVIDADE
+======================= */
 @media (max-width: 900px) {
-  .clientes-content {
-    grid-template-columns: 1fr;
+  .clientes-card {
+    width: 90%;
+    height: 120px;
   }
 
-  .clientes-imagem {
-    display: none;
+  .card-cliente-historico {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .btn-mini-edit {
+    margin-top: 6px;
+    align-self: flex-end;
   }
 }

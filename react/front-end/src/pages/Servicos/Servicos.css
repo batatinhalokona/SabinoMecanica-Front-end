@@ -1,140 +1,197 @@
+/* =======================
+   CONTAINER PRINCIPAL
+======================= */
 .servicos-container {
+  width: 100%;
+  min-height: calc(100vh - 70px);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  background-color: #cfc8b8;
-  min-height: 100vh;
-  font-family: "Poppins", sans-serif;
-  padding: 30px 40px;
-  overflow: hidden;
+  background-color: #d8ccb3; /* mesmo fundo da tela de clientes */
 }
 
-/* Cabeçalho central */
+/* =======================
+   CABEÇALHO
+======================= */
 .servicos-header {
   text-align: center;
-  color: #1a3326;
-  margin-bottom: 40px;
+  margin-top: 32px;
+  margin-bottom: 20px;
 }
 
 .servicos-header h1 {
   font-size: 2rem;
-  margin-bottom: 10px;
+  font-weight: 700;
+  color: #1f2933;
+  margin-bottom: 4px;
 }
 
 .servicos-header p {
-  font-size: 1rem;
-  color: #333;
+  font-size: 0.98rem;
+  color: #374151;
 }
 
-/* Área principal com imagem e cards */
+/* =======================
+   CORPO (IMAGEM + CARDS)
+======================= */
 .servicos-content {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto 40px;
+  padding: 0 24px 40px;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 60px;
+  gap: 24px;
   opacity: 0;
-  transform: translateY(20px);
-  transition: all 0.8s ease;
+  transform: translateX(35px);
+  transition: opacity 0.45s ease-out, transform 0.45s ease-out;
 }
 
-/* Quando o estado animar = true */
 .servicos-content.animar {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateX(0);
 }
 
-/* Imagem do carro */
+/* =======================
+   IMAGEM
+======================= */
 .servicos-imagem {
   flex: 1;
   display: flex;
-  justify-content: flex-end;
-  transform: translateX(-80px);
-  opacity: 0;
-  transition: all 1s ease;
-}
-
-.servicos-content.animar .servicos-imagem {
-  transform: translateX(0);
-  opacity: 1;
+  align-items: center;
+  justify-content: center;
 }
 
 .servicos-imagem img {
-  width: 80%;
-  max-width: 380px;
-  filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.25));
-  transition: transform 0.3s ease;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
 }
 
-.servicos-imagem img:hover {
-  transform: scale(1.03);
-}
-
-/* Cards */
+/* =======================
+   CARDS LADO DIREITO
+======================= */
 .servicos-cards {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  align-items: flex-start;
-  transform: translateX(80px);
-  opacity: 0;
-  transition: all 1s ease;
+  gap: 18px;
 }
 
-.servicos-content.animar .servicos-cards {
-  transform: translateX(0);
-  opacity: 1;
-}
-
-.card {
-  width: 320px;
-  background: rgba(255, 255, 255, 0.5);
-  border: 2px solid rgba(26, 51, 38, 0.25);
+.servicos-card {
+  background-color: #ffffff;
   border-radius: 12px;
-  padding: 20px;
+  padding: 18px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
+  border: none;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.card:hover {
+.servicos-card:hover {
   transform: translateY(-4px);
-  background: rgba(26, 51, 38, 0.85);
-  color: #fff;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
 }
 
-.card h2 {
-  font-size: 1.2rem;
-  margin-bottom: 8px;
+.servicos-card h2 {
+  font-size: 1.1rem;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.card p {
+.servicos-card p {
   font-size: 0.9rem;
-  color: #222;
+  color: #4b5563;
 }
 
-/* Responsividade */
+/* Card de ADICIONAR SERVIÇO */
+.card-add {
+  border: 1px dashed #0ea5e9;
+}
+
+/* Ícones dos cards (gradiente azul + verde) */
+.icone-card-servico {
+  font-size: 1.8rem;
+  background: linear-gradient(90deg, #0ea5e9, #22c55e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 4px;
+}
+
+/* =======================
+   FORMULÁRIO MODAL
+======================= */
+.servicos-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.servicos-form label {
+  font-size: 0.9rem;
+  color: #374151;
+  font-weight: 500;
+}
+
+.servicos-form input,
+.servicos-form select {
+  border-radius: 8px;
+  border: 1px solid #bcbcbc;
+  background: #f9fafb;
+  padding: 8px 10px;
+  font-size: 0.9rem;
+  color: #111827;
+}
+
+.servicos-form input:focus,
+.servicos-form select:focus {
+  outline: none;
+  border-color: #0ea5e9;
+}
+
+/* =======================
+   BOTÃO PRINCIPAL
+======================= */
+.btn-principal {
+  margin-top: 12px;
+  border: none;
+  border-radius: 999px;
+  padding: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  background: linear-gradient(90deg, #0ea5e9, #22c55e);
+  color: #0f172a;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.btn-principal:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(34, 197, 94, 0.4);
+}
+
+/* =======================
+   RESPONSIVIDADE
+======================= */
 @media (max-width: 900px) {
   .servicos-content {
     flex-direction: column;
-    gap: 30px;
+    padding: 0 16px 32px;
   }
 
   .servicos-imagem {
-    justify-content: center;
-  }
-
-  .servicos-imagem img {
-    width: 65%;
-    max-width: 300px;
+    order: 2;
   }
 
   .servicos-cards {
-    align-items: center;
+    order: 1;
   }
 
-  .card {
-    width: 280px;
+  .servicos-card {
+    padding: 16px;
   }
 }
