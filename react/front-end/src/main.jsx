@@ -16,11 +16,8 @@ import Home from "./pages/Home";
 // Páginas de Clientes
 import Clientes from "./pages/Clientes/Clientes";
 
-// Páginas de Serviços
+// Páginas de Serviços (APENAS 1)
 import Servicos from "./pages/Servicos/Servicos";
-import ServicoAndamento from "./pages/Servicos/ServicoAndamento";
-import ServicoGarantia from "./pages/Servicos/ServicoGarantia";
-import ServicoHistorico from "./pages/Servicos/ServicoHistorico";
 
 // Páginas de Registro
 import Registro from "./pages/Registro/Registro";
@@ -35,11 +32,13 @@ import Carros from "./pages/Carros/Carros";
 import "./index.css";
 import "./App.css";
 
-// Rotas
+// ============================
+// Definição das rotas
+// ============================
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
+    element: <App />, // App controla nav/footer/login
     children: [
       {
         path: "/home",
@@ -62,30 +61,6 @@ const router = createBrowserRouter([
         element: (
           <RotaPrivada>
             <Servicos />
-          </RotaPrivada>
-        ),
-      },
-      {
-        path: "/servicos/andamento",
-        element: (
-          <RotaPrivada>
-            <ServicoAndamento />
-          </RotaPrivada>
-        ),
-      },
-      {
-        path: "/servicos/garantia",
-        element: (
-          <RotaPrivada>
-            <ServicoGarantia />
-          </RotaPrivada>
-        ),
-      },
-      {
-        path: "/servicos/historico",
-        element: (
-          <RotaPrivada>
-            <ServicoHistorico />
           </RotaPrivada>
         ),
       },
@@ -121,6 +96,9 @@ const router = createBrowserRouter([
   },
 ]);
 
+// ============================
+// Renderização do app
+// ============================
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <RouterProvider router={router} />

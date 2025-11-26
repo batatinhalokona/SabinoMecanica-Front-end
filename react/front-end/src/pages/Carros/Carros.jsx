@@ -1,170 +1,186 @@
-import React, { useEffect, useState } from "react";
-import "./Carros.css";
-import Modal from "../../components/Modal";
-import { FaCarSide, FaPlus, FaSearch, FaTrash } from "react-icons/fa";
+// Importa os hooks do React
+import { useEffect, useState } from "react";
+// Importa a instância do axios configurada
+import api from "../../api/api";
 
+// Componente de página de Carros
 export default function Carros() {
+  // Estado com a lista de carros vindos do back-end
   const [carros, setCarros] = useState([]);
-  const [busca, setBusca] = useState("");
-  const [modalAberto, setModalAberto] = useState(false);
 
-  // Campos do formulário
-  const [modelo, setModelo] = useState("");
-  const [placa, setPlaca] = useState("");
-  const [ano, setAno] = useState("");
-  const [cor, setCor] = useState("");
-  const [cliente, setCliente] = useState("");
+  // Estado com os dados do formulário de carro
+  const [formData, setFormData] = useState({
+    modelo: "",   // mesmo nome do campo no back
+    placa: "",    // mesmo nome do campo no back
+    url_foto: "", // mesmo nome do campo no back
+  });
 
-  // Carregar do localStorage
+  // Guarda o id do carro que está sendo editado (se houver)
+  const [editId, setEditId] = useState(null);
+
+  // Ao montar o componente, carrega os carros
   useEffect(() => {
-    const armazenados = JSON.parse(localStorage.getItem("carros") || "[]");
-    setCarros(armazenados);
+    carregarCarros();
   }, []);
 
-  const salvarCarros = (lista) => {
-    setCarros(lista);
-    localStorage.setItem("carros", JSON.stringify(lista));
-  };
+  // Função que busca os carros no back-end
+  async function carregarCarros() {
+    try {
+      // Faz GET na rota de carros (ajuste a URL se precisar)
+      const response = await api.get("/api/carro");
+      // Salva resultado em "carros"
+      setCarros(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar carros:", error);
+    }
+  }
 
-  const cadastrarCarro = (e) => {
+  // Atualiza o formulário quando o usuário digita
+  function handleChange(e) {
+    // Pega nome do campo e valor digitado
+    const { name, value } = e.target;
+
+    // Atualiza o estado do formulário
+    setFormData((prev) => ({
+      ...prev,      // copia todos os campos anteriores
+      [name]: value // atualiza só o campo modificado
+    }));
+  }
+
+  // Envia o formulário (criar ou atualizar carro)
+  async function handleSubmit(e) {
+    // Evita reload da página
     e.preventDefault();
 
-    if (!modelo || !placa) {
-      alert("Modelo e placa são obrigatórios.");
-      return;
+    try {
+      if (editId) {
+        // Se tiver editId, faz PUT
+        await api.put(`/api/carro/${editId}`, formData);
+      } else {
+        // Se não tiver editId, faz POST
+        await api.post("/api/carro", formData);
+      }
+
+      // Depois de salvar, recarrega a lista
+      await carregarCarros();
+
+      // Limpa o formulário
+      setFormData({
+        modelo: "",
+        placa: "",
+        url_foto: "",
+      });
+      // Sai do modo edição
+      setEditId(null);
+    } catch (error) {
+      console.error("Erro ao salvar carro:", error);
     }
+  }
 
-    const novoCarro = {
-      id: Date.now(),
-      modelo,
-      placa,
-      ano,
-      cor,
-      cliente, // dono do carro (opcional)
-    };
+  // Quando clicar em "Editar" em algum carro
+  function handleEdit(carro) {
+    // Preenche o formulário com os dados desse carro
+    setFormData({
+      modelo: carro.modelo || "",
+      placa: carro.placa || "",
+      url_foto: carro.url_foto || "",
+    });
+    // Guarda o id para usar no PUT
+    setEditId(carro.id);
+  }
 
-    salvarCarros([...carros, novoCarro]);
+  // Excluir carro
+  async function handleDelete(id) {
+    // Confirma antes de excluir
+    if (!window.confirm("Tem certeza que deseja excluir este carro?")) return;
 
-    setModelo("");
-    setPlaca("");
-    setAno("");
-    setCor("");
-    setCliente("");
-    setModalAberto(false);
-  };
-
-  const excluirCarro = (id) => {
-    if (!window.confirm("Deseja excluir este carro?")) return;
-    salvarCarros(carros.filter((c) => c.id !== id));
-  };
-
-  const aplicarBusca = () => {
-    if (!busca) return carros;
-    const termo = busca.toLowerCase();
-    return carros.filter(
-      (c) =>
-        c.modelo.toLowerCase().includes(termo) ||
-        c.placa.toLowerCase().includes(termo) ||
-        (c.cliente && c.cliente.toLowerCase().includes(termo))
-    );
-  };
-
-  const carrosFiltrados = aplicarBusca();
+    try {
+      // Faz DELETE no back-end
+      await api.delete(`/api/carro/${id}`);
+      // Recarrega a lista
+      await carregarCarros();
+    } catch (error) {
+      console.error("Erro ao excluir carro:", error);
+    }
+  }
 
   return (
-    <div className="carros-container">
-      <div className="carros-content page-transition-side">
-        <h1 className="titulo-carros">Cadastro de Carros</h1>
+    <div className="carro-page">
+      <h1>Carros</h1>
 
-        {/* CARD PRINCIPAL */}
-        <div className="carros-grid">
-          <button className="carros-card" onClick={() => setModalAberto(true)}>
-            <FaCarSide className="icone-card-carro" />
-            <p>Cadastrar Carro</p>
-          </button>
-        </div>
-
-        {/* BUSCA */}
-        <div className="carros-busca">
-          <FaSearch />
-          <input
-            type="text"
-            placeholder="Buscar por modelo, placa ou cliente..."
-            value={busca}
-            onChange={(e) => setBusca(e.target.value)}
-          />
-        </div>
-
-        {/* LISTA DE CARROS */}
-        <h2 className="carros-subtitulo">Carros Cadastrados</h2>
-
-        {carrosFiltrados.length === 0 ? (
-          <p className="texto-vazio">Nenhum carro cadastrado.</p>
-        ) : (
-          carrosFiltrados.map((c) => (
-            <div key={c.id} className="carros-item">
-              <div>
-                <strong>{c.modelo}</strong>
-                <p>🚘 Placa: {c.placa}</p>
-                {c.ano && <p>📅 Ano: {c.ano}</p>}
-                {c.cor && <p>🎨 Cor: {c.cor}</p>}
-                {c.cliente && <p>👤 Cliente: {c.cliente}</p>}
-              </div>
-              <button className="btn-delete" onClick={() => excluirCarro(c.id)}>
-                <FaTrash />
-              </button>
-            </div>
-          ))
-        )}
-      </div>
-
-      {/* MODAL CADASTRO */}
-      <Modal
-        isOpen={modalAberto}
-        onClose={() => setModalAberto(false)}
-        title="Cadastrar Carro"
-      >
-        <form className="carros-form" onSubmit={cadastrarCarro}>
+      {/* FORMULÁRIO DE CARRO */}
+      <form onSubmit={handleSubmit} className="form-carro">
+        <div>
           <label>Modelo:</label>
           <input
             type="text"
-            value={modelo}
-            onChange={(e) => setModelo(e.target.value)}
+            name="modelo"            // TEM QUE SER "modelo"
+            value={formData.modelo}
+            onChange={handleChange}
           />
+        </div>
 
+        <div>
           <label>Placa:</label>
           <input
             type="text"
-            value={placa}
-            onChange={(e) => setPlaca(e.target.value)}
+            name="placa"             // TEM QUE SER "placa"
+            value={formData.placa}
+            onChange={handleChange}
           />
+        </div>
 
-          <label>Ano (opcional):</label>
-          <input
-            type="number"
-            value={ano}
-            onChange={(e) => setAno(e.target.value)}
-          />
-
-          <label>Cor (opcional):</label>
+        <div>
+          <label>URL da Foto:</label>
           <input
             type="text"
-            value={cor}
-            onChange={(e) => setCor(e.target.value)}
+            name="url_foto"          // TEM QUE SER "url_foto"
+            value={formData.url_foto}
+            onChange={handleChange}
+            placeholder="https://imagem-do-carro.jpg"
           />
+        </div>
 
-          <label>Cliente (opcional):</label>
-          <input
-            type="text"
-            value={cliente}
-            onChange={(e) => setCliente(e.target.value)}
-          />
+        <button type="submit">
+          {editId ? "Atualizar Carro" : "Cadastrar Carro"}
+        </button>
+      </form>
 
-          <button type="submit" className="btn-principal">
-            Salvar Carro
-          </button>
-        </form>
-      </Modal>
+      {/* TABELA DE CARROS */}
+      <table className="tabela-carro">
+        <thead>
+          <tr>
+            <th>Modelo</th>
+            <th>Placa</th>
+            <th>Foto</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {carros.map((carro) => (
+            <tr key={carro.id}>
+              <td>{carro.modelo}</td>
+              <td>{carro.placa}</td>
+              <td>
+                {/* Se tiver URL, mostra uma miniatura da imagem */}
+                {carro.url_foto ? (
+                  <img
+                    src={carro.url_foto}
+                    alt={carro.modelo}
+                    style={{ width: "80px", height: "auto" }}
+                  />
+                ) : (
+                  "Sem foto"
+                )}
+              </td>
+              <td>
+                <button onClick={() => handleEdit(carro)}>Editar</button>
+                <button onClick={() => handleDelete(carro.id)}>Excluir</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
