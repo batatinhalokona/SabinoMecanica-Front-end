@@ -26,7 +26,7 @@ export default function Clientes() {
   // função que busca os clientes no back-end
   async function carregarClientes() {
     try {
-      const response = await api.get("/api/cliente"); // ajuste pro seu endpoint
+      const response = await api.get("/clientes"); // ajuste pro seu endpoint
       setClientes(response.data);                     // salva no estado
     } catch (error) {
       console.error("Erro ao buscar clientes:", error);
@@ -49,10 +49,10 @@ export default function Clientes() {
     try {
       if (editId) {
         // se tiver editId, é edição (PUT)
-        await api.put(`/api/cliente/${editId}`, formData);
+        await api.put(`/clientes/${editId}`, formData);
       } else {
         // se não tiver, é criação (POST)
-        await api.post("/api/cliente", formData);
+        await api.post("/clientes", formData);
       }
 
       // depois de salvar, recarrega a lista
@@ -87,7 +87,7 @@ export default function Clientes() {
     if (!window.confirm("Tem certeza que deseja excluir este cliente?")) return;
 
     try {
-      await api.delete(`/api/cliente/${id}`);
+      await api.delete(`/clientes/${id}`);
       await carregarClientes();    // recarrega a lista
     } catch (error) {
       console.error("Erro ao excluir cliente:", error);

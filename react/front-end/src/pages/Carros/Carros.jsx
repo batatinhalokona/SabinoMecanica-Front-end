@@ -27,7 +27,7 @@ export default function Carros() {
   async function carregarCarros() {
     try {
       // Faz GET na rota de carros (ajuste a URL se precisar)
-      const response = await api.get("/api/carro");
+      const response = await api.get("/carros");
       // Salva resultado em "carros"
       setCarros(response.data);
     } catch (error) {
@@ -55,10 +55,10 @@ export default function Carros() {
     try {
       if (editId) {
         // Se tiver editId, faz PUT
-        await api.put(`/api/carro/${editId}`, formData);
+        await api.put(`/carros/${editId}`, formData);
       } else {
         // Se não tiver editId, faz POST
-        await api.post("/api/carro", formData);
+        await api.post("/carros", formData);
       }
 
       // Depois de salvar, recarrega a lista
@@ -96,7 +96,7 @@ export default function Carros() {
 
     try {
       // Faz DELETE no back-end
-      await api.delete(`/api/carro/${id}`);
+      await api.delete(`/carros/${id}`);
       // Recarrega a lista
       await carregarCarros();
     } catch (error) {

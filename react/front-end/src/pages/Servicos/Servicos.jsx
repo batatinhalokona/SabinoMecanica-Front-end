@@ -33,7 +33,7 @@ export default function Servicos() {
   async function carregarServicos() {
     try {
       // Faz um GET na rota de serviços (ajuste se sua URL for diferente)
-      const response = await api.get("/api/servico");
+      const response = await api.get("/servicos");
       // Salva a lista no estado
       setServicos(response.data);
     } catch (error) {
@@ -80,10 +80,10 @@ export default function Servicos() {
     try {
       if (editId) {
         // Se tiver editId, faz um PUT (edição)
-        await api.put(`/api/servico/${editId}`, formData);
+        await api.put(`/servicos/${editId}`, formData);
       } else {
         // Se não tiver editId, faz um POST (novo serviço)
-        await api.post("/api/servico", formData);
+        await api.post("/servicos", formData);
       }
 
       // Depois de salvar, recarrega a lista de serviços
@@ -133,7 +133,7 @@ export default function Servicos() {
 
     try {
       // Faz DELETE no back-end
-      await api.delete(`/api/servico/${id}`);
+      await api.delete(`/servicos/${id}`);
       // Recarrega lista
       await carregarServicos();
     } catch (error) {
