@@ -1,35 +1,21 @@
-/* =======================
-   CONTAINER PRINCIPAL
-======================= */
 .registro-container {
   width: 100%;
   min-height: calc(100vh - 70px);
   display: flex;
   flex-direction: column;
-  background-color: #d8ccb3; /* mesmo visual da oficina */
-}
-
-/* =======================
-   TÍTULO + ANIMAÇÃO
-======================= */
-.registro-titulo {
-  text-align: center;
-  font-size: 2rem;
-  font-weight: 700;
-  margin-top: 26px;
-  margin-bottom: 20px;
-  color: #1f2933;
+  background-color: #d8ccb3;
 }
 
 .registro-content {
   width: 100%;
   max-width: 1100px;
   margin: 0 auto;
-  padding-bottom: 40px;
   padding-inline: 24px;
+  padding-bottom: 40px;
 }
 
-.animar-registro {
+/* animação lateral padrão */
+.page-transition-side {
   opacity: 0;
   transform: translateX(35px);
   animation: registro-slide 0.45s ease-out forwards;
@@ -42,183 +28,222 @@
   }
 }
 
-/* =======================
-   GRID DE CARDS
-======================= */
-.registro-grid {
-  width: 100%;
+/* CABEÇALHO */
+.registro-header {
+  text-align: center;
+  margin-top: 26px;
+  margin-bottom: 20px;
+}
+
+.registro-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2933;
+}
+
+.registro-header p {
+  font-size: 0.98rem;
+  color: #374151;
+}
+
+/* CARDS PRINCIPAIS */
+.registro-grid-cards {
   display: flex;
   flex-wrap: wrap;
   gap: 18px;
   justify-content: center;
-  margin-top: 14px;
+  margin-bottom: 26px;
 }
 
 .registro-card {
-  background: #ffffff;
-  width: 240px;
-  height: 130px;
-  border-radius: 12px;
-  padding: 16px 14px;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: center;
+  width: 260px;
+  min-height: 120px;
+  border-radius: 14px;
+  padding: 14px;
   border: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+
+/* cores diferentes dos cards (não branco!) */
+.registro-card--novo {
+  background: linear-gradient(135deg, #fee2e2, #fbbf24);
+}
+
+.registro-card--salvos {
+  background: linear-gradient(135deg, #bfdbfe, #a7f3d0);
 }
 
 .registro-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.32);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  filter: brightness(1.03);
 }
 
-.icon-reg {
-  font-size: 2rem;
-  background: linear-gradient(90deg, #0ea5e9, #22c55e);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.registro-card p {
-  margin-top: 6px;
-  font-size: 1rem;
-  color: #111827;
-}
-
-/* =======================
-   BUSCA
-======================= */
-.registro-busca {
-  margin-top: 30px;
-  margin-bottom: 14px;
+.registro-card-icone {
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.15);
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: #ffffff;
-  padding: 8px 12px;
-  border-radius: 10px;
-  border: 1px solid #bcbcbc;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+  justify-content: center;
+  color: #f9fafb;
+  font-size: 1.4rem;
 }
 
-.registro-busca input {
-  border: none;
-  outline: none;
-  flex: 1;
-  font-size: 0.95rem;
-  background: transparent;
-  color: #1f2933;
-}
-
-/* =======================
-   TÍTULOS
-======================= */
-.registro-subtitulo {
-  margin-top: 25px;
-  font-size: 1.3rem;
-  font-weight: bold;
+.registro-card-texto h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
   color: #111827;
-  margin-bottom: 10px;
+  margin-bottom: 4px;
 }
 
-.registro-vazio {
-  color: #374151;
-  font-size: 0.95rem;
-  margin-bottom: 10px;
+.registro-card-texto p {
+  font-size: 0.87rem;
+  color: #1f2937;
 }
 
-/* =======================
-   LISTA DE FOTOS
-======================= */
-.registro-fotos-lista {
+/* SEÇÃO LISTA DE REGISTROS */
+.registro-lista-section {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  padding: 16px 16px 18px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  margin-top: 8px;
+}
+
+.registro-lista-header {
   display: flex;
   flex-wrap: wrap;
-  gap: 18px;
-}
-
-.registro-foto-card {
-  width: 180px;
-  background: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
-  padding: 8px;
-  text-align: center;
-  position: relative;
-  border-left: 5px solid #0ea5e9;
-}
-
-.registro-foto-card img {
-  width: 100%;
-  height: 130px;
-  object-fit: cover;
-  border-radius: 6px;
-}
-
-.registro-foto-card p {
-  color: #111827;
-  font-size: 0.85rem;
-  margin-top: 6px;
-  font-weight: 500;
-}
-
-/* =======================
-   LISTA DE NOTAS
-======================= */
-.registro-nota-card {
-  width: 100%;
-  background: #ffffff;
-  border-radius: 8px;
-  padding: 12px 14px;
-  margin-bottom: 10px;
-
-  display: flex;
+  gap: 10px;
   justify-content: space-between;
   align-items: center;
-
-  border-left: 5px solid #22c55e;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  margin-bottom: 12px;
 }
 
-.registro-nota-card strong {
+.registro-lista-header h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
   color: #111827;
-  font-size: 1rem;
 }
 
-.registro-nota-card p {
-  font-size: 0.9rem;
-  color: #374151;
-}
-
-/* =======================
-   BOTÃO DE EXCLUIR
-======================= */
-.btn-delete {
-  border: none;
-  cursor: pointer;
-  font-size: 1.1rem;
-  background: none;
-  color: #ef4444;
-  transition: transform 0.12s ease;
-}
-
-.btn-delete:hover {
-  transform: scale(1.25);
-}
-
-/* =======================
-   FORMULÁRIOS NOS MODAIS
-======================= */
-.registro-form input,
-.registro-form textarea {
-  border-radius: 8px;
-  border: 1px solid #bcbcbc;
-  padding: 8px 10px;
+.registro-lista-header input {
+  flex: 1;
+  min-width: 220px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  padding: 7px 12px;
   font-size: 0.9rem;
   background: #f9fafb;
   color: #111827;
+}
+
+.registro-lista-header input:focus {
+  outline: none;
+  border-color: #0ea5e9;
+}
+
+/* LISTA E ITENS */
+.registro-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.registro-item-card {
+  display: flex;
+  gap: 10px;
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 10px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.3);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.registro-item-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.4);
+}
+
+.registro-item-esquerda {
+  flex-shrink: 0;
+}
+
+.registro-thumb {
+  width: 90px;
+  height: 90px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 2px solid #0ea5e9;
+}
+
+.registro-thumb.sem-imagem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e5e7eb;
+  color: #4b5563;
+  font-size: 0.8rem;
+}
+
+.registro-item-direita {
+  flex: 1;
+}
+
+.registro-item-direita h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 3px;
+}
+
+.registro-linha {
+  font-size: 0.86rem;
+  color: #374151;
+}
+
+.registro-data {
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+.texto-vazio-registro {
+  font-size: 0.9rem;
+  color: #374151;
+}
+
+/* FORMULÁRIO NO MODAL */
+.registro-form label {
+  font-size: 0.95rem;
+  color: #374151;
+  font-weight: 500;
+  margin-top: 6px;
+}
+
+.registro-form input,
+.registro-form textarea {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  padding: 7px 10px;
+  font-size: 0.9rem;
+  background: #f9fafb;
+  color: #111827;
+}
+
+.registro-form textarea {
+  min-height: 60px;
+  resize: vertical;
 }
 
 .registro-form input:focus,
@@ -227,26 +252,50 @@
   border-color: #0ea5e9;
 }
 
-.registro-form label {
-  font-size: 0.95rem;
-  color: #374151;
-  font-weight: 500;
+.preview-imagem-container {
   margin-top: 8px;
 }
 
-.registro-form textarea {
-  height: 120px;
-  resize: none;
+.preview-imagem-container p {
+  font-size: 0.83rem;
+  color: #374151;
+  margin-bottom: 4px;
 }
 
-/* =======================
-   BOTÃO PRINCIPAL
-======================= */
+.preview-imagem {
+  max-width: 100%;
+  max-height: 220px;
+  border-radius: 10px;
+  object-fit: contain;
+  border: 1px solid #d1d5db;
+}
+
+/* MODAL ZOOM */
+.registro-zoom-conteudo {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.registro-zoom-imagem {
+  width: 100%;
+  max-height: 350px;
+  object-fit: contain;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+}
+
+.registro-zoom-textos p {
+  font-size: 0.9rem;
+  color: #111827;
+}
+
+/* BOTÃO PRINCIPAL (reaproveitado) */
 .btn-principal {
-  margin-top: 14px;
+  margin-top: 10px;
   border: none;
   border-radius: 999px;
-  padding: 10px;
+  padding: 9px 14px;
   font-size: 0.95rem;
   font-weight: 600;
   background: linear-gradient(90deg, #0ea5e9, #22c55e);
@@ -260,27 +309,29 @@
   box-shadow: 0 6px 12px rgba(34, 197, 94, 0.4);
 }
 
-/* =======================
-   RESPONSIVIDADE
-======================= */
+/* RESPONSIVO */
 @media (max-width: 900px) {
-  .registro-grid {
+  .registro-item-card {
+    flex-direction: row;
+  }
+}
+
+@media (max-width: 650px) {
+  .registro-item-card {
     flex-direction: column;
     align-items: center;
   }
 
-  .registro-card {
-    width: 90%;
-    height: 120px;
+  .registro-item-direita {
+    width: 100%;
   }
 
-  .registro-foto-card {
-    width: 48%;
+  .registro-lista-header {
+    flex-direction: column;
+    align-items: flex-start;
   }
-}
 
-@media (max-width: 600px) {
-  .registro-foto-card {
+  .registro-lista-header input {
     width: 100%;
   }
 }

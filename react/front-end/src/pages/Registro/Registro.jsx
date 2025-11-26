@@ -1,255 +1,360 @@
-import React, { useEffect, useState } from "react";
-import "./Registro.css";
+import React, { useEffect, useState, useRef } from "react";
+import "./Registro.css"; // ou Registro.css, se preferir renomear
 import Modal from "../../components/Modal";
-import { FaCamera, FaBook, FaPlus, FaTrash, FaSearch } from "react-icons/fa";
+import { FaCameraRetro, FaFolderOpen } from "react-icons/fa";
 
 export default function Registro() {
-  const [fotos, setFotos] = useState([]);
-  const [anotacoes, setAnotacoes] = useState([]);
-  const [modalFoto, setModalFoto] = useState(false);
-  const [modalNota, setModalNota] = useState(false);
-  const [tituloFoto, setTituloFoto] = useState("");
-  const [imagemBase64, setImagemBase64] = useState("");
-  const [tituloNota, setTituloNota] = useState("");
-  const [descricaoNota, setDescricaoNota] = useState("");
+  // Lista de registros
+  const [registros, setRegistros] = useState([]);
+
+  // Campos do formulário
+  const [titulo, setTitulo] = useState("");
+  const [motor, setMotor] = useState("");
+  const [medidas, setMedidas] = useState("");
+  const [ponto, setPonto] = useState("");
+  const [observacoes, setObservacoes] = useState("");
+
+  // Imagem (foto)
+  const [previewImagem, setPreviewImagem] = useState("");
+  const [arquivoImagem, setArquivoImagem] = useState(null);
+
+  // Busca nos registros salvos
   const [busca, setBusca] = useState("");
-  const [animar, setAnimar] = useState(false);
 
-  // ==========================
-  // Carregar dados salvos
-  // ==========================
+  // Modais
+  const [modalNovoRegistro, setModalNovoRegistro] = useState(false);
+  const [modalZoom, setModalZoom] = useState(false);
+  const [registroSelecionado, setRegistroSelecionado] = useState(null);
+
+  // Referência da área de registros salvos (pra rolar até lá)
+  const listaRef = useRef(null);
+
+  // ============================
+  // LocalStorage
+  // ============================
   useEffect(() => {
-    setAnimar(true);
-
-    const f = JSON.parse(localStorage.getItem("registro_fotos") || "[]");
-    const a = JSON.parse(localStorage.getItem("registro_anotacoes") || "[]");
-
-    setFotos(f);
-    setAnotacoes(a);
+    try {
+      const armazenados = JSON.parse(
+        localStorage.getItem("registrosTecnicos") || "[]"
+      );
+      setRegistros(armazenados);
+    } catch (e) {
+      console.error("Erro ao ler registros técnicos:", e);
+      setRegistros([]);
+    }
   }, []);
 
-  const salvarFotos = (lista) => {
-    setFotos(lista);
-    localStorage.setItem("registro_fotos", JSON.stringify(lista));
+  const salvarRegistros = (lista) => {
+    setRegistros(lista);
+    localStorage.setItem("registrosTecnicos", JSON.stringify(lista));
   };
 
-  const salvarNotas = (lista) => {
-    setAnotacoes(lista);
-    localStorage.setItem("registro_anotacoes", JSON.stringify(lista));
+  // ============================
+  // Upload de imagem
+  // ============================
+  const handleImagemChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setArquivoImagem(file);
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      setPreviewImagem(ev.target.result); // base64
+    };
+    reader.readAsDataURL(file);
   };
 
-  // ==========================
-  // Upload: converter para Base64
-  // ==========================
-  const handleImagem = (e) => {
-    const arquivo = e.target.files[0];
-    if (!arquivo) return;
-
-    const leitor = new FileReader();
-    leitor.onload = () => setImagemBase64(leitor.result);
-    leitor.readAsDataURL(arquivo);
-  };
-
-  // ==========================
-  // Salvar Foto
-  // ==========================
-  const salvarFoto = (e) => {
+  // ============================
+  // Cadastrar novo registro
+  // ============================
+  const cadastrarRegistro = (e) => {
     e.preventDefault();
 
-    if (!imagemBase64) {
-      alert("Selecione uma imagem.");
+    if (!titulo && !motor && !medidas && !ponto && !observacoes && !previewImagem) {
+      alert("Preencha alguma informação ou envie uma foto para salvar o registro.");
       return;
     }
 
-    const nova = {
+    const novoRegistro = {
       id: Date.now(),
-      titulo: tituloFoto || "Sem título",
-      imagem: imagemBase64,
+      titulo: titulo || "Registro sem título",
+      motor,
+      medidas,
+      ponto,
+      observacoes,
+      imagem: previewImagem || null,
+      dataCriacao: new Date().toLocaleString("pt-BR"),
     };
 
-    salvarFotos([...fotos, nova]);
+    const lista = [novoRegistro, ...registros];
+    salvarRegistros(lista);
 
-    setTituloFoto("");
-    setImagemBase64("");
-    setModalFoto(false);
+    // Limpa formulário
+    setTitulo("");
+    setMotor("");
+    setMedidas("");
+    setPonto("");
+    setObservacoes("");
+    setArquivoImagem(null);
+    setPreviewImagem("");
+    setModalNovoRegistro(false);
   };
 
-  // ==========================
-  // Salvar Nota
-  // ==========================
-  const salvarNota = (e) => {
-    e.preventDefault();
-
-    if (!tituloNota || !descricaoNota) {
-      alert("Preencha título e descrição.");
-      return;
-    }
-
-    const nova = {
-      id: Date.now(),
-      titulo: tituloNota,
-      descricao: descricaoNota,
-    };
-
-    salvarNotas([...anotacoes, nova]);
-
-    setTituloNota("");
-    setDescricaoNota("");
-    setModalNota(false);
-  };
-
-  // ==========================
-  // Excluir
-  // ==========================
-  const excluirFoto = (id) => {
-    salvarFotos(fotos.filter((f) => f.id !== id));
-  };
-
-  const excluirNota = (id) => {
-    salvarNotas(anotacoes.filter((a) => a.id !== id));
-  };
-
-  // ==========================
-  // Buscar
-  // ==========================
-  const filtrar = (lista) => {
-    if (!busca) return lista;
+  // ============================
+  // Busca
+  // ============================
+  const aplicarBusca = () => {
+    if (!busca) return registros;
     const termo = busca.toLowerCase();
-    return lista.filter(
-      (i) =>
-        i.titulo.toLowerCase().includes(termo) ||
-        (i.descricao && i.descricao.toLowerCase().includes(termo))
+    return registros.filter(
+      (r) =>
+        r.titulo.toLowerCase().includes(termo) ||
+        (r.motor && r.motor.toLowerCase().includes(termo)) ||
+        (r.observacoes && r.observacoes.toLowerCase().includes(termo))
     );
   };
 
-  const fotosFiltradas = filtrar(fotos);
-  const notasFiltradas = filtrar(anotacoes);
+  const registrosFiltrados = aplicarBusca();
 
+  // ============================
+  // Zoom da imagem
+  // ============================
+  const abrirZoom = (registro) => {
+    setRegistroSelecionado(registro);
+    setModalZoom(true);
+  };
+
+  // ============================
+  // Scroll para registros salvos
+  // ============================
+  const irParaRegistrosSalvos = () => {
+    if (listaRef.current) {
+      listaRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  // ============================
+  // JSX
+  // ============================
   return (
     <div className="registro-container">
-      <div className={`registro-content animar-registro`}>
-        <h1 className="registro-titulo">📚 Registro Técnico da Oficina Sabino</h1>
+      <div className="registro-content page-transition-side">
+        {/* Cabeçalho */}
+        <header className="registro-header">
+          <h1>📚 Registro Técnico da Oficina Sabino</h1>
+          <p>Salve fotos, medidas, ponto de motor e observações importantes.</p>
+        </header>
 
-        {/* GRID DE CARDS */}
-        <div className="registro-grid">
-          {/* Foto */}
-          <button className="registro-card" onClick={() => setModalFoto(true)}>
-            <FaCamera className="icon-reg" />
-            <p>Adicionar Foto</p>
-          </button>
-
-          {/* Nota */}
-          <button className="registro-card" onClick={() => setModalNota(true)}>
-            <FaBook className="icon-reg" />
-            <p>Nova Anotação</p>
-          </button>
-        </div>
-
-        {/* BUSCA */}
-        <div className="registro-busca">
-          <FaSearch />
-          <input
-            type="text"
-            placeholder="Buscar fotos ou anotações..."
-            value={busca}
-            onChange={(e) => setBusca(e.target.value)}
-          />
-        </div>
-
-        {/* =======================
-            LISTA DE FOTOS
-        ======================== */}
-        <h2 className="registro-subtitulo">📸 Fotos</h2>
-
-        {fotosFiltradas.length === 0 ? (
-          <p className="registro-vazio">Nenhuma foto salva.</p>
-        ) : (
-          <div className="registro-fotos-lista">
-            {fotosFiltradas.map((foto) => (
-              <div key={foto.id} className="registro-foto-card">
-                <img src={foto.imagem} alt={foto.titulo} />
-                <p>{foto.titulo}</p>
-                <button className="btn-delete" onClick={() => excluirFoto(foto.id)}>
-                  <FaTrash />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* =======================
-            LISTA DE NOTAS
-        ======================== */}
-        <h2 className="registro-subtitulo">📝 Anotações</h2>
-
-        {notasFiltradas.length === 0 ? (
-          <p className="registro-vazio">Nenhuma anotação salva.</p>
-        ) : (
-          notasFiltradas.map((nota) => (
-            <div key={nota.id} className="registro-nota-card">
-              <div>
-                <strong>{nota.titulo}</strong>
-                <p>{nota.descricao}</p>
-              </div>
-              <button className="btn-delete" onClick={() => excluirNota(nota.id)}>
-                <FaTrash />
-              </button>
+        {/* Cards principais */}
+        <div className="registro-grid-cards">
+          {/* Card novo registro */}
+          <button
+            className="registro-card registro-card--novo"
+            onClick={() => setModalNovoRegistro(true)}
+          >
+            <div className="registro-card-icone">
+              <FaCameraRetro />
             </div>
-          ))
-        )}
+            <div className="registro-card-texto">
+              <h2>Novo Registro</h2>
+              <p>Adicionar foto, medidas e anotações de um motor.</p>
+            </div>
+          </button>
+
+          {/* Card registros salvos */}
+          <button
+            className="registro-card registro-card--salvos"
+            onClick={irParaRegistrosSalvos}
+          >
+            <div className="registro-card-icone">
+              <FaFolderOpen />
+            </div>
+            <div className="registro-card-texto">
+              <h2>Registros Salvos</h2>
+              <p>Consultar rapidamente seus registros técnicos.</p>
+            </div>
+          </button>
+        </div>
+
+        {/* ============================
+            LISTA DE REGISTROS SALVOS
+        ============================ */}
+        <section
+          className="registro-lista-section"
+          ref={listaRef}
+        >
+          <div className="registro-lista-header">
+            <h2>📂 Registros Salvos</h2>
+            <input
+              type="text"
+              placeholder="Buscar por título, motor ou observação..."
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
+            />
+          </div>
+
+          {registrosFiltrados.length === 0 ? (
+            <p className="texto-vazio-registro">
+              Nenhum registro técnico salvo ainda.
+            </p>
+          ) : (
+            <div className="registro-lista">
+              {registrosFiltrados.map((r) => (
+                <div
+                  key={r.id}
+                  className="registro-item-card"
+                  onClick={() => abrirZoom(r)}
+                >
+                  <div className="registro-item-esquerda">
+                    {r.imagem ? (
+                      <img
+                        src={r.imagem}
+                        alt={r.titulo}
+                        className="registro-thumb"
+                      />
+                    ) : (
+                      <div className="registro-thumb sem-imagem">
+                        <span>Sem foto</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="registro-item-direita">
+                    <h3>{r.titulo}</h3>
+                    {r.motor && <p><strong>Motor:</strong> {r.motor}</p>}
+                    {r.medidas && (
+                      <p className="registro-linha">
+                        <strong>Medidas:</strong> {r.medidas}
+                      </p>
+                    )}
+                    {r.ponto && (
+                      <p className="registro-linha">
+                        <strong>Ponto:</strong> {r.ponto}
+                      </p>
+                    )}
+                    {r.observacoes && (
+                      <p className="registro-linha">
+                        <strong>Obs.:</strong> {r.observacoes}
+                      </p>
+                    )}
+                    {r.dataCriacao && (
+                      <p className="registro-data">
+                        Salvo em {r.dataCriacao}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
       </div>
 
-      {/* =======================
-          MODAL FOTO
-      ======================== */}
+      {/* ============================
+          MODAL NOVO REGISTRO
+      ============================ */}
       <Modal
-        isOpen={modalFoto}
-        onClose={() => setModalFoto(false)}
-        title="Adicionar Foto"
+        isOpen={modalNovoRegistro}
+        onClose={() => setModalNovoRegistro(false)}
+        title="Novo Registro Técnico"
       >
-        <form className="registro-form" onSubmit={salvarFoto}>
-          <label>Título (opcional):</label>
+        <form className="registro-form" onSubmit={cadastrarRegistro}>
+          <label>Título (carro / projeto):</label>
           <input
             type="text"
-            value={tituloFoto}
-            onChange={(e) => setTituloFoto(e.target.value)}
+            value={titulo}
+            onChange={(e) => setTitulo(e.target.value)}
           />
 
-          <label>Imagem:</label>
-          <input type="file" accept="image/*" onChange={handleImagem} />
+          <label>Motor:</label>
+          <input
+            type="text"
+            placeholder="Ex.: 2.0 8V, 1.6 16V..."
+            value={motor}
+            onChange={(e) => setMotor(e.target.value)}
+          />
 
-          <button className="btn-principal" type="submit">
-            Salvar Foto
+          <label>Medidas (folgas, torque, etc.):</label>
+          <textarea
+            value={medidas}
+            onChange={(e) => setMedidas(e.target.value)}
+          />
+
+          <label>Ponto do motor:</label>
+          <textarea
+            value={ponto}
+            onChange={(e) => setPonto(e.target.value)}
+          />
+
+          <label>Observações gerais:</label>
+          <textarea
+            value={observacoes}
+            onChange={(e) => setObservacoes(e.target.value)}
+          />
+
+          <label>Foto (opcional):</label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImagemChange}
+          />
+
+          {previewImagem && (
+            <div className="preview-imagem-container">
+              <p>Pré-visualização:</p>
+              <img
+                src={previewImagem}
+                alt="Pré-visualização"
+                className="preview-imagem"
+              />
+            </div>
+          )}
+
+          <button type="submit" className="btn-principal">
+            Salvar Registro
           </button>
         </form>
       </Modal>
 
-      {/* =======================
-          MODAL ANOTAÇÃO
-      ======================== */}
+      {/* ============================
+          MODAL ZOOM DA IMAGEM
+      ============================ */}
       <Modal
-        isOpen={modalNota}
-        onClose={() => setModalNota(false)}
-        title="Nova Anotação"
+        isOpen={modalZoom}
+        onClose={() => setModalZoom(false)}
+        title={registroSelecionado?.titulo || "Registro Técnico"}
       >
-        <form className="registro-form" onSubmit={salvarNota}>
-          <label>Título:</label>
-          <input
-            type="text"
-            value={tituloNota}
-            onChange={(e) => setTituloNota(e.target.value)}
-          />
+        {registroSelecionado && (
+          <div className="registro-zoom-conteudo">
+            {registroSelecionado.imagem && (
+              <img
+                src={registroSelecionado.imagem}
+                alt={registroSelecionado.titulo}
+                className="registro-zoom-imagem"
+              />
+            )}
 
-          <label>Descrição:</label>
-          <textarea
-            value={descricaoNota}
-            onChange={(e) => setDescricaoNota(e.target.value)}
-          />
-
-          <button className="btn-principal" type="submit">
-            Salvar Anotação
-          </button>
-        </form>
+            <div className="registro-zoom-textos">
+              {registroSelecionado.motor && (
+                <p><strong>Motor:</strong> {registroSelecionado.motor}</p>
+              )}
+              {registroSelecionado.medidas && (
+                <p><strong>Medidas:</strong> {registroSelecionado.medidas}</p>
+              )}
+              {registroSelecionado.ponto && (
+                <p><strong>Ponto:</strong> {registroSelecionado.ponto}</p>
+              )}
+              {registroSelecionado.observacoes && (
+                <p><strong>Observações:</strong> {registroSelecionado.observacoes}</p>
+              )}
+              {registroSelecionado.dataCriacao && (
+                <p className="registro-data">
+                  Salvo em {registroSelecionado.dataCriacao}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
       </Modal>
     </div>
   );
