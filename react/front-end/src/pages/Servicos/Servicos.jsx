@@ -1,95 +1,109 @@
-// Importa os hooks do React
 import { useEffect, useState } from "react";
-// Importa a configuração do axios (baseURL, etc.)
 import api from "../../api/api";
 
-// Componente de página de Serviços
 export default function Servicos() {
-  // Estado com a lista de serviços vindos do back-end
+  // lista de serviços
   const [servicos, setServicos] = useState([]);
+  // listas de clientes e carros
+  const [clientes, setClientes] = useState([]);
+  const [carros, setCarros] = useState([]);
+  const [carrosFiltrados, setCarrosFiltrados] = useState([]);
 
-  // Estado com os dados do formulário de serviço
+  // form
   const [formData, setFormData] = useState({
-    data_ini: "",           // mesma coisa que no back: Date data_ini;
-    data_fim: "",           // Date data_fim;
-    data_garantia: "",      // Date data_garantia;
-    descricao: "",          // String descricao;
-    preco_peca_pago: 0,     // double preco_peca_pago;
-    preco_peca_cobrado: 0,  // double preco_peca_cobrado;
-    preco_mao_obra: 0,      // double preco_mao_obra;
-    valor_total: 0,         // double valor_total;
-    status: "",             // campo "Status" no Java gera JSON "status"
+    data_ini: "",
+    data_fim: "",
+    data_garantia: "",
+    descricao: "",
+    preco_peca_pago: 0,
+    preco_peca_cobrado: 0,
+    preco_mao_obra: 0,
+    valor_total: 0,
+    status: "",
+    clienteId: "", // novo
+    carroId: "", // novo
   });
 
-  // Estado para saber se está editando algum serviço (guarda o id)
   const [editId, setEditId] = useState(null);
 
-  // Ao carregar a página, busca todos os serviços
+  // carrega tudo ao abrir
   useEffect(() => {
+    carregarClientes();
+    carregarCarros();
     carregarServicos();
   }, []);
 
-  // Função que busca serviços no back-end
+  async function carregarClientes() {
+    try {
+      const response = await api.get("/api/cliente");
+      setClientes(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar clientes:", error);
+    }
+  }
+
+  async function carregarCarros() {
+    try {
+      const response = await api.get("/api/carro");
+      setCarros(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar carros:", error);
+    }
+  }
+
   async function carregarServicos() {
     try {
-      // Faz um GET na rota de serviços (ajuste se sua URL for diferente)
-      const response = await api.get("/servicos");
-      // Salva a lista no estado
+      const response = await api.get("/api/servico");
       setServicos(response.data);
     } catch (error) {
       console.error("Erro ao buscar serviços:", error);
     }
   }
 
-  // Função para atualizar o formulário quando o usuário digita
+  // quando muda qualquer campo do form
   function handleChange(e) {
-    // Pega o nome do campo e o valor digitado
     const { name, value } = e.target;
 
-    // Usa setFormData em formato de função para garantir o estado anterior
     setFormData((prev) => {
-      // Começa copiando todo o objeto anterior
-      const novo = { ...prev, [name]: value };
+      let novo = { ...prev, [name]: value };
 
-      // Converte campos numéricos para número
+      // se mudou cliente, precisa filtrar carros desse cliente
+      if (name === "clienteId") {
+        novo.carroId = ""; // limpa carro escolhido
+        const filtrados = carros.filter((carro) => carro.clienteId === value);
+        setCarrosFiltrados(filtrados);
+      }
+
+      // garante que os campos numéricos são números
       if (
         name === "preco_peca_pago" ||
         name === "preco_peca_cobrado" ||
         name === "preco_mao_obra"
       ) {
-        // Usa parseFloat para transformar string em número
         novo[name] = parseFloat(value) || 0;
       }
 
-      // Recalcula o valor_total sempre que preço da peça cobrado ou mão de obra mudarem
-      // (aqui estou considerando valor_total = preco_peca_cobrado + preco_mao_obra)
+      // recálculo do valor total
       novo.valor_total =
         (parseFloat(novo.preco_peca_cobrado) || 0) +
         (parseFloat(novo.preco_mao_obra) || 0);
 
-      // Retorna o novo objeto atualizado
       return novo;
     });
   }
 
-  // Envia o formulário (cria ou atualiza um serviço)
   async function handleSubmit(e) {
-    // Impede o reload da página
     e.preventDefault();
 
     try {
       if (editId) {
-        // Se tiver editId, faz um PUT (edição)
-        await api.put(`/servicos/${editId}`, formData);
+        await api.put(`/api/servico/${editId}`, formData);
       } else {
-        // Se não tiver editId, faz um POST (novo serviço)
-        await api.post("/servicos", formData);
+        await api.post("/api/servico", formData);
       }
 
-      // Depois de salvar, recarrega a lista de serviços
       await carregarServicos();
 
-      // Limpa o formulário
       setFormData({
         data_ini: "",
         data_fim: "",
@@ -100,17 +114,17 @@ export default function Servicos() {
         preco_mao_obra: 0,
         valor_total: 0,
         status: "",
+        clienteId: "",
+        carroId: "",
       });
-      // Sai do modo edição
+      setCarrosFiltrados([]);
       setEditId(null);
     } catch (error) {
       console.error("Erro ao salvar serviço:", error);
     }
   }
 
-  // Quando clicar em "Editar" em algum serviço da tabela
   function handleEdit(servico) {
-    // Preenche o formulário com os dados do serviço selecionado
     setFormData({
       data_ini: servico.data_ini || "",
       data_fim: servico.data_fim || "",
@@ -121,37 +135,91 @@ export default function Servicos() {
       preco_mao_obra: servico.preco_mao_obra || 0,
       valor_total: servico.valor_total || 0,
       status: servico.status || "",
+      clienteId: servico.clienteId || "",
+      carroId: servico.carroId || "",
     });
-    // Guarda o id para o PUT
+
+    // ajusta carros filtrados de acordo com o cliente desse serviço
+    const filtrados = carros.filter(
+      (carro) => carro.clienteId === servico.clienteId
+    );
+    setCarrosFiltrados(filtrados);
+
     setEditId(servico.id);
   }
 
-  // Excluir serviço
   async function handleDelete(id) {
-    // Confirmação antes de apagar
     if (!window.confirm("Tem certeza que deseja excluir este serviço?")) return;
 
     try {
-      // Faz DELETE no back-end
-      await api.delete(`/servicos/${id}`);
-      // Recarrega lista
+      await api.delete(`/api/servico/${id}`);
       await carregarServicos();
     } catch (error) {
       console.error("Erro ao excluir serviço:", error);
     }
   }
 
+  function getNomeCliente(clienteId) {
+    const cliente = clientes.find((c) => c.id === clienteId);
+    return cliente ? cliente.nome : "Cliente não encontrado";
+  }
+
+  function getDescricaoCarro(carroId) {
+    const carro = carros.find((c) => c.id === carroId);
+    if (!carro) return "Carro não encontrado";
+    return `${carro.modelo} - ${carro.placa}`;
+  }
+
   return (
     <div className="servico-page">
       <h1>Serviços</h1>
 
-      {/* FORMULÁRIO DE SERVIÇO */}
       <form onSubmit={handleSubmit} className="form-servico">
+        {/* CLIENTE */}
+        <div>
+          <label>Cliente:</label>
+          <select
+            name="clienteId"
+            value={formData.clienteId}
+            onChange={handleChange}
+          >
+            <option value="">Selecione um cliente</option>
+            {clientes.map((cliente) => (
+              <option key={cliente.id} value={cliente.id}>
+                {cliente.nome} - {cliente.cpf}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* CARRO DO CLIENTE */}
+        <div>
+          <label>Carro:</label>
+          <select
+            name="carroId"
+            value={formData.carroId}
+            onChange={handleChange}
+            disabled={!formData.clienteId}
+          >
+            <option value="">
+              {formData.clienteId
+                ? "Selecione um carro"
+                : "Selecione um cliente primeiro"}
+            </option>
+            {carrosFiltrados.map((carro) => (
+              <option key={carro.id} value={carro.id}>
+                {carro.modelo} - {carro.placa}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* DEMAIS CAMPOS IGUAIS AO QUE JÁ TINHA */}
         <div>
           <label>Data Início:</label>
           <input
             type="date"
-            name="data_ini"              // igual ao campo do back
+            name="data_ini"
             value={formData.data_ini}
             onChange={handleChange}
           />
@@ -178,7 +246,7 @@ export default function Servicos() {
         </div>
 
         <div>
-          <label>Descrição do Serviço:</label>
+          <label>Descrição:</label>
           <textarea
             name="descricao"
             value={formData.descricao}
@@ -198,7 +266,7 @@ export default function Servicos() {
         </div>
 
         <div>
-          <label>Preço Peça (Cobrado do Cliente):</label>
+          <label>Preço Peça (Cobrado):</label>
           <input
             type="number"
             step="0.01"
@@ -227,8 +295,6 @@ export default function Servicos() {
             name="valor_total"
             value={formData.valor_total}
             onChange={handleChange}
-            // Se não quiser deixar o usuário mexer direto, pode pôr readOnly
-            // readOnly
           />
         </div>
 
@@ -248,15 +314,13 @@ export default function Servicos() {
         </button>
       </form>
 
-      {/* TABELA DE SERVIÇOS */}
+      {/* LISTA DE SERVIÇOS */}
       <table className="tabela-servico">
         <thead>
           <tr>
-            <th>Data Início</th>
-            <th>Data Fim</th>
-            <th>Garantia</th>
+            <th>Cliente</th>
+            <th>Carro</th>
             <th>Descrição</th>
-            <th>Peça (Pago)</th>
             <th>Peça (Cobrado)</th>
             <th>Mão de Obra</th>
             <th>Valor Total</th>
@@ -267,11 +331,9 @@ export default function Servicos() {
         <tbody>
           {servicos.map((servico) => (
             <tr key={servico.id}>
-              <td>{servico.data_ini}</td>
-              <td>{servico.data_fim}</td>
-              <td>{servico.data_garantia}</td>
+              <td>{getNomeCliente(servico.clienteId)}</td>
+              <td>{getDescricaoCarro(servico.carroId)}</td>
               <td>{servico.descricao}</td>
-              <td>{servico.preco_peca_pago}</td>
               <td>{servico.preco_peca_cobrado}</td>
               <td>{servico.preco_mao_obra}</td>
               <td>{servico.valor_total}</td>
