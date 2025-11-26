@@ -1,32 +1,33 @@
+// src/pages/Servicos/Servicos.jsx
+
 import { useEffect, useState } from "react";
 import api from "../../api/api";
 
 export default function Servicos() {
-  // lista de serviços
+  // listas vindas do back
   const [servicos, setServicos] = useState([]);
-  // listas de clientes e carros
   const [clientes, setClientes] = useState([]);
   const [carros, setCarros] = useState([]);
   const [carrosFiltrados, setCarrosFiltrados] = useState([]);
 
   // form
   const [formData, setFormData] = useState({
-    data_ini: "",
-    data_fim: "",
-    data_garantia: "",
     descricao: "",
     preco_peca_pago: 0,
     preco_peca_cobrado: 0,
     preco_mao_obra: 0,
     valor_total: 0,
     status: "",
-    clienteId: "", // novo
-    carroId: "", // novo
+    data_ini: "",
+    data_fim: "",
+    data_garantia: "",
+    clienteId: "",
+    carroId: "",
   });
 
   const [editId, setEditId] = useState(null);
 
-  // carrega tudo ao abrir
+  // carrega tudo quando a tela abre
   useEffect(() => {
     carregarClientes();
     carregarCarros();
@@ -35,46 +36,48 @@ export default function Servicos() {
 
   async function carregarClientes() {
     try {
-      const response = await api.get("/api/cliente");
-      setClientes(response.data);
-    } catch (error) {
-      console.error("Erro ao buscar clientes:", error);
+      const res = await api.get("/cliente"); // AJUSTA se teu controller for /clientes
+      setClientes(res.data);
+    } catch (e) {
+      console.error("Erro ao buscar clientes:", e);
     }
   }
 
   async function carregarCarros() {
     try {
-      const response = await api.get("/api/carro");
-      setCarros(response.data);
-    } catch (error) {
-      console.error("Erro ao buscar carros:", error);
+      const res = await api.get("/carros"); // AJUSTA se teu controller for /carro
+      setCarros(res.data);
+    } catch (e) {
+      console.error("Erro ao buscar carros:", e);
     }
   }
 
   async function carregarServicos() {
     try {
-      const response = await api.get("/api/servico");
-      setServicos(response.data);
-    } catch (error) {
-      console.error("Erro ao buscar serviços:", error);
+      const res = await api.get("/servico"); // ou /servicos
+      setServicos(res.data);
+    } catch (e) {
+      console.error("Erro ao buscar serviços:", e);
     }
   }
 
-  // quando muda qualquer campo do form
+  // quando o usuário mexe em algum campo
   function handleChange(e) {
     const { name, value } = e.target;
 
     setFormData((prev) => {
       let novo = { ...prev, [name]: value };
 
-      // se mudou cliente, precisa filtrar carros desse cliente
+      // se mudou o cliente → filtra carros daquele cliente
       if (name === "clienteId") {
-        novo.carroId = ""; // limpa carro escolhido
-        const filtrados = carros.filter((carro) => carro.clienteId === value);
+        novo.carroId = "";
+        const filtrados = carros.filter(
+          (c) => c.cliente && c.cliente.id === value
+        );
         setCarrosFiltrados(filtrados);
       }
 
-      // garante que os campos numéricos são números
+      // campos numéricos
       if (
         name === "preco_peca_pago" ||
         name === "preco_peca_cobrado" ||
@@ -83,7 +86,7 @@ export default function Servicos() {
         novo[name] = parseFloat(value) || 0;
       }
 
-      // recálculo do valor total
+      // recalcula valor_total = peça cobrada + mão de obra
       novo.valor_total =
         (parseFloat(novo.preco_peca_cobrado) || 0) +
         (parseFloat(novo.preco_mao_obra) || 0);
@@ -92,56 +95,79 @@ export default function Servicos() {
     });
   }
 
+  // salvar serviço (criar / editar)
   async function handleSubmit(e) {
     e.preventDefault();
 
+    // monta o payload do jeitinho que o back espera
+    const payload = {
+      descricao: formData.descricao,
+      preco_peca_pago: formData.preco_peca_pago,
+      preco_peca_cobrado: formData.preco_peca_cobrado,
+      preco_mao_obra: formData.preco_mao_obra,
+      valor_total: formData.valor_total,
+      status: formData.status,
+      data_ini: formData.data_ini,
+      data_fim: formData.data_fim,
+      data_garantia: formData.data_garantia,
+      carro: { id: formData.carroId },
+      cliente: { id: formData.clienteId },
+    };
+
     try {
       if (editId) {
-        await api.put(`/api/servico/${editId}`, formData);
+        await api.put(`/servico/${editId}`, payload); // ou /servicos/${editId}
       } else {
-        await api.post("/api/servico", formData);
+        await api.post("/servico", payload); // ou /servicos
       }
 
       await carregarServicos();
-
-      setFormData({
-        data_ini: "",
-        data_fim: "",
-        data_garantia: "",
-        descricao: "",
-        preco_peca_pago: 0,
-        preco_peca_cobrado: 0,
-        preco_mao_obra: 0,
-        valor_total: 0,
-        status: "",
-        clienteId: "",
-        carroId: "",
-      });
-      setCarrosFiltrados([]);
-      setEditId(null);
+      resetForm();
     } catch (error) {
-      console.error("Erro ao salvar serviço:", error);
+      console.error(
+        "Erro ao salvar serviço:",
+        error.response?.data || error.message
+      );
     }
   }
 
+  function resetForm() {
+    setFormData({
+      descricao: "",
+      preco_peca_pago: 0,
+      preco_peca_cobrado: 0,
+      preco_mao_obra: 0,
+      valor_total: 0,
+      status: "",
+      data_ini: "",
+      data_fim: "",
+      data_garantia: "",
+      clienteId: "",
+      carroId: "",
+    });
+    setEditId(null);
+    setCarrosFiltrados([]);
+  }
+
+  // quando clica em editar
   function handleEdit(servico) {
     setFormData({
-      data_ini: servico.data_ini || "",
-      data_fim: servico.data_fim || "",
-      data_garantia: servico.data_garantia || "",
       descricao: servico.descricao || "",
       preco_peca_pago: servico.preco_peca_pago || 0,
       preco_peca_cobrado: servico.preco_peca_cobrado || 0,
       preco_mao_obra: servico.preco_mao_obra || 0,
       valor_total: servico.valor_total || 0,
       status: servico.status || "",
-      clienteId: servico.clienteId || "",
-      carroId: servico.carroId || "",
+      data_ini: servico.data_ini || "",
+      data_fim: servico.data_fim || "",
+      data_garantia: servico.data_garantia || "",
+      clienteId: servico.cliente?.id || "",
+      carroId: servico.carro?.id || "",
     });
 
-    // ajusta carros filtrados de acordo com o cliente desse serviço
+    // atualiza lista de carros filtrados pro cliente desse serviço
     const filtrados = carros.filter(
-      (carro) => carro.clienteId === servico.clienteId
+      (c) => c.cliente && c.cliente.id === servico.cliente.id
     );
     setCarrosFiltrados(filtrados);
 
@@ -152,30 +178,19 @@ export default function Servicos() {
     if (!window.confirm("Tem certeza que deseja excluir este serviço?")) return;
 
     try {
-      await api.delete(`/api/servico/${id}`);
+      await api.delete(`/servico/${id}`); // ou /servicos/${id}
       await carregarServicos();
-    } catch (error) {
-      console.error("Erro ao excluir serviço:", error);
+    } catch (e) {
+      console.error("Erro ao excluir serviço:", e);
     }
-  }
-
-  function getNomeCliente(clienteId) {
-    const cliente = clientes.find((c) => c.id === clienteId);
-    return cliente ? cliente.nome : "Cliente não encontrado";
-  }
-
-  function getDescricaoCarro(carroId) {
-    const carro = carros.find((c) => c.id === carroId);
-    if (!carro) return "Carro não encontrado";
-    return `${carro.modelo} - ${carro.placa}`;
   }
 
   return (
     <div className="servico-page">
       <h1>Serviços</h1>
 
+      {/* FORMULÁRIO */}
       <form onSubmit={handleSubmit} className="form-servico">
-        {/* CLIENTE */}
         <div>
           <label>Cliente:</label>
           <select
@@ -184,15 +199,14 @@ export default function Servicos() {
             onChange={handleChange}
           >
             <option value="">Selecione um cliente</option>
-            {clientes.map((cliente) => (
-              <option key={cliente.id} value={cliente.id}>
-                {cliente.nome} - {cliente.cpf}
+            {clientes.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.nome} - {c.cpf}
               </option>
             ))}
           </select>
         </div>
 
-        {/* CARRO DO CLIENTE */}
         <div>
           <label>Carro:</label>
           <select
@@ -214,7 +228,6 @@ export default function Servicos() {
           </select>
         </div>
 
-        {/* DEMAIS CAMPOS IGUAIS AO QUE JÁ TINHA */}
         <div>
           <label>Data Início:</label>
           <input
@@ -255,7 +268,7 @@ export default function Servicos() {
         </div>
 
         <div>
-          <label>Preço Peça (Pago):</label>
+          <label>Preço Peça (pago):</label>
           <input
             type="number"
             step="0.01"
@@ -266,7 +279,7 @@ export default function Servicos() {
         </div>
 
         <div>
-          <label>Preço Peça (Cobrado):</label>
+          <label>Preço Peça (cobrado):</label>
           <input
             type="number"
             step="0.01"
@@ -295,6 +308,7 @@ export default function Servicos() {
             name="valor_total"
             value={formData.valor_total}
             onChange={handleChange}
+            readOnly
           />
         </div>
 
@@ -305,7 +319,7 @@ export default function Servicos() {
             name="status"
             value={formData.status}
             onChange={handleChange}
-            placeholder="Ex: Em andamento, Concluído..."
+            placeholder="Em andamento, Concluído, etc."
           />
         </div>
 
@@ -314,35 +328,35 @@ export default function Servicos() {
         </button>
       </form>
 
-      {/* LISTA DE SERVIÇOS */}
+      {/* TABELA DE SERVIÇOS */}
       <table className="tabela-servico">
         <thead>
           <tr>
             <th>Cliente</th>
             <th>Carro</th>
             <th>Descrição</th>
-            <th>Peça (Cobrado)</th>
-            <th>Mão de Obra</th>
-            <th>Valor Total</th>
+            <th>Peça (cobrado)</th>
+            <th>Mão de obra</th>
+            <th>Total</th>
             <th>Status</th>
             <th>Ações</th>
           </tr>
         </thead>
         <tbody>
-          {servicos.map((servico) => (
-            <tr key={servico.id}>
-              <td>{getNomeCliente(servico.clienteId)}</td>
-              <td>{getDescricaoCarro(servico.carroId)}</td>
-              <td>{servico.descricao}</td>
-              <td>{servico.preco_peca_cobrado}</td>
-              <td>{servico.preco_mao_obra}</td>
-              <td>{servico.valor_total}</td>
-              <td>{servico.status}</td>
+          {servicos.map((s) => (
+            <tr key={s.id}>
+              <td>{s.cliente?.nome}</td>
               <td>
-                <button onClick={() => handleEdit(servico)}>Editar</button>
-                <button onClick={() => handleDelete(servico.id)}>
-                  Excluir
-                </button>
+                {s.carro?.modelo} - {s.carro?.placa}
+              </td>
+              <td>{s.descricao}</td>
+              <td>{s.preco_peca_cobrado}</td>
+              <td>{s.preco_mao_obra}</td>
+              <td>{s.valor_total}</td>
+              <td>{s.status}</td>
+              <td>
+                <button onClick={() => handleEdit(s)}>Editar</button>
+                <button onClick={() => handleDelete(s.id)}>Excluir</button>
               </td>
             </tr>
           ))}

@@ -1,73 +1,77 @@
 import { useEffect, useState } from "react";
 import api from "../../api/api"; // caminho correto
 
+
 export default function Carros() {
-  // lista de carros
   const [carros, setCarros] = useState([]);
-  // lista de clientes pra escolher o dono do carro
   const [clientes, setClientes] = useState([]);
 
-  // dados do formulário
+  // usamos clienteId só pra controlar o select no front
   const [formData, setFormData] = useState({
     modelo: "",
     placa: "",
     url_foto: "",
-    clienteId: "", // id do cliente dono do carro
+    clienteId: "",
   });
 
-  // id do carro que está sendo editado (se estiver editando)
   const [editId, setEditId] = useState(null);
 
-  // carrega clientes e carros ao abrir a tela
   useEffect(() => {
     carregarClientes();
     carregarCarros();
   }, []);
 
-  // busca clientes no back-end
   async function carregarClientes() {
     try {
-      const response = await api.get("/api/cliente");
+      const response = await api.get("/clientes");
       setClientes(response.data);
     } catch (error) {
       console.error("Erro ao buscar clientes:", error);
     }
   }
 
-  // busca carros no back-end
   async function carregarCarros() {
     try {
-      const response = await api.get("/api/carro");
+      // AJUSTA AQUI pro path do teu controller:
+      // se for @RequestMapping("/carros") → "/carros"
+      // se for "/api/carro" → troca aqui também
+      const response = await api.get("/carros");
       setCarros(response.data);
     } catch (error) {
       console.error("Erro ao buscar carros:", error);
     }
   }
 
-  // atualiza o formulário quando digita / seleciona algo
   function handleChange(e) {
     const { name, value } = e.target;
-
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
   }
 
-  // salvar (criar ou atualizar) carro
   async function handleSubmit(e) {
     e.preventDefault();
 
+    // monta o JSON exatamente como o back espera
+    const payload = {
+      modelo: formData.modelo,
+      placa: formData.placa,
+      url_foto: formData.url_foto,
+      cliente: {
+        id: formData.clienteId, // vai virar a FK id_cliente no banco
+      },
+    };
+
     try {
       if (editId) {
-        await api.put(`/api/carro/${editId}`, formData);
+        await api.put(`/carros/${editId}`, payload);
       } else {
-        await api.post("/api/carro", formData);
+        await api.post("/carros", payload);
       }
 
       await carregarCarros();
 
-      // limpa form
       setFormData({
         modelo: "",
         placa: "",
@@ -76,45 +80,43 @@ export default function Carros() {
       });
       setEditId(null);
     } catch (error) {
-      console.error("Erro ao salvar carro:", error);
+      console.error(
+        "Erro ao salvar carro:",
+        error.response?.data || error.message
+      );
     }
   }
 
-  // carregar dados para edição
   function handleEdit(carro) {
     setFormData({
       modelo: carro.modelo || "",
       placa: carro.placa || "",
       url_foto: carro.url_foto || "",
-      // aqui assumo que vem carro.clienteId no JSON
-      clienteId: carro.clienteId || "",
+      // agora o cliente vem aninhado: carro.cliente.id
+      clienteId: carro.cliente?.id || "",
     });
     setEditId(carro.id);
   }
 
-  // excluir carro
   async function handleDelete(id) {
     if (!window.confirm("Tem certeza que deseja excluir este carro?")) return;
 
     try {
-      await api.delete(`/api/carro/${id}`);
+      await api.delete(`/carros/${id}`);
       await carregarCarros();
     } catch (error) {
       console.error("Erro ao excluir carro:", error);
     }
   }
 
-  // função auxiliar pra mostrar nome do cliente na tabela
-  function getNomeCliente(clienteId) {
-    const cliente = clientes.find((c) => c.id === clienteId);
-    return cliente ? cliente.nome : "Sem cliente";
+  function getNomeClienteDoCarro(carro) {
+    return carro.cliente ? carro.cliente.nome : "Sem cliente";
   }
 
   return (
     <div className="carro-page">
       <h1>Carros</h1>
 
-      {/* FORMULÁRIO */}
       <form onSubmit={handleSubmit} className="form-carro">
         <div>
           <label>Modelo:</label>
@@ -168,7 +170,6 @@ export default function Carros() {
         </button>
       </form>
 
-      {/* LISTA */}
       <table className="tabela-carro">
         <thead>
           <tr>
@@ -184,7 +185,7 @@ export default function Carros() {
             <tr key={carro.id}>
               <td>{carro.modelo}</td>
               <td>{carro.placa}</td>
-              <td>{getNomeCliente(carro.clienteId)}</td>
+              <td>{getNomeClienteDoCarro(carro)}</td>
               <td>
                 {carro.url_foto ? (
                   <img
