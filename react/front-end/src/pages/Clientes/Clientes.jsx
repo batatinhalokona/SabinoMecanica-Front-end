@@ -1,24 +1,13 @@
 // src/pages/Clientes/Clientes.jsx
 
-// Importa os hooks do React
 import { useEffect, useState } from "react";
-
-// Importa a instância do axios configurada
 import api from "../../api/api";
+import "./Clientes.css"; // opcional se quiser estilizar depois
 
-// (opcional) CSS específico da tela de clientes
-import "./Clientes.css";
-
-// Componente principal da página de Clientes
 export default function Clientes() {
-  // -----------------------------
-  // ESTADOS
-  // -----------------------------
-
-  // Guarda a lista de clientes vindos do back-end
   const [clientes, setClientes] = useState([]);
+  const [editId, setEditId] = useState(null);
 
-  // Guarda os dados do formulário (usado tanto para cadastrar quanto editar)
   const [formData, setFormData] = useState({
     cpf: "",
     nome: "",
@@ -26,128 +15,95 @@ export default function Clientes() {
     situacao: "",
   });
 
-  // Guarda o ID do cliente que está sendo editado
-  // Se for null → estamos cadastrando um novo
-  // Se tiver um id → estamos editando
-  const [editId, setEditId] = useState(null);
-
-  // -----------------------------
-  // CARREGAR CLIENTES AO ABRIR TELA
-  // -----------------------------
+  // ==== CARREGAR CLIENTES AO ABRIR ====
   useEffect(() => {
     carregarClientes();
   }, []);
 
-  // Função que busca os clientes no back-end
   async function carregarClientes() {
     try {
-      // GET na rota de clientes do back (ajusta se sua rota for diferente)
-      const response = await api.get("/api/cliente");
-      // salva lista no estado
+      const response = await api.get("/clientes"); // LISTAR
       setClientes(response.data);
     } catch (error) {
       console.error("Erro ao buscar clientes:", error);
     }
   }
 
-  // -----------------------------
-  // ATUALIZAÇÃO DO FORMULÁRIO
-  // -----------------------------
+  // ==== ATUALIZA INPUTS ====
   function handleChange(e) {
-    // pega o nome do campo (name="...") e o valor digitado
     const { name, value } = e.target;
-
-    // atualiza somente o campo que mudou, mantendo o resto
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
   }
 
-  // -----------------------------
-  // SUBMIT DO FORMULÁRIO (CRIAR / EDITAR)
-  // -----------------------------
+  // ==== CADASTRAR / EDITAR ====
   async function handleSubmit(e) {
-    // evita reload padrão do formulário
     e.preventDefault();
 
     try {
       if (editId) {
-        // Se tem editId → é edição → PUT /api/cliente/{id}
-        await api.put(`/api/cliente/${editId}`, formData);
+        await api.put(`/clientes/${editId}`, formData); // EDITAR
       } else {
-        // Se não tem editId → é novo cliente → POST /api/cliente
-        await api.post("/api/cliente", formData);
+        await api.post("/clientes", formData); // CADASTRAR
       }
 
-      // Recarrega a lista de clientes após salvar
-      await carregarClientes();
-
-      // Limpa o formulário para o próximo cadastro/edição
-      setFormData({
-        cpf: "",
-        nome: "",
-        telefone: "",
-        situacao: "",
-      });
-
-      // Sai do modo edição
-      setEditId(null);
+      carregarClientes(); // recarrega a tabela
+      resetForm(); // limpa campos após salvar
     } catch (error) {
       console.error("Erro ao salvar cliente:", error);
     }
   }
 
-  // -----------------------------
-  // CLICAR NO BOTÃO EDITAR
-  // -----------------------------
+  // ==== EDITAR CLIQUE ====
   function handleEdit(cliente) {
-    // Preenche o form com os dados do cliente clicado
     setFormData({
       cpf: cliente.cpf || "",
       nome: cliente.nome || "",
       telefone: cliente.telefone || "",
       situacao: cliente.situacao || "",
     });
-
-    // Guarda o id para o PUT na hora de salvar
     setEditId(cliente.id);
   }
 
-  // -----------------------------
-  // EXCLUIR CLIENTE
-  // -----------------------------
+  // ==== EXCLUIR ====
   async function handleDelete(id) {
-    // Confirma antes de apagar
-    if (!window.confirm("Tem certeza que deseja excluir este cliente?")) return;
+    if (!window.confirm("Excluir cliente?")) return;
 
     try {
-      // DELETE /api/cliente/{id}
-      await api.delete(`/api/cliente/${id}`);
-
-      // Atualiza a lista
-      await carregarClientes();
+      await api.delete(`/clientes/${id}`);
+      carregarClientes();
     } catch (error) {
       console.error("Erro ao excluir cliente:", error);
     }
   }
 
-  // -----------------------------
-  // RENDERIZAÇÃO
-  // -----------------------------
+  // ==== RESET ====
+  function resetForm() {
+    setFormData({
+      cpf: "",
+      nome: "",
+      telefone: "",
+      situacao: "",
+    });
+    setEditId(null);
+  }
+
   return (
     <div className="cliente-page">
       <h1>Clientes</h1>
 
-      {/* FORMULÁRIO DE CLIENTE */}
+      {/* FORMULÁRIO */}
       <form onSubmit={handleSubmit} className="form-cliente">
         <div>
           <label>CPF:</label>
           <input
             type="text"
-            name="cpf"               // precisa bater com a propriedade do back
+            name="cpf"
             value={formData.cpf}
             onChange={handleChange}
+            placeholder="000.000.000-00"
           />
         </div>
 
@@ -158,6 +114,7 @@ export default function Clientes() {
             name="nome"
             value={formData.nome}
             onChange={handleChange}
+            placeholder="Nome completo"
           />
         </div>
 
@@ -168,6 +125,7 @@ export default function Clientes() {
             name="telefone"
             value={formData.telefone}
             onChange={handleChange}
+            placeholder="(00) 00000-0000"
           />
         </div>
 
@@ -178,7 +136,7 @@ export default function Clientes() {
             name="situacao"
             value={formData.situacao}
             onChange={handleChange}
-            placeholder="Ex: Ativo, Inadimplente, Bloqueado..."
+            placeholder="Ativo, Inativo, Inadimplente..."
           />
         </div>
 
@@ -187,7 +145,7 @@ export default function Clientes() {
         </button>
       </form>
 
-      {/* TABELA DE CLIENTES */}
+      {/* TABELA */}
       <table className="tabela-cliente">
         <thead>
           <tr>
@@ -198,6 +156,7 @@ export default function Clientes() {
             <th>Ações</th>
           </tr>
         </thead>
+
         <tbody>
           {clientes.map((cliente) => (
             <tr key={cliente.id}>
@@ -206,13 +165,8 @@ export default function Clientes() {
               <td>{cliente.telefone}</td>
               <td>{cliente.situacao}</td>
               <td>
-                {/* BOTÃO EDITAR: carrega dados no formulário */}
-                <button type="button" onClick={() => handleEdit(cliente)}>
-                  Editar
-                </button>
-
-                {/* BOTÃO EXCLUIR: apaga do back */}
-                <button type="button" onClick={() => handleDelete(cliente.id)}>
+                <button onClick={() => handleEdit(cliente)}>Editar</button>
+                <button onClick={() => handleDelete(cliente.id)}>
                   Excluir
                 </button>
               </td>
