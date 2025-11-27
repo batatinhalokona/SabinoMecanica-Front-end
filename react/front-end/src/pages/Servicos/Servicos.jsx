@@ -1,12 +1,16 @@
+// src/pages/Servicos/Servicos.jsx
+
 import { useEffect, useState } from "react";
 import api from "../../api/api";
 
 export default function Servicos() {
+  // listas vindas do back
   const [servicos, setServicos] = useState([]);
   const [clientes, setClientes] = useState([]);
   const [carros, setCarros] = useState([]);
   const [carrosFiltrados, setCarrosFiltrados] = useState([]);
 
+  // peças do serviço (apenas front)
   const [itensPeca, setItensPeca] = useState([]);
   const [novoItem, setNovoItem] = useState({
     descricao: "",
@@ -14,6 +18,7 @@ export default function Servicos() {
     preco_cobrado: "",
   });
 
+  // form principal (preco_peca_* só pro cálculo/visualização no front)
   const [formData, setFormData] = useState({
     descricao: "",
     preco_peca_pago: 0,
@@ -30,6 +35,7 @@ export default function Servicos() {
 
   const [editId, setEditId] = useState(null);
 
+  // carregar dados iniciais
   useEffect(() => {
     carregarClientes();
     carregarCarros();
@@ -37,26 +43,40 @@ export default function Servicos() {
   }, []);
 
   async function carregarClientes() {
-    const res = await api.get("/clientes");
-    setClientes(res.data);
+    try {
+      const res = await api.get("/clientes");
+      setClientes(res.data);
+    } catch (e) {
+      console.error("Erro ao buscar clientes:", e);
+    }
   }
 
   async function carregarCarros() {
-    const res = await api.get("/carros");
-    setCarros(res.data);
+    try {
+      const res = await api.get("/carros");
+      setCarros(res.data);
+    } catch (e) {
+      console.error("Erro ao buscar carros:", e);
+    }
   }
 
   async function carregarServicos() {
-    const res = await api.get("/servicos");
-    setServicos(res.data);
+    try {
+      const res = await api.get("/servicos");
+      setServicos(res.data);
+    } catch (e) {
+      console.error("Erro ao buscar serviços:", e);
+    }
   }
 
+  // mudanças nos campos principais
   function handleChange(e) {
     const { name, value } = e.target;
 
     setFormData((prev) => {
       let novo = { ...prev, [name]: value };
 
+      // quando muda o cliente, filtra carros daquele cliente
       if (name === "clienteId") {
         novo.carroId = "";
         const filtrados = carros.filter(
@@ -65,6 +85,7 @@ export default function Servicos() {
         setCarrosFiltrados(filtrados);
       }
 
+      // atualiza mão de obra e recalcula valor_total
       if (name === "preco_mao_obra") {
         const mao = parseFloat(value) || 0;
         const totalPecasCobradas = prev.preco_peca_cobrado || 0;
@@ -76,6 +97,7 @@ export default function Servicos() {
     });
   }
 
+  // mudança nos inputs da nova peça
   function handleNovoItemChange(e) {
     const { name, value } = e.target;
     setNovoItem((prev) => ({
@@ -84,6 +106,7 @@ export default function Servicos() {
     }));
   }
 
+  // adiciona peça na tabela
   function adicionarItemPeca() {
     if (!novoItem.descricao.trim()) return;
 
@@ -96,8 +119,10 @@ export default function Servicos() {
       preco_cobrado: precoCobrado,
     };
 
+    // adiciona item na lista
     setItensPeca((prev) => [...prev, item]);
 
+    // atualiza totais no form (somente front)
     setFormData((prev) => {
       const novoPago = (prev.preco_peca_pago || 0) + precoPago;
       const novoCobrado =
@@ -112,6 +137,7 @@ export default function Servicos() {
       };
     });
 
+    // limpa inputs da peça
     setNovoItem({
       descricao: "",
       preco_pago: "",
@@ -119,11 +145,13 @@ export default function Servicos() {
     });
   }
 
+  // remover peça da lista
   function removerItemPeca(index) {
     const itemRemovido = itensPeca[index];
 
     setItensPeca((prev) => prev.filter((_, i) => i !== index));
 
+    // atualiza totais
     setFormData((prev) => {
       const novoPago =
         (prev.preco_peca_pago || 0) - itemRemovido.preco_pago;
@@ -140,13 +168,13 @@ export default function Servicos() {
     });
   }
 
+  // salvar serviço (criar / editar)
   async function handleSubmit(e) {
     e.preventDefault();
 
+    // monta payload SEM preco_peca_* (back não tem mais esses campos)
     const payload = {
       descricao: formData.descricao,
-      preco_peca_pago: formData.preco_peca_pago,
-      preco_peca_cobrado: formData.preco_peca_cobrado,
       preco_mao_obra: formData.preco_mao_obra,
       valor_total: formData.valor_total,
       status: formData.status,
@@ -156,7 +184,7 @@ export default function Servicos() {
       carro: { id: formData.carroId },
       cliente: { id: formData.clienteId },
 
-      // LISTA DE PEÇAS VAI JUNTO PRO BACK
+      // lista de peças que serão salvas na tabela servico_peca
       itens: itensPeca.map((item) => ({
         descricao: item.descricao,
         precoPago: item.preco_pago,
@@ -205,44 +233,73 @@ export default function Servicos() {
     setEditId(null);
   }
 
+  // editar serviço existente
   function handleEdit(servico) {
+    // converte datas se vierem com horário (2025-11-26T00:00:00 → 2025-11-26)
+    const parseDate = (d) =>
+      d ? String(d).substring(0, 10) : "";
+
+    // se já tiver itens vindo do back, recria lista de peças no front
+    const itens = Array.isArray(servico.itens) ? servico.itens : [];
+    const itensFront = itens.map((i) => ({
+      descricao: i.descricao,
+      preco_pago: i.precoPago,
+      preco_cobrado: i.precoCobrado,
+    }));
+
+    // soma de peças (só front)
+    const totalPago = itensFront.reduce(
+      (acc, i) => acc + (i.preco_pago || 0),
+      0
+    );
+    const totalCobrado = itensFront.reduce(
+      (acc, i) => acc + (i.preco_cobrado || 0),
+      0
+    );
+
     setFormData({
       descricao: servico.descricao || "",
-      preco_peca_pago: servico.preco_peca_pago || 0,
-      preco_peca_cobrado: servico.preco_peca_cobrado || 0,
+      preco_peca_pago: totalPago,
+      preco_peca_cobrado: totalCobrado,
       preco_mao_obra: servico.preco_mao_obra || 0,
-      valor_total: servico.valor_total || 0,
+      valor_total: servico.valor_total || totalCobrado + (servico.preco_mao_obra || 0),
       status: servico.status || "",
-      data_ini: servico.data_ini || "",
-      data_fim: servico.data_fim || "",
-      data_garantia: servico.data_garantia || "",
+      data_ini: parseDate(servico.data_ini),
+      data_fim: parseDate(servico.data_fim),
+      data_garantia: parseDate(servico.data_garantia),
       clienteId: servico.cliente?.id || "",
       carroId: servico.carro?.id || "",
     });
 
+    // atualiza carros daquele cliente
     const filtrados = carros.filter(
       (c) => c.cliente && c.cliente.id === servico.cliente.id
     );
     setCarrosFiltrados(filtrados);
 
-    // se quiser depois, dá pra carregar as peças do serviço, por enquanto começa vazio:
-    setItensPeca([]);
+    // carrega peças do serviço na tabela
+    setItensPeca(itensFront);
     setEditId(servico.id);
   }
 
   async function handleDelete(id) {
     if (!window.confirm("Tem certeza que deseja excluir este serviço?")) return;
 
-    await api.delete(`/servicos/${id}`);
-    carregarServicos();
+    try {
+      await api.delete(`/servicos/${id}`);
+      await carregarServicos();
+    } catch (e) {
+      console.error("Erro ao excluir serviço:", e);
+    }
   }
 
   return (
     <div className="servico-page">
       <h1>Serviços</h1>
 
+      {/* FORMULÁRIO PRINCIPAL */}
       <form onSubmit={handleSubmit} className="form-servico">
-        {/* Cliente / Carro */}
+        {/* Cliente e Carro */}
         <div>
           <label>Cliente:</label>
           <select
@@ -382,7 +439,7 @@ export default function Servicos() {
           </table>
         )}
 
-        {/* Totais */}
+        {/* Totais das peças (só front, pra tua conferência) */}
         <div>
           <label>Total peças (pago):</label>
           <input
@@ -403,6 +460,7 @@ export default function Servicos() {
           />
         </div>
 
+        {/* Mão de obra e total */}
         <div>
           <label>Mão de obra:</label>
           <input
@@ -431,6 +489,7 @@ export default function Servicos() {
             name="status"
             value={formData.status}
             onChange={handleChange}
+            placeholder="Ex: Em andamento, Concluído..."
           />
         </div>
 
@@ -446,7 +505,6 @@ export default function Servicos() {
             <th>Cliente</th>
             <th>Carro</th>
             <th>Descrição</th>
-            <th>Peças (cobrado)</th>
             <th>Mão de obra</th>
             <th>Total</th>
             <th>Status</th>
@@ -461,7 +519,6 @@ export default function Servicos() {
                 {s.carro?.modelo} - {s.carro?.placa}
               </td>
               <td>{s.descricao}</td>
-              <td>{s.preco_peca_cobrado}</td>
               <td>{s.preco_mao_obra}</td>
               <td>{s.valor_total}</td>
               <td>{s.status}</td>
