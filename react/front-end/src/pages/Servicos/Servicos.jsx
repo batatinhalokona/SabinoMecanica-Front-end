@@ -1,535 +1,1368 @@
-// src/pages/Servicos/Servicos.jsx
-
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import api from "../../api/api";
+import "./Servicos.css";
 
 export default function Servicos() {
-  // listas vindas do back
-  const [servicos, setServicos] = useState([]);
+  // ===== ROTEAMENTO =====
+  const location = useLocation();
+  const navigate = useNavigate();
+  const searchParams = new URLSearchParams(location.search);
+  const carroIdDaUrl = searchParams.get("carroId");
+  const isNovaOS = location.pathname.includes("/servicos/novo");
+
+  // ===== FORMULÁRIO - CAMPOS PRINCIPAIS =====
+  const [clienteSelecionado, setClienteSelecionado] = useState(null);
+  const [carroSelecionado, setCarroSelecionado] = useState(null);
+
+  const [buscaClienteForm, setBuscaClienteForm] = useState("");
+  const [buscaCarroForm, setBuscaCarroForm] = useState("");
+
+  const [dataInicio, setDataInicio] = useState("");
+  const [dataFim, setDataFim] = useState("");
+
+  const [temGarantia, setTemGarantia] = useState(false);
+  const [tempoGarantiaDias, setTempoGarantiaDias] = useState("");
+
+  const [descricao, setDescricao] = useState("");
+
+  const [valorMaoObra, setValorMaoObra] = useState("");
+  const [tempoMaoObra, setTempoMaoObra] = useState("");
+
+  // ===== PEÇAS DO SERVIÇO =====
+  const [pecas, setPecas] = useState([]);
+  const [pecaNome, setPecaNome] = useState("");
+  const [pecaPrecoCusto, setPecaPrecoCusto] = useState("");
+  const [pecaPrecoVenda, setPecaPrecoVenda] = useState("");
+
+  // ===== PAGAMENTO =====
+  // DINHEIRO, PIX, DEBITO, CREDITO_AVISTA, CREDITO_PARCELADO, CHEQUE
+  const [formaPagamento, setFormaPagamento] = useState("DINHEIRO");
+  const [numeroParcelas, setNumeroParcelas] = useState(1);
+  const [jurosPercentual, setJurosPercentual] = useState(0);
+  const [chequeData, setChequeData] = useState("");
+
+  // ===== STATUS =====
+  const [status, setStatus] = useState("EM_ANDAMENTO"); // EM_ANDAMENTO ou CONCLUIDO
+
+  // ===== LISTAS GERAIS =====
   const [clientes, setClientes] = useState([]);
   const [carros, setCarros] = useState([]);
-  const [carrosFiltrados, setCarrosFiltrados] = useState([]);
+  const [servicos, setServicos] = useState([]);
 
-  // peças do serviço (apenas front)
-  const [itensPeca, setItensPeca] = useState([]);
-  const [novoItem, setNovoItem] = useState({
-    descricao: "",
-    preco_pago: "",
-    preco_cobrado: "",
-  });
+  // ===== CONTROLE DE EDIÇÃO =====
+  const [servicoEditandoId, setServicoEditandoId] = useState(null);
 
-  // form principal (preco_peca_* só pro cálculo/visualização no front)
-  const [formData, setFormData] = useState({
-    descricao: "",
-    preco_peca_pago: 0,
-    preco_peca_cobrado: 0,
-    preco_mao_obra: 0,
-    valor_total: 0,
-    status: "",
-    data_ini: "",
-    data_fim: "",
-    data_garantia: "",
-    clienteId: "",
-    carroId: "",
-  });
+  // ===== FILTROS PARA LISTAS =====
+  const [buscaServicos, setBuscaServicos] = useState("");
+  const [filtroPagamentoHistorico, setFiltroPagamentoHistorico] =
+    useState("TODOS"); // TODOS / DINHEIRO / PIX / MAQUININHA / CHEQUE
 
-  const [editId, setEditId] = useState(null);
+  // ===== MODAIS (PEÇAS e PARCELAS) =====
+  const [servicoPecasVisivel, setServicoPecasVisivel] = useState(null);
+  const [servicoParcelasVisivel, setServicoParcelasVisivel] = useState(null);
 
-  // carregar dados iniciais
+  // ===== CARREGAR DADOS NO INÍCIO =====
   useEffect(() => {
     carregarClientes();
     carregarCarros();
     carregarServicos();
   }, []);
 
+  // Pré-selecionar carro vindo da URL (Nova OS a partir do carro)
+  useEffect(() => {
+    if (carros.length > 0 && carroIdDaUrl) {
+      const encontrado = carros.find((c) => c.id === carroIdDaUrl);
+      if (encontrado) {
+        setCarroSelecionado(encontrado);
+        if (encontrado.cliente) {
+          setClienteSelecionado(encontrado.cliente);
+        }
+      }
+    }
+  }, [carros, carroIdDaUrl]);
+
+  // ===== REQUISIÇÕES =====
   async function carregarClientes() {
     try {
-      const res = await api.get("/clientes");
-      setClientes(res.data);
-    } catch (e) {
-      console.error("Erro ao buscar clientes:", e);
+      const response = await api.get("/clientes");
+      setClientes(response.data);
+    } catch (err) {
+      console.log("Erro ao carregar clientes:", err);
     }
   }
 
   async function carregarCarros() {
     try {
-      const res = await api.get("/carros");
-      setCarros(res.data);
-    } catch (e) {
-      console.error("Erro ao buscar carros:", e);
+      const response = await api.get("/carros");
+      setCarros(response.data);
+    } catch (err) {
+      console.log("Erro ao carregar carros:", err);
     }
   }
 
   async function carregarServicos() {
     try {
-      const res = await api.get("/servicos");
-      setServicos(res.data);
-    } catch (e) {
-      console.error("Erro ao buscar serviços:", e);
+      const response = await api.get("/servicos");
+      setServicos(response.data);
+    } catch (err) {
+      console.log("Erro ao carregar serviços:", err);
     }
   }
 
-  // mudanças nos campos principais
-  function handleChange(e) {
-    const { name, value } = e.target;
+  // ===== CÁLCULOS DE VALORES =====
+  const valorGasto = pecas.reduce(
+    (total, p) => total + (Number(p.precoCusto) || 0),
+    0
+  );
+  const valorPecasCobrado = pecas.reduce(
+    (total, p) => total + (Number(p.precoVenda) || 0),
+    0
+  );
+  const valorMaoObraNum = Number(valorMaoObra) || 0;
+  const valorBase = valorPecasCobrado + valorMaoObraNum;
 
-    setFormData((prev) => {
-      let novo = { ...prev, [name]: value };
+  const jurosNum =
+    formaPagamento === "CREDITO_PARCELADO" && numeroParcelas > 1
+      ? Number(jurosPercentual) || 0
+      : 0;
 
-      // quando muda o cliente, filtra carros daquele cliente
-      if (name === "clienteId") {
-        novo.carroId = "";
-        const filtrados = carros.filter(
-          (c) => c.cliente && c.cliente.id === value
-        );
-        setCarrosFiltrados(filtrados);
-      }
+  const valorComJuros =
+    formaPagamento === "CREDITO_PARCELADO" && numeroParcelas > 1
+      ? valorBase * (1 + jurosNum / 100)
+      : valorBase;
 
-      // atualiza mão de obra e recalcula valor_total
-      if (name === "preco_mao_obra") {
-        const mao = parseFloat(value) || 0;
-        const totalPecasCobradas = prev.preco_peca_cobrado || 0;
-        novo.preco_mao_obra = mao;
-        novo.valor_total = mao + totalPecasCobradas;
-      }
+  const valorParcela =
+    formaPagamento === "CREDITO_PARCELADO" && numeroParcelas > 1
+      ? valorComJuros / numeroParcelas
+      : valorComJuros;
 
-      return novo;
-    });
-  }
+  const parcelasGeradas =
+    formaPagamento === "CREDITO_PARCELADO" && numeroParcelas > 1
+      ? Array.from({ length: numeroParcelas }, (_, i) => ({
+          numero: i + 1,
+          valor: Number(valorParcela.toFixed(2)),
+          pago: false,
+        }))
+      : [];
 
-  // mudança nos inputs da nova peça
-  function handleNovoItemChange(e) {
-    const { name, value } = e.target;
-    setNovoItem((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  }
+  // ===== PEÇAS NO FORM =====
+  function adicionarPeca() {
+    if (!pecaNome.trim()) {
+      alert("Informe o nome da peça.");
+      return;
+    }
 
-  // adiciona peça na tabela
-  function adicionarItemPeca() {
-    if (!novoItem.descricao.trim()) return;
-
-    const precoPago = parseFloat(novoItem.preco_pago) || 0;
-    const precoCobrado = parseFloat(novoItem.preco_cobrado) || 0;
-
-    const item = {
-      descricao: novoItem.descricao,
-      preco_pago: precoPago,
-      preco_cobrado: precoCobrado,
+    const novaPeca = {
+      nome: pecaNome,
+      precoCusto: Number(pecaPrecoCusto) || 0,
+      precoVenda: Number(pecaPrecoVenda) || 0,
     };
 
-    // adiciona item na lista
-    setItensPeca((prev) => [...prev, item]);
-
-    // atualiza totais no form (somente front)
-    setFormData((prev) => {
-      const novoPago = (prev.preco_peca_pago || 0) + precoPago;
-      const novoCobrado =
-        (prev.preco_peca_cobrado || 0) + precoCobrado;
-      const novoTotal = novoCobrado + (prev.preco_mao_obra || 0);
-
-      return {
-        ...prev,
-        preco_peca_pago: novoPago,
-        preco_peca_cobrado: novoCobrado,
-        valor_total: novoTotal,
-      };
-    });
-
-    // limpa inputs da peça
-    setNovoItem({
-      descricao: "",
-      preco_pago: "",
-      preco_cobrado: "",
-    });
+    setPecas((prev) => [...prev, novaPeca]);
+    setPecaNome("");
+    setPecaPrecoCusto("");
+    setPecaPrecoVenda("");
   }
 
-  // remover peça da lista
-  function removerItemPeca(index) {
-    const itemRemovido = itensPeca[index];
-
-    setItensPeca((prev) => prev.filter((_, i) => i !== index));
-
-    // atualiza totais
-    setFormData((prev) => {
-      const novoPago =
-        (prev.preco_peca_pago || 0) - itemRemovido.preco_pago;
-      const novoCobrado =
-        (prev.preco_peca_cobrado || 0) - itemRemovido.preco_cobrado;
-      const novoTotal = novoCobrado + (prev.preco_mao_obra || 0);
-
-      return {
-        ...prev,
-        preco_peca_pago: novoPago,
-        preco_peca_cobrado: novoCobrado,
-        valor_total: novoTotal,
-      };
-    });
+  function removerPeca(index) {
+    setPecas((prev) => prev.filter((_, i) => i !== index));
   }
 
-  // salvar serviço (criar / editar)
-  async function handleSubmit(e) {
+  // ===== LIMPAR FORMULÁRIO =====
+  function limparFormulario() {
+    setClienteSelecionado(null);
+    setCarroSelecionado(null);
+    setBuscaClienteForm("");
+    setBuscaCarroForm("");
+
+    setDataInicio("");
+    setDataFim("");
+    setTemGarantia(false);
+    setTempoGarantiaDias("");
+    setDescricao("");
+
+    setValorMaoObra("");
+    setTempoMaoObra("");
+
+    setPecas([]);
+    setPecaNome("");
+    setPecaPrecoCusto("");
+    setPecaPrecoVenda("");
+
+    setFormaPagamento("DINHEIRO");
+    setNumeroParcelas(1);
+    setJurosPercentual(0);
+    setChequeData("");
+
+    setStatus("EM_ANDAMENTO");
+    setServicoEditandoId(null);
+
+    if (isNovaOS) {
+      navigate("/servicos");
+    }
+  }
+
+  // ===== SALVAR SERVIÇO =====
+  async function salvarServico(e) {
     e.preventDefault();
 
-    // monta payload SEM preco_peca_* (back não tem mais esses campos)
-    const payload = {
-      descricao: formData.descricao,
-      preco_mao_obra: formData.preco_mao_obra,
-      valor_total: formData.valor_total,
-      status: formData.status,
-      data_ini: formData.data_ini,
-      data_fim: formData.data_fim,
-      data_garantia: formData.data_garantia,
-      carro: { id: formData.carroId },
-      cliente: { id: formData.clienteId },
+    if (!clienteSelecionado) {
+      alert("Selecione o cliente.");
+      return;
+    }
 
-      // lista de peças que serão salvas na tabela servico_peca
-      itens: itensPeca.map((item) => ({
-        descricao: item.descricao,
-        precoPago: item.preco_pago,
-        precoCobrado: item.preco_cobrado,
-      })),
+    if (!carroSelecionado) {
+      alert("Selecione o carro.");
+      return;
+    }
+
+    if (!dataInicio) {
+      alert("Data de início é obrigatória.");
+      return;
+    }
+
+    if (!descricao.trim()) {
+      alert("Descrição do serviço é obrigatória.");
+      return;
+    }
+
+    if (formaPagamento === "CHEQUE" && !chequeData) {
+      alert("Informe a data para depósito do cheque.");
+      return;
+    }
+
+    const dadosServico = {
+      clienteId: clienteSelecionado.id,
+      carroId: carroSelecionado.id,
+      dataInicio,
+      dataFim: dataFim || null,
+      temGarantia,
+      tempoGarantiaDias: temGarantia ? Number(tempoGarantiaDias) || 0 : 0,
+      descricao,
+      valorMaoObra: valorMaoObraNum,
+      tempoMaoObra: tempoMaoObra || null,
+      pecas: pecas,
+      valorGasto,
+      valorTotal: valorComJuros,
+      formaPagamento,
+      numeroParcelas:
+        formaPagamento === "CREDITO_PARCELADO" && numeroParcelas > 1
+          ? numeroParcelas
+          : 1,
+      jurosPercentual: jurosNum,
+      parcelas:
+        formaPagamento === "CREDITO_PARCELADO" && numeroParcelas > 1
+          ? parcelasGeradas
+          : [],
+      chequeData: formaPagamento === "CHEQUE" ? chequeData : null,
+      status,
     };
 
     try {
-      if (editId) {
-        await api.put(`/servicos/${editId}`, payload);
+      if (servicoEditandoId) {
+        await api.put(`/servicos/${servicoEditandoId}`, dadosServico);
+        alert("Serviço atualizado com sucesso!");
       } else {
-        await api.post("/servicos", payload);
+        await api.post("/servicos", dadosServico);
+        alert("Serviço cadastrado com sucesso!");
       }
-
-      await carregarServicos();
-      resetForm();
-    } catch (error) {
-      console.error(
-        "Erro ao salvar serviço:",
-        error.response?.data || error.message
-      );
+      carregarServicos();
+      limparFormulario();
+    } catch (err) {
+      console.log("Erro ao salvar serviço:", err);
+      alert("Erro ao salvar serviço.");
     }
   }
 
-  function resetForm() {
-    setFormData({
-      descricao: "",
-      preco_peca_pago: 0,
-      preco_peca_cobrado: 0,
-      preco_mao_obra: 0,
-      valor_total: 0,
-      status: "",
-      data_ini: "",
-      data_fim: "",
-      data_garantia: "",
-      clienteId: "",
-      carroId: "",
-    });
-    setItensPeca([]);
-    setNovoItem({
-      descricao: "",
-      preco_pago: "",
-      preco_cobrado: "",
-    });
-    setCarrosFiltrados([]);
-    setEditId(null);
+  // ===== PREPARAR EDIÇÃO =====
+  function prepararEdicao(servico) {
+    if (servico.cliente) setClienteSelecionado(servico.cliente);
+    else setClienteSelecionado(null);
+
+    if (servico.carro) setCarroSelecionado(servico.carro);
+    else setCarroSelecionado(null);
+
+    setDataInicio(servico.dataInicio || "");
+    setDataFim(servico.dataFim || "");
+    setTemGarantia(servico.temGarantia || false);
+    setTempoGarantiaDias(
+      servico.tempoGarantiaDias != null
+        ? String(servico.tempoGarantiaDias)
+        : ""
+    );
+    setDescricao(servico.descricao || "");
+
+    setValorMaoObra(
+      servico.valorMaoObra != null ? String(servico.valorMaoObra) : ""
+    );
+    setTempoMaoObra(servico.tempoMaoObra || "");
+
+    setPecas(servico.pecas || []);
+
+    setFormaPagamento(servico.formaPagamento || "DINHEIRO");
+    setNumeroParcelas(servico.numeroParcelas || 1);
+    setJurosPercentual(servico.jurosPercentual || 0);
+    setChequeData(servico.chequeData || "");
+
+    setStatus(servico.status || "EM_ANDAMENTO");
+    setServicoEditandoId(servico.id);
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  // editar serviço existente
-  function handleEdit(servico) {
-    // converte datas se vierem com horário (2025-11-26T00:00:00 → 2025-11-26)
-    const parseDate = (d) =>
-      d ? String(d).substring(0, 10) : "";
-
-    // se já tiver itens vindo do back, recria lista de peças no front
-    const itens = Array.isArray(servico.itens) ? servico.itens : [];
-    const itensFront = itens.map((i) => ({
-      descricao: i.descricao,
-      preco_pago: i.precoPago,
-      preco_cobrado: i.precoCobrado,
-    }));
-
-    // soma de peças (só front)
-    const totalPago = itensFront.reduce(
-      (acc, i) => acc + (i.preco_pago || 0),
-      0
-    );
-    const totalCobrado = itensFront.reduce(
-      (acc, i) => acc + (i.preco_cobrado || 0),
-      0
-    );
-
-    setFormData({
-      descricao: servico.descricao || "",
-      preco_peca_pago: totalPago,
-      preco_peca_cobrado: totalCobrado,
-      preco_mao_obra: servico.preco_mao_obra || 0,
-      valor_total: servico.valor_total || totalCobrado + (servico.preco_mao_obra || 0),
-      status: servico.status || "",
-      data_ini: parseDate(servico.data_ini),
-      data_fim: parseDate(servico.data_fim),
-      data_garantia: parseDate(servico.data_garantia),
-      clienteId: servico.cliente?.id || "",
-      carroId: servico.carro?.id || "",
-    });
-
-    // atualiza carros daquele cliente
-    const filtrados = carros.filter(
-      (c) => c.cliente && c.cliente.id === servico.cliente.id
-    );
-    setCarrosFiltrados(filtrados);
-
-    // carrega peças do serviço na tabela
-    setItensPeca(itensFront);
-    setEditId(servico.id);
+  // ===== EXCLUIR SERVIÇO =====
+  async function excluirServico(servico) {
+    if (!window.confirm("Tem certeza que deseja excluir este serviço?")) {
+      return;
+    }
+    try {
+      await api.delete(`/servicos/${servico.id}`);
+      carregarServicos();
+    } catch (err) {
+      console.log("Erro ao excluir serviço:", err);
+      if (err.response && err.response.data) {
+        alert(err.response.data);
+      } else {
+        alert("Erro ao excluir serviço.");
+      }
+    }
   }
 
-  async function handleDelete(id) {
-    if (!window.confirm("Tem certeza que deseja excluir este serviço?")) return;
+  // ===== CONCLUIR SERVIÇO =====
+  async function concluirServico(servico) {
+    if (!window.confirm("Marcar este serviço como concluído?")) return;
 
     try {
-      await api.delete(`/servicos/${id}`);
-      await carregarServicos();
-    } catch (e) {
-      console.error("Erro ao excluir serviço:", e);
+      // Endpoint específico (depois a gente casa com o back)
+      await api.put(`/servicos/${servico.id}/status`, { status: "CONCLUIDO" });
+      carregarServicos();
+    } catch (err) {
+      console.log("Erro ao concluir serviço:", err);
+      alert("Erro ao concluir serviço.");
     }
   }
 
+  // ===== FILTROS DE CLIENTE/CARRO NO FORM =====
+  const clientesFiltradosForm = clientes.filter((cli) => {
+    if (!buscaClienteForm.trim()) return true;
+    const texto = buscaClienteForm.toLowerCase();
+    return (
+      cli.nome?.toLowerCase().includes(texto) ||
+      cli.telefone?.toLowerCase().includes(texto) ||
+      cli.cpf?.toLowerCase().includes(texto)
+    );
+  });
+
+  const carrosFiltradosForm = carros.filter((carro) => {
+    if (!buscaCarroForm.trim()) return true;
+    const texto = buscaCarroForm.toLowerCase();
+
+    const placaMatch = carro.placa?.toLowerCase().includes(texto);
+    const modeloMatch = carro.modelo?.toLowerCase().includes(texto);
+    const donoMatch = carro.cliente?.nome?.toLowerCase().includes(texto);
+
+    return placaMatch || modeloMatch || donoMatch;
+  });
+
+  // ===== FILTRO DE SERVIÇOS PARA TABELAS =====
+  const servicosFiltrados = servicos.filter((servico) => {
+    if (carroIdDaUrl && servico.carro && servico.carro.id !== carroIdDaUrl) {
+      return false;
+    }
+
+    if (!buscaServicos.trim()) return true;
+    const texto = buscaServicos.toLowerCase();
+
+    const descMatch = servico.descricao?.toLowerCase().includes(texto);
+    const nomeMatch = servico.cliente?.nome?.toLowerCase().includes(texto);
+    const carroMatch = servico.carro?.modelo?.toLowerCase().includes(texto);
+    const placaMatch = servico.carro?.placa?.toLowerCase().includes(texto);
+
+    return descMatch || nomeMatch || carroMatch || placaMatch;
+  });
+
+  const servicosEmAndamento = servicosFiltrados.filter(
+    (s) => s.status === "EM_ANDAMENTO"
+  );
+
+  function ehPagamentoMaquininha(fp) {
+    return (
+      fp === "DEBITO" ||
+      fp === "CREDITO_AVISTA" ||
+      fp === "CREDITO_PARCELADO"
+    );
+  }
+
+  const servicosConcluidosBase = servicosFiltrados.filter(
+    (s) => s.status === "CONCLUIDO"
+  );
+
+  const servicosConcluidos = servicosConcluidosBase.filter((s) => {
+    if (filtroPagamentoHistorico === "TODOS") return true;
+
+    const fp = s.formaPagamento;
+
+    if (filtroPagamentoHistorico === "DINHEIRO") return fp === "DINHEIRO";
+    if (filtroPagamentoHistorico === "PIX") return fp === "PIX";
+    if (filtroPagamentoHistorico === "MAQUININHA")
+      return ehPagamentoMaquininha(fp);
+    if (filtroPagamentoHistorico === "CHEQUE") return fp === "CHEQUE";
+
+    return true;
+  });
+
+  // ===== SERVIÇOS COM PAGAMENTO PENDENTE =====
+  const servicosPendentes = servicosFiltrados.filter((s) => {
+    // cartão parcelado com pelo menos uma parcela não paga
+    if (
+      s.formaPagamento === "CREDITO_PARCELADO" &&
+      Array.isArray(s.parcelas) &&
+      s.parcelas.some((p) => !p.pago)
+    ) {
+      return true;
+    }
+
+    // qualquer serviço pago em cheque entra como pendente
+    if (s.formaPagamento === "CHEQUE") return true;
+
+    return false;
+  });
+
+  // ===== AUXILIARES =====
+  function resumoDescricao(texto, limite = 40) {
+    if (!texto) return "-";
+    return texto.length > limite ? texto.slice(0, limite) + "..." : texto;
+  }
+
+  async function alternarParcelaPaga(servico, indiceParcela) {
+    if (!servico.parcelas || !servico.parcelas.length) return;
+
+    const novosServicos = servicos.map((s) => {
+      if (s.id === servico.id) {
+        const novasParcelas = s.parcelas.map((parcela, index) =>
+          index === indiceParcela
+            ? { ...parcela, pago: !parcela.pago }
+            : parcela
+        );
+        return { ...s, parcelas: novasParcelas };
+      }
+      return s;
+    });
+
+    setServicos(novosServicos);
+
+    // aqui depois dá pra fazer PUT no back com as parcelas atualizadas
+  }
+
+  function textoFormaPagamento(servico) {
+    const fp = servico.formaPagamento || "DINHEIRO";
+    const base = {
+      DINHEIRO: "Dinheiro",
+      PIX: "Pix",
+      DEBITO: "Débito",
+      CREDITO_AVISTA: "Crédito à vista",
+      CREDITO_PARCELADO: "Crédito parcelado",
+      CHEQUE: "Cheque",
+    }[fp];
+
+    if (fp === "CREDITO_PARCELADO") {
+      return `${base} (${servico.numeroParcelas}x, ${servico.jurosPercentual}% juros)`;
+    }
+
+    if (fp === "CHEQUE" && servico.chequeData) {
+      return `${base} (para ${servico.chequeData})`;
+    }
+
+    return base;
+  }
+
+  const tituloPagina = "Serviços";
+
   return (
-    <div className="servico-page">
-      <h1>Serviços</h1>
+    <div className="servicos-container">
+      <h1 className="titulo">{tituloPagina}</h1>
 
-      {/* FORMULÁRIO PRINCIPAL */}
-      <form onSubmit={handleSubmit} className="form-servico">
-        {/* Cliente e Carro */}
-        <div>
-          <label>Cliente:</label>
-          <select
-            name="clienteId"
-            value={formData.clienteId}
-            onChange={handleChange}
-          >
-            <option value="">Selecione um cliente</option>
-            {clientes.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.nome} - {c.cpf}
-              </option>
-            ))}
-          </select>
-        </div>
+      {/* ===================== SEÇÃO 1 - FORMULÁRIO ===================== */}
+      <div className="secao">
+        <h2 className="secao-titulo">
+          {servicoEditandoId ? "Editar serviço" : "Nova ordem de serviço"}
+        </h2>
 
-        <div>
-          <label>Carro:</label>
-          <select
-            name="carroId"
-            value={formData.carroId}
-            onChange={handleChange}
-            disabled={!formData.clienteId}
-          >
-            <option value="">
-              {formData.clienteId
-                ? "Selecione um carro"
-                : "Selecione um cliente primeiro"}
-            </option>
-            {carrosFiltrados.map((carro) => (
-              <option key={carro.id} value={carro.id}>
-                {carro.modelo} - {carro.placa}
-              </option>
-            ))}
-          </select>
-        </div>
+        <form className="form" onSubmit={salvarServico}>
+          {/* CLIENTE / CARRO */}
+          <div className="grupo-horizontal">
+            <div className="campo-flex">
+              <label className="label">Cliente:</label>
+              {clienteSelecionado ? (
+                <div className="selecionado-box">
+                  <span>
+                    <strong>{clienteSelecionado.nome}</strong> (
+                    {clienteSelecionado.telefone})
+                  </span>
+                  <button
+                    type="button"
+                    className="btn-trocar"
+                    onClick={() => setClienteSelecionado(null)}
+                  >
+                    Trocar
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <input
+                    className="input"
+                    type="text"
+                    placeholder="Buscar cliente por nome, telefone ou CPF"
+                    value={buscaClienteForm}
+                    onChange={(e) => setBuscaClienteForm(e.target.value)}
+                  />
+                  <div className="lista-popup">
+                    {clientesFiltradosForm.slice(0, 5).map((cli) => (
+                      <div
+                        key={cli.id}
+                        className="item-popup"
+                        onClick={() => setClienteSelecionado(cli)}
+                      >
+                        <span className="linha-principal">{cli.nome}</span>
+                        <span className="linha-secundaria">
+                          {cli.telefone} {cli.cpf && `- ${cli.cpf}`}
+                        </span>
+                      </div>
+                    ))}
+                    {clientesFiltradosForm.length === 0 && (
+                      <p className="nenhum-item">Nenhum cliente encontrado.</p>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
 
-        {/* Datas */}
-        <div>
-          <label>Data Início:</label>
-          <input
-            type="date"
-            name="data_ini"
-            value={formData.data_ini}
-            onChange={handleChange}
-          />
-        </div>
+            <div className="campo-flex">
+              <label className="label">Carro:</label>
+              {carroSelecionado ? (
+                <div className="selecionado-box">
+                  <span>
+                    <strong>{carroSelecionado.placa}</strong> -{" "}
+                    {carroSelecionado.modelo}{" "}
+                    {carroSelecionado.cliente &&
+                      `(${carroSelecionado.cliente.nome})`}
+                  </span>
+                  <button
+                    type="button"
+                    className="btn-trocar"
+                    onClick={() => setCarroSelecionado(null)}
+                  >
+                    Trocar
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <input
+                    className="input"
+                    type="text"
+                    placeholder="Buscar carro por placa, modelo ou dono"
+                    value={buscaCarroForm}
+                    onChange={(e) => setBuscaCarroForm(e.target.value)}
+                  />
+                  <div className="lista-popup">
+                    {carrosFiltradosForm.slice(0, 5).map((carro) => (
+                      <div
+                        key={carro.id}
+                        className="item-popup"
+                        onClick={() => {
+                          setCarroSelecionado(carro);
+                          if (carro.cliente) {
+                            setClienteSelecionado(carro.cliente);
+                          }
+                        }}
+                      >
+                        <span className="linha-principal">
+                          {carro.placa} - {carro.modelo}
+                        </span>
+                        <span className="linha-secundaria">
+                          {carro.cliente
+                            ? carro.cliente.nome
+                            : "Sem dono cadastrado"}
+                        </span>
+                      </div>
+                    ))}
+                    {carrosFiltradosForm.length === 0 && (
+                      <p className="nenhum-item">Nenhum carro encontrado.</p>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
 
-        <div>
-          <label>Data Fim:</label>
-          <input
-            type="date"
-            name="data_fim"
-            value={formData.data_fim}
-            onChange={handleChange}
-          />
-        </div>
+          {/* DATAS */}
+          <div className="grupo-horizontal">
+            <div className="campo-flex">
+              <label className="label">Data início:</label>
+              <input
+                className="input"
+                type="date"
+                value={dataInicio}
+                onChange={(e) => setDataInicio(e.target.value)}
+                required
+              />
+            </div>
+            <div className="campo-flex">
+              <label className="label">Data fim (opcional):</label>
+              <input
+                className="input"
+                type="date"
+                value={dataFim}
+                onChange={(e) => setDataFim(e.target.value)}
+              />
+            </div>
+          </div>
 
-        <div>
-          <label>Data Garantia:</label>
-          <input
-            type="date"
-            name="data_garantia"
-            value={formData.data_garantia}
-            onChange={handleChange}
-          />
-        </div>
+          {/* GARANTIA */}
+          <div className="grupo-horizontal">
+            <div className="campo-flex">
+              <label className="label">Garantia:</label>
+              <div className="toggle-wrapper">
+                <button
+                  type="button"
+                  className={temGarantia ? "toggle active" : "toggle"}
+                  onClick={() => setTemGarantia(true)}
+                >
+                  Tem garantia
+                </button>
+                <button
+                  type="button"
+                  className={!temGarantia ? "toggle inactive" : "toggle"}
+                  onClick={() => setTemGarantia(false)}
+                >
+                  Sem garantia
+                </button>
+              </div>
+            </div>
+            {temGarantia && (
+              <div className="campo-flex">
+                <label className="label">Tempo de garantia (dias):</label>
+                <input
+                  className="input"
+                  type="number"
+                  min="0"
+                  value={tempoGarantiaDias}
+                  onChange={(e) => setTempoGarantiaDias(e.target.value)}
+                />
+              </div>
+            )}
+          </div>
 
-        <div>
-          <label>Descrição do Serviço:</label>
+          {/* DESCRIÇÃO */}
+          <label className="label">Descrição do serviço:</label>
           <textarea
-            name="descricao"
-            value={formData.descricao}
-            onChange={handleChange}
+            className="textarea"
+            placeholder="Descreva o serviço realizado, problemas encontrados, observações..."
+            value={descricao}
+            onChange={(e) => setDescricao(e.target.value)}
           />
+
+          {/* MÃO DE OBRA */}
+          <div className="grupo-horizontal">
+            <div className="campo-flex">
+              <label className="label">Valor mão de obra:</label>
+              <input
+                className="input"
+                type="number"
+                step="0.01"
+                placeholder="0,00"
+                value={valorMaoObra}
+                onChange={(e) => setValorMaoObra(e.target.value)}
+              />
+            </div>
+            <div className="campo-flex">
+              <label className="label">Tempo de serviço (ex: 2h30):</label>
+              <input
+                className="input"
+                type="text"
+                placeholder="Tempo gasto"
+                value={tempoMaoObra}
+                onChange={(e) => setTempoMaoObra(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* PEÇAS */}
+          <div className="secao-sub">
+            <h3 className="subtitulo-form">Peças utilizadas</h3>
+            <div className="grupo-horizontal">
+              <div className="campo-flex">
+                <label className="label">Nome da peça:</label>
+                <input
+                  className="input"
+                  type="text"
+                  placeholder="Ex: Filtro de óleo"
+                  value={pecaNome}
+                  onChange={(e) => setPecaNome(e.target.value)}
+                />
+              </div>
+              <div className="campo-flex">
+                <label className="label">Preço pago (custo):</label>
+                <input
+                  className="input"
+                  type="number"
+                  step="0.01"
+                  placeholder="0,00"
+                  value={pecaPrecoCusto}
+                  onChange={(e) => setPecaPrecoCusto(e.target.value)}
+                />
+              </div>
+              <div className="campo-flex">
+                <label className="label">Preço cobrado:</label>
+                <input
+                  className="input"
+                  type="number"
+                  step="0.01"
+                  placeholder="0,00"
+                  value={pecaPrecoVenda}
+                  onChange={(e) => setPecaPrecoVenda(e.target.value)}
+                />
+              </div>
+              <div className="campo-flex botao-peca">
+                <button
+                  type="button"
+                  className="btn-adicionar-peca"
+                  onClick={adicionarPeca}
+                >
+                  Adicionar peça
+                </button>
+              </div>
+            </div>
+
+            {pecas.length > 0 && (
+              <table className="tabela-pecas-form">
+                <thead>
+                  <tr>
+                    <th>Peça</th>
+                    <th>Preço pago</th>
+                    <th>Preço cobrado</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pecas.map((p, index) => (
+                    <tr key={index}>
+                      <td>{p.nome}</td>
+                      <td>R$ {p.precoCusto.toFixed(2)}</td>
+                      <td>R$ {p.precoVenda.toFixed(2)}</td>
+                      <td>
+                        <button
+                          type="button"
+                          className="btn-remover-peca"
+                          onClick={() => removerPeca(index)}
+                        >
+                          Remover
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+
+          {/* PAGAMENTO */}
+          <div className="secao-sub">
+            <h3 className="subtitulo-form">Pagamento</h3>
+
+            <div className="grupo-horizontal">
+              <div className="campo-flex">
+                <label className="label">Forma de pagamento:</label>
+                <select
+                  className="input"
+                  value={formaPagamento}
+                  onChange={(e) => {
+                    const valor = e.target.value;
+                    setFormaPagamento(valor);
+
+                    if (valor !== "CREDITO_PARCELADO") {
+                      setNumeroParcelas(1);
+                      setJurosPercentual(0);
+                    }
+                    if (valor !== "CHEQUE") {
+                      setChequeData("");
+                    }
+                  }}
+                >
+                  <option value="DINHEIRO">Dinheiro</option>
+                  <option value="PIX">Pix</option>
+                  <option value="DEBITO">Débito</option>
+                  <option value="CREDITO_AVISTA">Crédito à vista</option>
+                  <option value="CREDITO_PARCELADO">Crédito parcelado</option>
+                  <option value="CHEQUE">Cheque</option>
+                </select>
+              </div>
+
+              {formaPagamento === "CREDITO_PARCELADO" && (
+                <>
+                  <div className="campo-flex">
+                    <label className="label">Número de parcelas:</label>
+                    <input
+                      className="input"
+                      type="number"
+                      min="1"
+                      value={numeroParcelas}
+                      onChange={(e) =>
+                        setNumeroParcelas(
+                          Math.max(1, Number(e.target.value) || 1)
+                        )
+                      }
+                    />
+                  </div>
+
+                  <div className="campo-flex">
+                    <label className="label">Juros (%):</label>
+                    <input
+                      className="input"
+                      type="number"
+                      min="0"
+                      step="0.1"
+                      value={jurosPercentual}
+                      onChange={(e) =>
+                        setJurosPercentual(Number(e.target.value) || 0)
+                      }
+                    />
+                  </div>
+                </>
+              )}
+
+              {formaPagamento === "CHEQUE" && (
+                <div className="campo-flex">
+                  <label className="label">
+                    Data para depósito do cheque:
+                  </label>
+                  <input
+                    className="input"
+                    type="date"
+                    value={chequeData}
+                    onChange={(e) => setChequeData(e.target.value)}
+                  />
+                </div>
+              )}
+            </div>
+
+            <div className="resumo-valores">
+              <p>
+                Valor gasto (peças):{" "}
+                <strong>R$ {valorGasto.toFixed(2)}</strong>
+              </p>
+              <p>
+                Valor peças (cobrado):{" "}
+                <strong>R$ {valorPecasCobrado.toFixed(2)}</strong>
+              </p>
+              <p>
+                Valor base (peças + mão de obra):{" "}
+                <strong>R$ {valorBase.toFixed(2)}</strong>
+              </p>
+              {formaPagamento === "CREDITO_PARCELADO" && numeroParcelas > 1 ? (
+                <p>
+                  Total com juros ({jurosNum}%):{" "}
+                  <strong>R$ {valorComJuros.toFixed(2)}</strong> em{" "}
+                  <strong>
+                    {numeroParcelas}x de R$ {valorParcela.toFixed(2)}
+                  </strong>
+                </p>
+              ) : (
+                <p>
+                  Total a receber:{" "}
+                  <strong>R$ {valorComJuros.toFixed(2)}</strong>
+                </p>
+              )}
+              {formaPagamento === "CHEQUE" && chequeData && (
+                <p>
+                  Cheque para depósito em:{" "}
+                  <strong>{chequeData}</strong>
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* STATUS */}
+          <div className="secao-sub">
+            <h3 className="subtitulo-form">Status do serviço</h3>
+            <div className="status-wrapper">
+              <button
+                type="button"
+                className={
+                  status === "EM_ANDAMENTO"
+                    ? "status-btn status-andamento active"
+                    : "status-btn status-andamento"
+                }
+                onClick={() => setStatus("EM_ANDAMENTO")}
+              >
+                Em andamento
+              </button>
+              <button
+                type="button"
+                className={
+                  status === "CONCLUIDO"
+                    ? "status-btn status-finalizado active"
+                    : "status-btn status-finalizado"
+                }
+                onClick={() => setStatus("CONCLUIDO")}
+              >
+                Concluído
+              </button>
+            </div>
+          </div>
+
+          {/* BOTÕES FORM */}
+          <div className="botoes-form">
+            <button className="btn-cadastrar" type="submit">
+              {servicoEditandoId ? "Salvar alterações" : "Salvar serviço"}
+            </button>
+            {servicoEditandoId && (
+              <button
+                type="button"
+                className="btn-cancelar"
+                onClick={limparFormulario}
+              >
+                Cancelar edição
+              </button>
+            )}
+          </div>
+        </form>
+      </div>
+
+      {/* ===================== SEÇÃO 2 - EM ANDAMENTO ===================== */}
+      <div className="secao">
+        <h2 className="secao-titulo">Serviços em andamento</h2>
+
+        <div className="filtros-lista">
+          <div className="filtro-esquerda">
+            <label className="label">Buscar:</label>
+            <input
+              className="input"
+              type="text"
+              placeholder="Cliente, carro ou descrição"
+              value={buscaServicos}
+              onChange={(e) => setBuscaServicos(e.target.value)}
+            />
+          </div>
         </div>
 
-        {/* TABELA DE PEÇAS */}
-        <h3>Peças usadas</h3>
-
-        <div className="linha-nova-peca">
-          <input
-            type="text"
-            name="descricao"
-            placeholder="Nome da peça"
-            value={novoItem.descricao}
-            onChange={handleNovoItemChange}
-          />
-          <input
-            type="number"
-            step="0.01"
-            name="preco_pago"
-            placeholder="Preço pago"
-            value={novoItem.preco_pago}
-            onChange={handleNovoItemChange}
-          />
-          <input
-            type="number"
-            step="0.01"
-            name="preco_cobrado"
-            placeholder="Preço cobrado"
-            value={novoItem.preco_cobrado}
-            onChange={handleNovoItemChange}
-          />
-          <button type="button" onClick={adicionarItemPeca}>
-            Adicionar peça
-          </button>
-        </div>
-
-        {itensPeca.length > 0 && (
-          <table className="tabela-pecas">
-            <thead>
-              <tr>
-                <th>Peça</th>
-                <th>Pago</th>
-                <th>Cobrado</th>
-                <th></th>
+        <table className="tabela-servicos">
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th>Carro</th>
+              <th>Descrição</th>
+              <th>Mão de obra</th>
+              <th>Valor gasto</th>
+              <th>Valor total</th>
+              <th>Peças</th>
+              <th>Pagamento</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {servicosEmAndamento.map((servico) => (
+              <tr key={servico.id}>
+                <td>{servico.cliente ? servico.cliente.nome : "-"}</td>
+                <td>
+                  {servico.carro
+                    ? `${servico.carro.placa} - ${servico.carro.modelo}`
+                    : "-"}
+                </td>
+                <td title={servico.descricao}>
+                  {resumoDescricao(servico.descricao, 50)}
+                </td>
+                <td>
+                  {servico.valorMaoObra != null
+                    ? `R$ ${servico.valorMaoObra.toFixed(2)}`
+                    : "-"}
+                </td>
+                <td>
+                  {servico.valorGasto != null
+                    ? `R$ ${servico.valorGasto.toFixed(2)}`
+                    : "-"}
+                </td>
+                <td>
+                  {servico.valorTotal != null
+                    ? `R$ ${servico.valorTotal.toFixed(2)}`
+                    : "-"}
+                </td>
+                <td>
+                  <button
+                    type="button"
+                    className="btn-pequeno"
+                    onClick={() => setServicoPecasVisivel(servico)}
+                  >
+                    Ver peças
+                  </button>
+                </td>
+                <td>
+                  <button
+                    type="button"
+                    className="btn-pequeno secundario"
+                    onClick={() => {
+                      if (servico.formaPagamento === "CREDITO_PARCELADO") {
+                        setServicoParcelasVisivel(servico);
+                      } else if (servico.formaPagamento === "CHEQUE") {
+                        alert(
+                          servico.chequeData
+                            ? `Cheque para depósito em: ${servico.chequeData}`
+                            : "Cheque (sem data cadastrada)"
+                        );
+                      } else {
+                        alert(textoFormaPagamento(servico));
+                      }
+                    }}
+                  >
+                    {textoFormaPagamento(servico)}
+                  </button>
+                </td>
+                <td className="acoes-cell-servico">
+                  <button
+                    className="btn-concluir"
+                    type="button"
+                    onClick={() => concluirServico(servico)}
+                  >
+                    Concluir
+                  </button>
+                  <button
+                    className="btn-editar-servico"
+                    type="button"
+                    onClick={() => prepararEdicao(servico)}
+                  >
+                    Editar
+                  </button>
+                  <button
+                    className="btn-excluir-servico"
+                    type="button"
+                    onClick={() => excluirServico(servico)}
+                  >
+                    Excluir
+                  </button>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {itensPeca.map((item, index) => (
-                <tr key={index}>
-                  <td>{item.descricao}</td>
-                  <td>{item.preco_pago.toFixed(2)}</td>
-                  <td>{item.preco_cobrado.toFixed(2)}</td>
-                  <td>
+            ))}
+
+            {servicosEmAndamento.length === 0 && (
+              <tr>
+                <td colSpan="9">Nenhum serviço em andamento.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* ===================== SEÇÃO 3 - PAGAMENTO PENDENTE ===================== */}
+      <div className="secao">
+        <h2 className="secao-titulo">Serviços com pagamento pendente</h2>
+
+        <table className="tabela-servicos">
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th>Carro</th>
+              <th>Descrição</th>
+              <th>Forma de pagamento</th>
+              <th>Valor total</th>
+              <th>Data cheque / parcelas</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {servicosPendentes.map((servico) => (
+              <tr key={servico.id}>
+                <td>{servico.cliente ? servico.cliente.nome : "-"}</td>
+                <td>
+                  {servico.carro
+                    ? `${servico.carro.placa} - ${servico.carro.modelo}`
+                    : "-"}
+                </td>
+                <td title={servico.descricao}>
+                  {resumoDescricao(servico.descricao, 50)}
+                </td>
+                <td>{textoFormaPagamento(servico)}</td>
+                <td>
+                  {servico.valorTotal != null
+                    ? `R$ ${servico.valorTotal.toFixed(2)}`
+                    : "-"}
+                </td>
+                <td>
+                  {servico.formaPagamento === "CHEQUE" ? (
+                    servico.chequeData || "-"
+                  ) : servico.formaPagamento === "CREDITO_PARCELADO" ? (
                     <button
                       type="button"
-                      onClick={() => removerItemPeca(index)}
+                      className="btn-pequeno"
+                      onClick={() => setServicoParcelasVisivel(servico)}
                     >
-                      Remover
+                      Ver parcelas
                     </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+                  ) : (
+                    "-"
+                  )}
+                </td>
+                <td className="acoes-cell-servico">
+                  <button
+                    className="btn-editar-servico"
+                    type="button"
+                    onClick={() => prepararEdicao(servico)}
+                  >
+                    Editar
+                  </button>
+                  <button
+                    className="btn-excluir-servico"
+                    type="button"
+                    onClick={() => excluirServico(servico)}
+                  >
+                    Excluir
+                  </button>
+                </td>
+              </tr>
+            ))}
 
-        {/* Totais das peças (só front, pra tua conferência) */}
-        <div>
-          <label>Total peças (pago):</label>
-          <input
-            type="number"
-            step="0.01"
-            value={formData.preco_peca_pago}
-            readOnly
-          />
+            {servicosPendentes.length === 0 && (
+              <tr>
+                <td colSpan="7">Nenhum pagamento pendente.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* ===================== SEÇÃO 4 - HISTÓRICO ===================== */}
+      <div className="secao">
+        <h2 className="secao-titulo">Histórico de serviços concluídos</h2>
+
+        <div className="filtros-historico">
+          <div className="campo-flex">
+            <label className="label">Filtrar por pagamento:</label>
+            <select
+              className="input"
+              value={filtroPagamentoHistorico}
+              onChange={(e) => setFiltroPagamentoHistorico(e.target.value)}
+            >
+              <option value="TODOS">Todos</option>
+              <option value="DINHEIRO">Só dinheiro</option>
+              <option value="PIX">Só Pix</option>
+              <option value="MAQUININHA">
+                Só maquininha (débito/crédito)
+              </option>
+              <option value="CHEQUE">Só cheque</option>
+            </select>
+          </div>
         </div>
 
-        <div>
-          <label>Total peças (cobrado):</label>
-          <input
-            type="number"
-            step="0.01"
-            value={formData.preco_peca_cobrado}
-            readOnly
-          />
-        </div>
-
-        {/* Mão de obra e total */}
-        <div>
-          <label>Mão de obra:</label>
-          <input
-            type="number"
-            step="0.01"
-            name="preco_mao_obra"
-            value={formData.preco_mao_obra}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div>
-          <label>Valor total:</label>
-          <input
-            type="number"
-            step="0.01"
-            value={formData.valor_total}
-            readOnly
-          />
-        </div>
-
-        <div>
-          <label>Status:</label>
-          <input
-            type="text"
-            name="status"
-            value={formData.status}
-            onChange={handleChange}
-            placeholder="Ex: Em andamento, Concluído..."
-          />
-        </div>
-
-        <button type="submit">
-          {editId ? "Atualizar Serviço" : "Cadastrar Serviço"}
-        </button>
-      </form>
-
-      {/* LISTA DE SERVIÇOS */}
-      <table className="tabela-servico">
-        <thead>
-          <tr>
-            <th>Cliente</th>
-            <th>Carro</th>
-            <th>Descrição</th>
-            <th>Mão de obra</th>
-            <th>Total</th>
-            <th>Status</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          {servicos.map((s) => (
-            <tr key={s.id}>
-              <td>{s.cliente?.nome}</td>
-              <td>
-                {s.carro?.modelo} - {s.carro?.placa}
-              </td>
-              <td>{s.descricao}</td>
-              <td>{s.preco_mao_obra}</td>
-              <td>{s.valor_total}</td>
-              <td>{s.status}</td>
-              <td>
-                <button onClick={() => handleEdit(s)}>Editar</button>
-                <button onClick={() => handleDelete(s.id)}>Excluir</button>
-              </td>
+        <table className="tabela-servicos">
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th>Carro</th>
+              <th>Descrição</th>
+              <th>Mão de obra</th>
+              <th>Valor gasto</th>
+              <th>Valor total</th>
+              <th>Peças</th>
+              <th>Pagamento</th>
+              <th>Data fim</th>
+              <th>Data cheque</th>
+              <th>Ações</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {servicosConcluidos.map((servico) => (
+              <tr key={servico.id}>
+                <td>{servico.cliente ? servico.cliente.nome : "-"}</td>
+                <td>
+                  {servico.carro
+                    ? `${servico.carro.placa} - ${servico.carro.modelo}`
+                    : "-"}
+                </td>
+                <td title={servico.descricao}>
+                  {resumoDescricao(servico.descricao, 50)}
+                </td>
+                <td>
+                  {servico.valorMaoObra != null
+                    ? `R$ ${servico.valorMaoObra.toFixed(2)}`
+                    : "-"}
+                </td>
+                <td>
+                  {servico.valorGasto != null
+                    ? `R$ ${servico.valorGasto.toFixed(2)}`
+                    : "-"}
+                </td>
+                <td>
+                  {servico.valorTotal != null
+                    ? `R$ ${servico.valorTotal.toFixed(2)}`
+                    : "-"}
+                </td>
+                <td>
+                  <button
+                    type="button"
+                    className="btn-pequeno"
+                    onClick={() => setServicoPecasVisivel(servico)}
+                  >
+                    Ver peças
+                  </button>
+                </td>
+                <td>
+                  <button
+                    type="button"
+                    className="btn-pequeno secundario"
+                    onClick={() => {
+                      if (servico.formaPagamento === "CREDITO_PARCELADO") {
+                        setServicoParcelasVisivel(servico);
+                      } else if (servico.formaPagamento === "CHEQUE") {
+                        alert(
+                          servico.chequeData
+                            ? `Cheque para depósito em: ${servico.chequeData}`
+                            : "Cheque (sem data cadastrada)"
+                        );
+                      } else {
+                        alert(textoFormaPagamento(servico));
+                      }
+                    }}
+                  >
+                    {textoFormaPagamento(servico)}
+                  </button>
+                </td>
+                <td>{servico.dataFim || "-"}</td>
+                <td>{servico.chequeData || "-"}</td>
+                <td className="acoes-cell-servico">
+                  <button
+                    className="btn-editar-servico"
+                    type="button"
+                    onClick={() => prepararEdicao(servico)}
+                  >
+                    Editar
+                  </button>
+                  <button
+                    className="btn-excluir-servico"
+                    type="button"
+                    onClick={() => excluirServico(servico)}
+                  >
+                    Excluir
+                  </button>
+                </td>
+              </tr>
+            ))}
+
+            {servicosConcluidos.length === 0 && (
+              <tr>
+                <td colSpan="11">Nenhum serviço concluído.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* ===================== MODAL - PEÇAS ===================== */}
+      {servicoPecasVisivel && (
+        <div
+          className="modal-overlay"
+          onClick={() => setServicoPecasVisivel(null)}
+        >
+          <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+            <h3>
+              Peças do serviço -{" "}
+              {servicoPecasVisivel.cliente
+                ? servicoPecasVisivel.cliente.nome
+                : "Cliente"}
+            </h3>
+            <table className="tabela-modal">
+              <thead>
+                <tr>
+                  <th>Peça</th>
+                  <th>Preço pago</th>
+                  <th>Preço cobrado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(servicoPecasVisivel.pecas || []).map((p, idx) => (
+                  <tr key={idx}>
+                    <td>{p.nome}</td>
+                    <td>R$ {Number(p.precoCusto || 0).toFixed(2)}</td>
+                    <td>R$ {Number(p.precoVenda || 0).toFixed(2)}</td>
+                  </tr>
+                ))}
+
+                {(!servicoPecasVisivel.pecas ||
+                  servicoPecasVisivel.pecas.length === 0) && (
+                  <tr>
+                    <td colSpan="3">Nenhuma peça cadastrada.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+            <button
+              className="btn-fechar-modal"
+              type="button"
+              onClick={() => setServicoPecasVisivel(null)}
+            >
+              Fechar
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ===================== MODAL - PARCELAS ===================== */}
+      {servicoParcelasVisivel && (
+        <div
+          className="modal-overlay"
+          onClick={() => setServicoParcelasVisivel(null)}
+        >
+          <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+            <h3>
+              Parcelas -{" "}
+              {servicoParcelasVisivel.cliente
+                ? servicoParcelasVisivel.cliente.nome
+                : "Cliente"}
+            </h3>
+            <table className="tabela-modal">
+              <thead>
+                <tr>
+                  <th>Parcela</th>
+                  <th>Valor</th>
+                  <th>Pago?</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(servicoParcelasVisivel.parcelas || []).map(
+                  (parcela, idx) => (
+                    <tr key={idx}>
+                      <td>{parcela.numero}</td>
+                      <td>R$ {Number(parcela.valor || 0).toFixed(2)}</td>
+                      <td>
+                        <input
+                          type="checkbox"
+                          checked={!!parcela.pago}
+                          onChange={() =>
+                            alternarParcelaPaga(servicoParcelasVisivel, idx)
+                          }
+                        />
+                      </td>
+                    </tr>
+                  )
+                )}
+
+                {(!servicoParcelasVisivel.parcelas ||
+                  servicoParcelasVisivel.parcelas.length === 0) && (
+                  <tr>
+                    <td colSpan="3">Nenhuma parcela cadastrada.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+            <button
+              className="btn-fechar-modal"
+              type="button"
+              onClick={() => setServicoParcelasVisivel(null)}
+            >
+              Fechar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

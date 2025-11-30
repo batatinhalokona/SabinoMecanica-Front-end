@@ -1,197 +1,485 @@
-/* =======================
-   CONTAINER PRINCIPAL
-======================= */
+/* ===== CONTAINER GERAL ===== */
 .servicos-container {
-  width: 100%;
-  min-height: calc(100vh - 70px);
-  display: flex;
-  flex-direction: column;
-  background-color: #d8ccb3; /* mesmo fundo da tela de clientes */
+  padding: 20px;
+  width: 90%;
+  margin: auto;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-/* =======================
-   CABEÇALHO
-======================= */
-.servicos-header {
-  text-align: center;
-  margin-top: 32px;
+/* Títulos */
+.titulo {
+  font-size: 28px;
   margin-bottom: 20px;
+  color: #222;
 }
 
-.servicos-header h1 {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1f2933;
-  margin-bottom: 4px;
+.secao {
+  margin-bottom: 30px;
 }
 
-.servicos-header p {
-  font-size: 0.98rem;
-  color: #374151;
+.secao-titulo {
+  font-size: 22px;
+  margin-bottom: 10px;
+  color: #1c4d1c;
 }
 
-/* =======================
-   CORPO (IMAGEM + CARDS)
-======================= */
-.servicos-content {
+/* ===== FORMULÁRIO ===== */
+.form {
+  background: #f8f8f8;
+  padding: 20px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.label {
+  font-weight: bold;
+  color: #333;
+}
+
+/* CAMPOS DE ENTRADA (texto, número, data, select) */
+.input,
+.select-status {
   width: 100%;
-  max-width: 1100px;
-  margin: 0 auto 40px;
-  padding: 0 24px 40px;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #c7c7c7;
+  background: #ffffff;
+  font-size: 14px;
+  color: #333;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* foco bonitinho */
+.input:focus,
+.select-status:focus,
+.textarea:focus {
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.15);
+}
+
+/* TEXTAREA */
+.textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #c7c7c7;
+  background: #ffffff;
+  font-size: 14px;
+  color: #333;
+  min-height: 90px;
+  resize: vertical;
+}
+
+/* GRUPOS HORIZONTAIS NO FORM */
+.grupo-horizontal {
   display: flex;
-  gap: 24px;
-  opacity: 0;
-  transform: translateX(35px);
-  transition: opacity 0.45s ease-out, transform 0.45s ease-out;
+  gap: 15px;
 }
 
-.servicos-content.animar {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-/* =======================
-   IMAGEM
-======================= */
-.servicos-imagem {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.servicos-imagem img {
-  max-width: 100%;
-  height: auto;
-  object-fit: contain;
-}
-
-/* =======================
-   CARDS LADO DIREITO
-======================= */
-.servicos-cards {
+.campo-flex {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 4px;
 }
 
-.servicos-card {
-  background-color: #ffffff;
-  border-radius: 12px;
-  padding: 18px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
+/* CAIXA DE SELECIONADO (CLIENTE, CARRO) */
+.selecionado-box {
+  background: #e9f5ff;
+  border-radius: 6px;
+  border: 1px solid #b3d7ff;
+  padding: 8px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-trocar {
+  padding: 6px 10px;
+  border-radius: 5px;
   border: none;
   cursor: pointer;
+  background: #1a73e8;
+  color: #fff;
+  font-size: 13px;
+}
+
+/* LISTAS POPUP (CLIENTE / CARRO NO FORM) */
+.lista-popup {
+  max-height: 180px;
+  overflow-y: auto;
+  margin-top: 5px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  background: #fff;
+}
+
+.item-popup {
+  padding: 8px 10px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+}
+
+.item-popup:hover {
+  background: #f2f9ff;
+}
+
+.linha-principal {
+  font-weight: bold;
+  display: block;
+}
+
+.linha-secundaria {
+  font-size: 12px;
+  color: #555;
+}
+
+.nenhum-item {
+  padding: 8px 10px;
+  font-size: 13px;
+  color: #777;
+}
+
+/* GARANTIA TOGGLE */
+.toggle-wrapper {
+  display: flex;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.toggle {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: #d9d9d9;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.toggle.active {
+  background: #2ecc71;
+  color: #fff;
+}
+
+.toggle.inactive {
+  background: #e74c3c;
+  color: #fff;
+}
+
+/* SUBSEÇÕES DO FORM (PEÇAS, PAGAMENTO, STATUS) */
+.secao-sub {
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px solid #ddd;
+}
+
+.subtitulo-form {
+  font-size: 18px;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+/* BOTÕES DO FORM */
+.botoes-form {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.btn-cadastrar {
+  background: #1a73e8;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.btn-cancelar {
+  background: #777;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+/* ===== PEÇAS NO FORM ===== */
+.botao-peca {
+  justify-content: flex-end;
+}
+
+.btn-adicionar-peca {
+  margin-top: 20px;
+  padding: 8px 12px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  background: #00b894;
+  color: #fff;
+  font-size: 14px;
+}
+
+.btn-remover-peca {
+  padding: 5px 10px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  background: #d63031;
+  color: #fff;
+  font-size: 13px;
+}
+
+.tabela-pecas-form {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  background: #fff;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.tabela-pecas-form th {
+  background: #003300;
+  padding: 8px;
+  color: #fff;
   text-align: left;
+  font-size: 14px;
+}
+
+.tabela-pecas-form td {
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+  font-size: 14px;
+}
+
+/* ===== PAGAMENTO / RESUMO ===== */
+.resumo-valores {
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.resumo-valores p {
+  margin: 2px 0;
+}
+
+/* STATUS BOTÕES */
+.status-wrapper {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.servicos-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
-}
-
-.servicos-card h2 {
-  font-size: 1.1rem;
-  color: #111827;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.servicos-card p {
-  font-size: 0.9rem;
-  color: #4b5563;
-}
-
-/* Card de ADICIONAR SERVIÇO */
-.card-add {
-  border: 1px dashed #0ea5e9;
-}
-
-/* Ícones dos cards (gradiente azul + verde) */
-.icone-card-servico {
-  font-size: 1.8rem;
-  background: linear-gradient(90deg, #0ea5e9, #22c55e);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 4px;
-}
-
-/* =======================
-   FORMULÁRIO MODAL
-======================= */
-.servicos-form {
-  display: flex;
-  flex-direction: column;
   gap: 10px;
 }
 
-.servicos-form label {
-  font-size: 0.9rem;
-  color: #374151;
-  font-weight: 500;
-}
-
-.servicos-form input,
-.servicos-form select {
-  border-radius: 8px;
-  border: 1px solid #bcbcbc;
-  background: #f9fafb;
-  padding: 8px 10px;
-  font-size: 0.9rem;
-  color: #111827;
-}
-
-.servicos-form input:focus,
-.servicos-form select:focus {
-  outline: none;
-  border-color: #0ea5e9;
-}
-
-/* =======================
-   BOTÃO PRINCIPAL
-======================= */
-.btn-principal {
-  margin-top: 12px;
+.status-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
   border: none;
-  border-radius: 999px;
-  padding: 10px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  background: linear-gradient(90deg, #0ea5e9, #22c55e);
-  color: #0f172a;
   cursor: pointer;
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  font-weight: bold;
+  font-size: 14px;
+  background: #d9d9d9;
+  color: #333;
 }
 
-.btn-principal:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 12px rgba(34, 197, 94, 0.4);
+.status-andamento.active {
+  background: #f1c40f;
+  color: #000;
 }
 
-/* =======================
-   RESPONSIVIDADE
-======================= */
-@media (max-width: 900px) {
-  .servicos-content {
+.status-finalizado.active {
+  background: #2ecc71;
+  color: #fff;
+}
+
+/* ===== FILTROS DA LISTA (ANDAMENTO + HISTÓRICO) ===== */
+.filtros-lista {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 10px;
+  gap: 15px;
+}
+
+.filtro-esquerda,
+.filtro-direita {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+/* Filtro específico do histórico (forma de pagamento) */
+.filtros-historico {
+  margin-bottom: 10px;
+  max-width: 320px;
+}
+
+/* ===== TABELAS DE SERVIÇOS ===== */
+.tabela-servicos {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  background: #fff;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.tabela-servicos th {
+  background: #003300;
+  padding: 10px 12px;
+  color: #fff;
+  text-align: left;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.tabela-servicos td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #ddd;
+  font-size: 14px;
+}
+
+/* AÇÕES DE SERVIÇOS */
+.acoes-cell-servico {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.btn-concluir {
+  background: #2ecc71;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.btn-editar-servico {
+  background: #ffb700;
+  color: black;
+  padding: 5px 10px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.btn-excluir-servico {
+  background: #d63031;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+/* BOTÕES PEQUENOS (peças/pagamento) */
+.btn-pequeno {
+  background: #1a73e8;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.btn-pequeno.secundario {
+  background: #555;
+}
+
+/* ===== MODAIS (PEÇAS E PARCELAS) ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal-box {
+  background: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  max-width: 90%;
+  max-height: 90%;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-box h3 {
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+/* tabela dentro do modal */
+.tabela-modal {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 10px;
+}
+
+.tabela-modal th {
+  background: #003300;
+  padding: 8px;
+  color: #fff;
+  text-align: left;
+  font-size: 14px;
+}
+
+.tabela-modal td {
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+  font-size: 14px;
+}
+
+.btn-fechar-modal {
+  align-self: flex-end;
+  padding: 6px 12px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  background: #333;
+  color: #fff;
+  font-size: 13px;
+}
+
+/* ===== RESPONSIVO ===== */
+@media (max-width: 768px) {
+  .servicos-container {
+    width: 100%;
+    padding: 10px;
+  }
+
+  .form {
+    padding: 15px;
+  }
+
+  .grupo-horizontal {
     flex-direction: column;
-    padding: 0 16px 32px;
   }
 
-  .servicos-imagem {
-    order: 2;
+  .tabela-servicos th,
+  .tabela-servicos td {
+    padding: 6px;
+    font-size: 12px;
   }
 
-  .servicos-cards {
-    order: 1;
+  .acoes-cell-servico {
+    flex-direction: column;
   }
 
-  .servicos-card {
-    padding: 16px;
+  .filtros-lista {
+    flex-direction: column;
   }
 }

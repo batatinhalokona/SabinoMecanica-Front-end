@@ -1,243 +1,243 @@
-/* =======================
-   CONTAINER PRINCIPAL
-======================= */
+/* ===== CONTAINER GERAL DA PÁGINA DE CLIENTES ===== */
 .clientes-container {
-  width: 100%;
-  min-height: calc(100vh - 70px);
-  display: flex;
-  flex-direction: column;
-  background-color: #d8ccb3; /* Padrão da Oficina */
+  /* espaço interno */
+  padding: 20px;
+  /* largura máxima relativa */
+  width: 90%;
+  /* centraliza na tela */
+  margin: auto;
+  /* fonte padrão */
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-/* =======================
-   CABEÇALHO / TÍTULO
-======================= */
-.titulo-clientes {
-  text-align: center;
-  font-size: 2rem;
-  font-weight: 700;
-  margin-top: 26px;
+/* ===== TÍTULO PRINCIPAL ===== */
+.titulo {
+  font-size: 28px;
   margin-bottom: 20px;
-  color: #1f2933;
+  color: #222;
 }
 
-.clientes-content {
-  width: 100%;
-  max-width: 1100px;
-  margin: 0 auto;
-  padding-bottom: 30px;
-  padding-inline: 24px;
-}
-
-.page-transition-side {
-  opacity: 0;
-  transform: translateX(35px);
-  animation: slide-page 0.45s ease-out forwards;
-}
-
-@keyframes slide-page {
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-/* =======================
-   CARDS DE AÇÕES
-======================= */
-.clientes-grid {
-  width: 100%;
+/* ===== FORMULÁRIO DE CADASTRO / EDIÇÃO ===== */
+.form {
+  background: #f8f8f8;         /* fundo cinza claro */
+  padding: 20px;               /* espaço interno */
+  border-radius: 8px;          /* cantos arredondados */
+  margin-bottom: 25px;         /* espaço abaixo do form */
   display: flex;
-  flex-wrap: wrap;
-  gap: 18px;
-  justify-content: center;
-  margin-top: 14px;
+  flex-direction: column;      /* empilha os itens em coluna */
+  gap: 10px;                   /* espaço entre os campos */
 }
 
-.clientes-card {
-  background: #ffffff;
-  width: 240px;
-  height: 130px;
-  border-radius: 12px;
-  padding: 16px 14px;
-  cursor: pointer;
+/* rótulos dos campos */
+.label {
+  font-weight: bold;
+  color: #333;
+}
+
+/* inputs de texto */
+.input {
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #bbb;
+  background: #fff;
+  font-size: 15px;
+}
+
+/* ===== TOGGLE DE SITUAÇÃO (ATIVO / INATIVO) ===== */
+.toggle-wrapper {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: center;
+  gap: 10px;              /* espaço entre os botões */
+  margin-bottom: 10px;
+}
+
+/* estilo base dos botões de toggle */
+.toggle {
+  padding: 8px 18px;
+  border-radius: 6px;
   border: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  cursor: pointer;
+  background: #d9d9d9;
+  font-weight: bold;
+  transition: 0.2s;
 }
 
-.clientes-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.32);
+/* quando o botão representa o estado "ativo" selecionado */
+.toggle.active {
+  background: #2ecc71;    /* verde */
+  color: white;
 }
 
-.icone-card {
-  font-size: 2rem;
-  background: linear-gradient(90deg, #0ea5e9, #22c55e);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+/* quando representa "inativo" selecionado */
+.toggle.inactive {
+  background: #e74c3c;    /* vermelho */
+  color: white;
 }
 
-.clientes-card p {
-  margin-top: 6px;
-  font-size: 1rem;
-  color: #111827;
+/* ===== BOTÕES DO FORM (CADASTRAR / SALVAR / CANCELAR) ===== */
+.botoes-form {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
 }
 
-/* =======================
-   ÁREA DO HISTÓRICO
-======================= */
-.clientes-historico-area {
+/* botão principal (cadastrar / salvar alterações) */
+.btn-cadastrar {
+  background: #1a73e8;   /* azul */
+  color: white;
+  padding: 10px 16px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+/* botão de cancelar edição */
+.btn-cancelar {
+  background: #777;      /* cinza escuro */
+  color: white;
+  padding: 10px 16px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+/* ===== ÁREA DE BUSCA ===== */
+.busca-container {
+  margin-top: 25px;
+  margin-bottom: 15px;
+}
+
+/* ===== SUBTÍTULOS DAS SEÇÕES (Ativos / Inativos) ===== */
+.subtitulo {
+  margin-top: 10px;
+  font-size: 20px;
+  color: #1c4d1c;         /* verde escuro */
+}
+
+/* subtítulo específico para inativos */
+.subtitulo.inativo {
+  color: #8b0000;         /* vermelho escuro */
+}
+
+/* ===== TABELAS ===== */
+.tabela {
   width: 100%;
-  max-width: 1100px;
-  margin: 0 auto 40px;
-  padding-inline: 24px;
+  border-collapse: collapse;
+  margin-top: 10px;
+  background: #fff;
+  border-radius: 6px;
+  overflow: hidden;        /* mantém bordas arredondadas */
 }
 
-.subtitulo-historico {
-  margin-top: 22px;
-  font-weight: 700;
-  font-size: 1.4rem;
-  color: #111827;
-  margin-bottom: 14px;
+/* cabeçalho da tabela */
+.tabela th {
+  background: #003300;     /* verde bem escuro */
+  padding: 12px;
+  color: white;
+  text-align: left;
+  font-weight: bold;
 }
 
-/* =======================
-   BUSCA DO HISTÓRICO
-======================= */
-.area-busca-clientes {
+/* células da tabela */
+.tabela td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+/* estilo aplicado em tabelas secundárias (ativos/inativos) */
+.tabela-secundaria {
+  margin-bottom: 15px;
+}
+
+/* cabeçalho das tabelas secundárias (se quiser outra cor, muda aqui) */
+.tabela-secundaria th {
+  background: #1b4b1b;
+}
+
+/* ===== BOTÕES DE AÇÃO (EDITAR / EXCLUIR) ===== */
+.btn-editar {
+  background: #ffb700;   /* amarelo */
+  padding: 6px 12px;
+  border: none;
+  border-radius: 5px;
+  margin-right: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* botão de excluir */
+.btn-excluir {
+  background: #d63031;   /* vermelho */
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* caso em algum momento você desabilite o excluir */
+.btn-excluir:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===== PAGINAÇÃO ===== */
+.paginacao {
   display: flex;
   align-items: center;
-  gap: 8px;
-  background: #ffffff;
-  padding: 8px 12px;
-  border-radius: 10px;
-  border: 1px solid #bcbcbc;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
-  margin-bottom: 16px;
+  justify-content: flex-end; /* joga pro lado direito da tela */
+  gap: 10px;
+  margin-bottom: 25px;
 }
 
-.area-busca-clientes input {
-  border: none;
-  outline: none;
-  flex: 1;
-  font-size: 0.95rem;
-  background: transparent;
-  color: #1f2933;
-}
-
-/* =======================
-   LISTA DO HISTÓRICO
-======================= */
-.card-cliente-historico {
-  background: #ffffff;
-  border-radius: 10px;
-  padding: 10px 14px;
-  margin-bottom: 12px;
-
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  border-left: 5px solid #0ea5e9;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
-}
-
-.card-cliente-historico strong {
-  font-size: 1rem;
-  color: #111827;
-}
-
-.card-cliente-historico p {
-  font-size: 0.88rem;
-  color: #374151;
-}
-
-/* =======================
-   BOTÃO EDITAR (FUTURO)
-======================= */
-.btn-mini-edit {
-  border: none;
+/* botões de paginação (anterior/próxima) */
+.paginacao button {
+  padding: 6px 12px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background: #f0f0f0;
   cursor: pointer;
-  background: none;
-  color: #0ea5e9;
-  font-size: 1.3rem;
-  transition: transform 0.12s ease;
+  font-size: 13px;
 }
 
-.btn-mini-edit:hover {
-  transform: scale(1.25);
+/* botão desabilitado (sem próxima página, por exemplo) */
+.paginacao button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-/* =======================
-   BOTÕES MINI (MODAIS)
-======================= */
-.btn-mini {
-  border: none;
-  cursor: pointer;
-  background: linear-gradient(90deg, #0ea5e9, #22c55e);
-  padding: 8px 10px;
-  border-radius: 999px;
-  color: #0f172a;
-  font-size: 0.85rem;
-  font-weight: 600;
-  transition: transform 0.1s ease;
+/* texto "Página X de Y" */
+.paginacao span {
+  font-size: 14px;
+  color: #333;
 }
 
-.btn-mini:hover {
-  transform: translateY(-2px);
-}
-
-/* =======================
-   ESTILOS GENERAIS
-======================= */
-.modal-form input {
-  border-radius: 8px;
-  border: 1px solid #bcbcbc;
-  padding: 8px 10px;
-  font-size: 0.9rem;
-  background: #f9fafb;
-  color: #111827;
-}
-
-.modal-form input:focus {
-  outline: none;
-  border-color: #0ea5e9;
-}
-
-.modal-form label {
-  font-size: 0.95rem;
-  color: #374151;
-  font-weight: 500;
-  margin-top: 8px;
-}
-
-.texto-vazio {
-  padding: 4px;
-  color: #374151;
-  font-size: 0.9rem;
-}
-
-/* =======================
-   RESPONSIVIDADE
-======================= */
-@media (max-width: 900px) {
-  .clientes-card {
-    width: 90%;
-    height: 120px;
+/* ===== RESPONSIVIDADE BÁSICA ===== */
+@media (max-width: 768px) {
+  .clientes-container {
+    width: 100%;
+    padding: 10px;
   }
 
-  .card-cliente-historico {
-    flex-direction: column;
-    align-items: flex-start;
+  .form {
+    padding: 15px;
   }
 
-  .btn-mini-edit {
-    margin-top: 6px;
-    align-self: flex-end;
+  .tabela th,
+  .tabela td {
+    padding: 8px;
+    font-size: 13px;
+  }
+
+  .btn-editar,
+  .btn-excluir {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+
+  .paginacao {
+    justify-content: center; /* centraliza paginação no celular */
   }
 }

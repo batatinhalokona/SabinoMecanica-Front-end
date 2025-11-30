@@ -1,214 +1,306 @@
+/* ===== CONTAINER GERAL ===== */
 .carros-container {
-  width: 100%;
-  min-height: calc(100vh - 70px);
+  padding: 20px;
+  width: 90%;
+  margin: auto;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* ===== TÍTULO ===== */
+.titulo {
+  font-size: 28px;
+  margin-bottom: 20px;
+  color: #222;
+}
+
+/* ===== FORMULÁRIO ===== */
+.form {
+  background: #f8f8f8;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 25px;
   display: flex;
   flex-direction: column;
-  background-color: #d8ccb3;
+  gap: 10px;
 }
 
-.carros-content {
-  width: 100%;
-  max-width: 1100px;
-  margin: 0 auto;
-  padding-inline: 24px;
-  padding-bottom: 40px;
+.label {
+  font-weight: bold;
+  color: #333;
 }
 
-.titulo-carros {
-  text-align: center;
-  font-size: 2rem;
-  font-weight: 700;
-  margin-top: 26px;
-  margin-bottom: 20px;
-  color: #1f2933;
-}
-
-.page-transition-side {
-  opacity: 0;
-  transform: translateX(35px);
-  animation: slide-carros 0.45s ease-out forwards;
-}
-
-@keyframes slide-carros {
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-/* CARD PRINCIPAL */
-.carros-grid {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  margin-top: 14px;
-  margin-bottom: 20px;
-}
-
-.carros-card {
-  background: #ffffff;
-  width: 260px;
-  height: 130px;
-  border-radius: 12px;
-  padding: 16px 14px;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: center;
-  border: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.carros-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.32);
-}
-
-.icone-card-carro {
-  font-size: 2rem;
-  background: linear-gradient(90deg, #0ea5e9, #22c55e);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.carros-card p {
-  margin-top: 6px;
-  font-size: 1rem;
-  color: #111827;
-}
-
-/* BUSCA */
-.carros-busca {
-  margin-top: 10px;
-  margin-bottom: 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #ffffff;
-  padding: 8px 12px;
-  border-radius: 10px;
-  border: 1px solid #bcbcbc;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
-}
-
-.carros-busca input {
-  border: none;
-  outline: none;
-  flex: 1;
-  font-size: 0.95rem;
-  background: transparent;
-  color: #1f2933;
-}
-
-/* LISTA */
-.carros-subtitulo {
-  margin-top: 18px;
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: #111827;
-  margin-bottom: 10px;
-}
-
-.carros-item {
-  width: 100%;
-  background: #ffffff;
-  border-radius: 8px;
-  padding: 12px 14px;
-  margin-bottom: 10px;
-
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  border-left: 5px solid #0ea5e9;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
-}
-
-.carros-item strong {
-  font-size: 1rem;
-  color: #111827;
-}
-
-.carros-item p {
-  font-size: 0.9rem;
-  color: #374151;
-}
-
-.texto-vazio {
-  font-size: 0.9rem;
-  color: #374151;
-}
-
-/* FORM NO MODAL */
-.carros-form label {
-  font-size: 0.95rem;
-  color: #374151;
-  font-weight: 500;
-  margin-top: 8px;
-}
-
-.carros-form input {
-  border-radius: 8px;
-  border: 1px solid #bcbcbc;
-  padding: 8px 10px;
-  font-size: 0.9rem;
-  background: #f9fafb;
-  color: #111827;
-}
-
-.carros-form input:focus {
-  outline: none;
-  border-color: #0ea5e9;
-}
-
-/* REAPROVEITA .btn-principal e .btn-delete do resto do projeto */
-
-.btn-principal {
-  margin-top: 14px;
-  border: none;
-  border-radius: 999px;
+.input {
   padding: 10px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  background: linear-gradient(90deg, #0ea5e9, #22c55e);
-  color: #0f172a;
-  cursor: pointer;
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  border-radius: 5px;
+  border: 1px solid #bbb;
+  background: #fff;
+  font-size: 15px;
 }
 
-.btn-principal:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 12px rgba(34, 197, 94, 0.4);
+/* ===== BOTÕES FORMULÁRIO ===== */
+.botoes-form {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
 }
 
-.btn-delete {
+.btn-cadastrar {
+  background: #1a73e8;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 5px;
   border: none;
   cursor: pointer;
-  font-size: 1.1rem;
-  background: none;
-  color: #ef4444;
-  transition: transform 0.12s ease;
+  font-size: 15px;
 }
 
-.btn-delete:hover {
-  transform: scale(1.25);
+.btn-cancelar {
+  background: #777;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
 }
 
-/* RESPONSIVO */
-@media (max-width: 900px) {
-  .carros-card {
-    width: 90%;
+/* ===== FOTO PREVIEW ===== */
+.preview-foto p {
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.foto-preview {
+  max-width: 120px;
+  max-height: 80px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+/* ===== SELEÇÃO DE DONO ===== */
+.dono-container {
+  margin-top: 10px;
+}
+
+.dono-selecionado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #e9f5ff;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #b3d7ff;
+  margin-top: 5px;
+}
+
+.btn-trocar-dono {
+  padding: 6px 12px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  background: #1a73e8;
+  color: #fff;
+  font-size: 13px;
+}
+
+/* lista de clientes */
+.lista-clientes {
+  max-height: 180px;
+  overflow-y: auto;
+  margin-top: 5px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  background: #fff;
+}
+
+.item-cliente {
+  padding: 8px 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
+
+.item-cliente:hover {
+  background: #f2f9ff;
+}
+
+.nome-cliente {
+  font-weight: bold;
+  display: block;
+}
+
+.detalhes-cliente {
+  font-size: 12px;
+  color: #555;
+}
+
+.nenhum-cliente {
+  padding: 8px 10px;
+  font-size: 13px;
+  color: #777;
+}
+
+/* ===== BUSCA CARRO ===== */
+.busca-container {
+  margin-top: 25px;
+  margin-bottom: 15px;
+}
+
+/* ===== SUBTÍTULO ===== */
+.subtitulo {
+  margin-top: 10px;
+  font-size: 20px;
+  color: #1c4d1c;
+}
+
+/* ===== TABELA ===== */
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  background: #fff;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.tabela th {
+  background: #003300;
+  padding: 12px;
+  color: white;
+  text-align: left;
+  font-weight: bold;
+}
+
+.tabela td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+/* mini foto na tabela */
+.foto-thumb {
+  max-width: 70px;
+  max-height: 50px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+/* ===== AÇÕES NA TABELA ===== */
+.acoes-cell {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+/* Histórico */
+.btn-historico {
+  background: #6c5ce7; /* roxo */
+  color: white;
+  padding: 6px 10px;
+  border-radius: 5px;
+  border: none;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* Nova OS */
+.btn-os {
+  background: #00b894; /* verde água */
+  color: white;
+  padding: 6px 10px;
+  border-radius: 5px;
+  border: none;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* Editar */
+.btn-editar {
+  background: #ffb700;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 5px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* Excluir */
+.btn-excluir {
+  background: #d63031;
+  color: white;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 5px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* ===== MODAL FOTO AMPLIADA ===== */
+.modal-foto {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal-conteudo {
+  background: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  max-width: 90%;
+  max-height: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.foto-grande {
+  max-width: 100%;
+  max-height: 80vh;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.btn-fechar-modal {
+  padding: 6px 14px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  background: #333;
+  color: white;
+  font-size: 14px;
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 768px) {
+  .carros-container {
+    padding: 10px;
+    width: 100%;
   }
 
-  .carros-item {
+  .form {
+    padding: 15px;
+  }
+
+  .tabela th,
+  .tabela td {
+    padding: 8px;
+    font-size: 13px;
+  }
+
+  .acoes-cell {
     flex-direction: column;
-    align-items: flex-start;
+    gap: 10px;
   }
 
-  .btn-delete {
-    align-self: flex-end;
-    margin-top: 6px;
+  .btn-editar,
+  .btn-excluir,
+  .btn-historico,
+  .btn-os {
+    padding: 5px 8px;
+    font-size: 12px;
   }
 }
