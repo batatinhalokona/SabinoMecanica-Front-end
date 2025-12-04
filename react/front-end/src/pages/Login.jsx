@@ -61,10 +61,7 @@ export default function Login() {
             <button type="submit" className="btn-submit">Entrar</button>
           </form>
 
-          <p className="login-info">
-            <strong>Usuário:</strong> sabino@oficina.com <br />
-            <strong>Senha:</strong> 12345
-          </p>
+          
         </div>
       </div>
     </div>

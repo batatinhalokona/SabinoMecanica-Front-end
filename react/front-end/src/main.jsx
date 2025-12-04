@@ -64,6 +64,15 @@ const router = createBrowserRouter([
           </RotaPrivada>
         ),
       },
+      // 🔹 NOVA ROTA PRA "NOVA OS"
+      {
+        path: "/servicos/novo",
+        element: (
+          <RotaPrivada>
+            <Servicos />
+          </RotaPrivada>
+        ),
+      },
       {
         path: "/registro",
         element: (

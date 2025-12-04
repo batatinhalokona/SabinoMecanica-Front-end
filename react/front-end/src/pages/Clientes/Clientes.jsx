@@ -1,21 +1,22 @@
+// src/pages/Clientes/Clientes.jsx
 import React, { useState, useEffect } from "react";
 import api from "../../api/api";
 import "./Clientes.css";
 
 export default function Clientes() {
   // Campos do formulário
-  const [nome, setNome] = useState("");          // obrigatório
-  const [telefone, setTelefone] = useState("");  // obrigatório
-  const [cpf, setCpf] = useState("");            // opcional
-  const [situacao, setSituacao] = useState("ATIVO"); // ATIVO ou INATIVO
+  const [nome, setNome] = useState("");
+  const [telefone, setTelefone] = useState("");
+  const [cpf, setCpf] = useState("");
+  const [situacao, setSituacao] = useState("ATIVO");
 
-  // Lista de clientes vinda do back
+  // Lista de clientes
   const [clientes, setClientes] = useState([]);
 
-  // Texto da busca
+  // Busca
   const [busca, setBusca] = useState("");
 
-  // Controle de edição (null = cadastrando, id = editando)
+  // Edição
   const [clienteEditandoId, setClienteEditandoId] = useState(null);
 
   // Paginação
@@ -23,7 +24,7 @@ export default function Clientes() {
   const [paginaAtivos, setPaginaAtivos] = useState(1);
   const [paginaInativos, setPaginaInativos] = useState(1);
 
-  // Carrega clientes ao abrir a tela
+  // Carrega clientes ao iniciar
   useEffect(() => {
     carregarClientes();
   }, []);
@@ -31,16 +32,37 @@ export default function Clientes() {
   async function carregarClientes() {
     try {
       const response = await api.get("/clientes");
-      setClientes(response.data);
-      // Sempre volta pra página 1 quando recarregar
+
+      console.log("RESPOSTA /clientes:", response.data);
+
+      // Garante que seja array
+      const data = response.data;
+      const lista = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.content)
+        ? data.content
+        : [];
+
+      const tratados = lista.map((c) => ({
+        id: c.id,
+        nome: c.nome,
+        telefone: c.telefone,
+        cpf: c.cpf,
+        situacao: c.situacao,
+      }));
+
+      console.log("Clientes salvos no estado:", tratados);
+
+      setClientes(tratados);
       setPaginaAtivos(1);
       setPaginaInativos(1);
     } catch (err) {
-      console.log("Erro ao listar clientes:", err);
+      console.error("Erro ao listar clientes:", err);
+      setClientes([]);
     }
   }
 
-  // Cadastrar ou atualizar cliente
+  // Salvar cliente (cadastrar / editar)
   async function salvarCliente(e) {
     e.preventDefault();
 
@@ -57,21 +79,34 @@ export default function Clientes() {
     };
 
     try {
+      let resposta;
+
       if (clienteEditandoId) {
-        // Modo edição
-        await api.put(`/clientes/${clienteEditandoId}`, dadosCliente);
-        alert("Cliente atualizado com sucesso!");
+        resposta = await api.put(`/clientes/${clienteEditandoId}`, dadosCliente);
       } else {
-        // Modo cadastro
-        await api.post("/clientes", dadosCliente);
-        alert("Cliente cadastrado com sucesso!");
+        resposta = await api.post("/clientes", dadosCliente);
       }
+
+      console.log("Resposta do backend ao salvar:", resposta.data);
+
+      alert(clienteEditandoId ? "Cliente atualizado!" : "Cliente cadastrado!");
 
       carregarClientes();
       limparCampos();
     } catch (err) {
-      console.log("Erro ao salvar cliente:", err);
-      alert("Erro ao salvar cliente.");
+      console.error("Erro ao salvar cliente:", err);
+
+      if (err.response) {
+        console.error("Status:", err.response.status);
+        console.error("Erro do servidor:", err.response.data);
+        alert("Erro ao salvar cliente: " + JSON.stringify(err.response.data));
+      } else if (err.request) {
+        console.error("Sem resposta do servidor:", err.request);
+        alert("Servidor não respondeu.");
+      } else {
+        console.error("Erro desconhecido:", err.message);
+        alert("Erro ao salvar cliente: " + err.message);
+      }
     }
   }
 
@@ -84,83 +119,70 @@ export default function Clientes() {
   }
 
   function prepararEdicao(cliente) {
-    setNome(cliente.nome || "");
-    setTelefone(cliente.telefone || "");
+    setNome(cliente.nome);
+    setTelefone(cliente.telefone);
     setCpf(cliente.cpf || "");
     setSituacao(cliente.situacao || "ATIVO");
     setClienteEditandoId(cliente.id);
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  // Exclusão: regra de bloqueio fica no back
   async function excluirCliente(cliente) {
-    if (!window.confirm("Tem certeza que deseja excluir este cliente?")) {
-      return;
-    }
+    if (!window.confirm("Tem certeza que deseja excluir este cliente?")) return;
 
     try {
       await api.delete(`/clientes/${cliente.id}`);
       carregarClientes();
     } catch (err) {
-      console.log("Erro ao excluir cliente:", err);
+      console.error("Erro ao excluir:", err);
 
-      if (err.response && err.response.data) {
-        alert(err.response.data); // mensagem do back (ex: tem carro vinculado)
+      if (err.response?.data) {
+        alert(err.response.data);
       } else {
         alert("Erro ao excluir cliente.");
       }
     }
   }
 
-  // Filtro da busca (nome, telefone ou CPF)
+  // FILTRO DE BUSCA
   const clientesFiltrados = clientes.filter((c) => {
     if (!busca.trim()) return true;
-
     const texto = busca.toLowerCase();
-    const nomeMatch = c.nome?.toLowerCase().includes(texto);
-    const telMatch = c.telefone?.toLowerCase().includes(texto);
-    const cpfMatch = c.cpf?.toLowerCase().includes(texto);
 
-    return nomeMatch || telMatch || cpfMatch;
+    return (
+      c.nome?.toLowerCase().includes(texto) ||
+      c.telefone?.toLowerCase().includes(texto) ||
+      c.cpf?.toLowerCase().includes(texto)
+    );
   });
 
-  // Separa ativos e inativos
-  const clientesAtivos = clientesFiltrados.filter(
-    (c) => c.situacao === "ATIVO"
-  );
+  const clientesAtivos = clientesFiltrados.filter((c) => c.situacao === "ATIVO");
   const clientesInativos = clientesFiltrados.filter(
     (c) => c.situacao === "INATIVO"
   );
 
-  // ===== PAGINAÇÃO ATIVOS =====
+  // PAGINAÇÃO ATIVOS
   const totalPaginasAtivos = Math.max(
     1,
     Math.ceil(clientesAtivos.length / ITENS_POR_PAGINA)
   );
-  const indexInicialAtivos = (paginaAtivos - 1) * ITENS_POR_PAGINA;
-  const indexFinalAtivos = indexInicialAtivos + ITENS_POR_PAGINA;
-  const ativosPagina = clientesAtivos.slice(indexInicialAtivos, indexFinalAtivos);
+  const indexInicioAtivos = (paginaAtivos - 1) * ITENS_POR_PAGINA;
+  const ativosPagina = clientesAtivos.slice(
+    indexInicioAtivos,
+    indexInicioAtivos + ITENS_POR_PAGINA
+  );
 
-  // Garante que a página não fique fora do limite se a lista mudar
-  useEffect(() => {
-    if (paginaAtivos > totalPaginasAtivos) {
-      setPaginaAtivos(totalPaginasAtivos);
-    }
-  }, [totalPaginasAtivos, paginaAtivos]);
-
-  // ===== PAGINAÇÃO INATIVOS =====
+  // PAGINAÇÃO INATIVOS
   const totalPaginasInativos = Math.max(
     1,
     Math.ceil(clientesInativos.length / ITENS_POR_PAGINA)
   );
-  const indexInicialInativos = (paginaInativos - 1) * ITENS_POR_PAGINA;
-  const indexFinalInativos = indexInicialInativos + ITENS_POR_PAGINA;
-  const inativosPagina = clientesInativos.slice(indexInicialInativos, indexFinalInativos);
-
-  useEffect(() => {
-    if (paginaInativos > totalPaginasInativos) {
-      setPaginaInativos(totalPaginasInativos);
-    }
-  }, [totalPaginasInativos, paginaInativos]);
+  const indexInicioInativos = (paginaInativos - 1) * ITENS_POR_PAGINA;
+  const inativosPagina = clientesInativos.slice(
+    indexInicioInativos,
+    indexInicioInativos + ITENS_POR_PAGINA
+  );
 
   return (
     <div className="clientes-container">
@@ -227,7 +249,7 @@ export default function Clientes() {
               className="btn-cancelar"
               onClick={limparCampos}
             >
-              Cancelar Edição
+              Cancelar
             </button>
           )}
         </div>
@@ -243,14 +265,13 @@ export default function Clientes() {
           value={busca}
           onChange={(e) => {
             setBusca(e.target.value);
-            // Sempre volta pra primeira página ao mudar a busca
             setPaginaAtivos(1);
             setPaginaInativos(1);
           }}
         />
       </div>
 
-      {/* CLIENTES ATIVOS */}
+      {/* LISTA ATIVOS */}
       <h2 className="subtitulo">Clientes Ativos</h2>
       <table className="tabela tabela-secundaria">
         <thead>
@@ -261,6 +282,7 @@ export default function Clientes() {
             <th>Ações</th>
           </tr>
         </thead>
+
         <tbody>
           {ativosPagina.map((c) => (
             <tr key={c.id}>
@@ -295,7 +317,7 @@ export default function Clientes() {
         </tbody>
       </table>
 
-      {/* CONTROLES PAGINAÇÃO ATIVOS */}
+      {/* PAGINAÇÃO ATIVOS */}
       {clientesAtivos.length > 0 && (
         <div className="paginacao">
           <button
@@ -305,9 +327,11 @@ export default function Clientes() {
           >
             ◀ Anterior
           </button>
+
           <span>
             Página {paginaAtivos} de {totalPaginasAtivos}
           </span>
+
           <button
             type="button"
             onClick={() =>
@@ -320,7 +344,7 @@ export default function Clientes() {
         </div>
       )}
 
-      {/* CLIENTES INATIVOS */}
+      {/* LISTA INATIVOS */}
       <h2 className="subtitulo inativo">Clientes Inativos</h2>
       <table className="tabela tabela-secundaria">
         <thead>
@@ -331,6 +355,7 @@ export default function Clientes() {
             <th>Ações</th>
           </tr>
         </thead>
+
         <tbody>
           {inativosPagina.map((c) => (
             <tr key={c.id}>
@@ -365,7 +390,7 @@ export default function Clientes() {
         </tbody>
       </table>
 
-      {/* CONTROLES PAGINAÇÃO INATIVOS */}
+      {/* PAGINAÇÃO INATIVOS */}
       {clientesInativos.length > 0 && (
         <div className="paginacao">
           <button
@@ -375,13 +400,17 @@ export default function Clientes() {
           >
             ◀ Anterior
           </button>
+
           <span>
             Página {paginaInativos} de {totalPaginasInativos}
           </span>
+
           <button
             type="button"
             onClick={() =>
-              setPaginaInativos((p) => Math.min(totalPaginasInativos, p + 1))
+              setPaginaInativos((p) =>
+                Math.min(totalPaginasInativos, p + 1)
+              )
             }
             disabled={paginaInativos === totalPaginasInativos}
           >

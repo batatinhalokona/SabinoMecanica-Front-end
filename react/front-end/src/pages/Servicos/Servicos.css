@@ -38,7 +38,7 @@
   color: #333;
 }
 
-/* CAMPOS DE ENTRADA (texto, número, data, select) */
+/* CAMPOS DE ENTRADA */
 .input,
 .select-status {
   width: 100%;
@@ -53,7 +53,6 @@
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-/* foco bonitinho */
 .input:focus,
 .select-status:focus,
 .textarea:focus {
@@ -88,7 +87,7 @@
   gap: 4px;
 }
 
-/* CAIXA DE SELECIONADO (CLIENTE, CARRO) */
+/* SELECIONADO (CLIENTE/CARRO) */
 .selecionado-box {
   background: #e9f5ff;
   border-radius: 6px;
@@ -109,7 +108,7 @@
   font-size: 13px;
 }
 
-/* LISTAS POPUP (CLIENTE / CARRO NO FORM) */
+/* POPUP LISTAS */
 .lista-popup {
   max-height: 180px;
   overflow-y: auto;
@@ -145,7 +144,7 @@
   color: #777;
 }
 
-/* GARANTIA TOGGLE */
+/* GARANTIA */
 .toggle-wrapper {
   display: flex;
   gap: 10px;
@@ -172,7 +171,7 @@
   color: #fff;
 }
 
-/* SUBSEÇÕES DO FORM (PEÇAS, PAGAMENTO, STATUS) */
+/* SUBSEÇÕES */
 .secao-sub {
   margin-top: 15px;
   padding-top: 10px;
@@ -185,7 +184,7 @@
   color: #333;
 }
 
-/* BOTÕES DO FORM */
+/* BOTÕES PRINCIPAIS */
 .botoes-form {
   display: flex;
   gap: 10px;
@@ -212,7 +211,7 @@
   font-size: 15px;
 }
 
-/* ===== PEÇAS NO FORM ===== */
+/* PEÇAS */
 .botao-peca {
   justify-content: flex-end;
 }
@@ -261,7 +260,7 @@
   font-size: 14px;
 }
 
-/* ===== PAGAMENTO / RESUMO ===== */
+/* RESUMO VALORES */
 .resumo-valores {
   margin-top: 10px;
   font-size: 14px;
@@ -271,7 +270,7 @@
   margin: 2px 0;
 }
 
-/* STATUS BOTÕES */
+/* STATUS */
 .status-wrapper {
   display: flex;
   gap: 10px;
@@ -298,7 +297,7 @@
   color: #fff;
 }
 
-/* ===== FILTROS DA LISTA (ANDAMENTO + HISTÓRICO) ===== */
+/* FILTROS */
 .filtros-lista {
   display: flex;
   justify-content: flex-start;
@@ -313,7 +312,6 @@
   gap: 5px;
 }
 
-/* Filtro específico do histórico (forma de pagamento) */
 .filtros-historico {
   margin-bottom: 10px;
   max-width: 320px;
@@ -344,7 +342,7 @@
   font-size: 14px;
 }
 
-/* AÇÕES DE SERVIÇOS */
+/* AÇÕES */
 .acoes-cell-servico {
   display: flex;
   flex-wrap: wrap;
@@ -381,7 +379,24 @@
   font-size: 13px;
 }
 
-/* BOTÕES PEQUENOS (peças/pagamento) */
+/* BOTÃO DE PAGAMENTO PENDENTE — ADICIONADO */
+.btn-pendente {
+  background: #e67e22;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+.btn-pendente:hover {
+  background: #d35400;
+}
+
+/* BOTÕES PEQUENOS */
 .btn-pequeno {
   background: #1a73e8;
   color: #fff;
@@ -396,7 +411,7 @@
   background: #555;
 }
 
-/* ===== MODAIS (PEÇAS E PARCELAS) ===== */
+/* MODAIS */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -422,7 +437,6 @@
   font-size: 18px;
 }
 
-/* tabela dentro do modal */
 .tabela-modal {
   width: 100%;
   border-collapse: collapse;
@@ -454,7 +468,7 @@
   font-size: 13px;
 }
 
-/* ===== RESPONSIVO ===== */
+/* RESPONSIVO */
 @media (max-width: 768px) {
   .servicos-container {
     width: 100%;

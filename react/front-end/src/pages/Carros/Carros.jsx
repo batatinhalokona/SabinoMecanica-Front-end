@@ -1,19 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";  // <<< IMPORTANTE
+import { useNavigate } from "react-router-dom";
 import api from "../../api/api";
 import "./Carros.css";
 
 export default function Carros() {
   // ===== CAMPOS DO FORMULÁRIO =====
-  const [placa, setPlaca] = useState("");        // obrigatório
-  const [modelo, setModelo] = useState("");      // obrigatório
-  const [marca, setMarca] = useState("");        // opcional
-  const [cor, setCor] = useState("");            // opcional
-
-  // Foto do carro (URL opcional)
+  const [placa, setPlaca] = useState("");
+  const [modelo, setModelo] = useState("");
+  const [marca, setMarca] = useState("");
+  const [cor, setCor] = useState("");
   const [fotoUrl, setFotoUrl] = useState("");
 
-  // Dono do carro (cliente selecionado)
+  // Dono do carro
   const [clienteSelecionado, setClienteSelecionado] = useState(null);
   const [buscaCliente, setBuscaCliente] = useState("");
 
@@ -24,16 +22,19 @@ export default function Carros() {
   // Edição
   const [carroEditandoId, setCarroEditandoId] = useState(null);
 
-  // Busca de carro
+  // Busca carro
   const [buscaCarro, setBuscaCarro] = useState("");
 
-  // Foto ampliada (modal)
+  // Modal foto
   const [fotoAmpliada, setFotoAmpliada] = useState(null);
 
-  // Navegação entre telas
   const navigate = useNavigate();
 
-  // Carregar dados ao abrir
+  // PROTEÇÃO para garantir que clientes e carros sempre são arrays
+  const listaClientes = Array.isArray(clientes) ? clientes : [];
+  const listaCarros = Array.isArray(carros) ? carros : [];
+
+  // ===== CARREGA LISTAS =====
   useEffect(() => {
     carregarCarros();
     carregarClientes();
@@ -42,22 +43,24 @@ export default function Carros() {
   async function carregarCarros() {
     try {
       const response = await api.get("/carros");
-      setCarros(response.data);
+      setCarros(Array.isArray(response.data) ? response.data : []);
     } catch (err) {
       console.log("Erro ao listar carros:", err);
+      setCarros([]);
     }
   }
 
   async function carregarClientes() {
     try {
       const response = await api.get("/clientes");
-      setClientes(response.data);
+      setClientes(Array.isArray(response.data) ? response.data : []);
     } catch (err) {
       console.log("Erro ao listar clientes:", err);
+      setClientes([]);
     }
   }
 
-  // Salvar (cadastrar ou editar)
+  // ===== SALVAR CARRO =====
   async function salvarCarro(e) {
     e.preventDefault();
 
@@ -77,16 +80,16 @@ export default function Carros() {
       marca,
       cor,
       fotoUrl: fotoUrl || null,
-      clienteId: clienteSelecionado.id,  // depois o back usa esse ID
+      clienteId: clienteSelecionado.id,
     };
 
     try {
       if (carroEditandoId) {
         await api.put(`/carros/${carroEditandoId}`, dadosCarro);
-        alert("Carro atualizado com sucesso!");
+        alert("Carro atualizado!");
       } else {
         await api.post("/carros", dadosCarro);
-        alert("Carro cadastrado com sucesso!");
+        alert("Carro cadastrado!");
       }
 
       carregarCarros();
@@ -108,28 +111,21 @@ export default function Carros() {
     setCarroEditandoId(null);
   }
 
-  // Prepara edição
+  // ===== PREPARAR EDIÇÃO =====
   function prepararEdicao(carro) {
     setPlaca(carro.placa || "");
     setModelo(carro.modelo || "");
     setMarca(carro.marca || "");
     setCor(carro.cor || "");
     setFotoUrl(carro.fotoUrl || "");
-
-    if (carro.cliente) {
-      setClienteSelecionado(carro.cliente);
-    } else {
-      setClienteSelecionado(null);
-    }
-
+    setClienteSelecionado(carro.cliente || null);
     setCarroEditandoId(carro.id);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  // Excluir carro (back vai bloquear se tiver serviço vinculado)
+  // ===== EXCLUIR CARRO =====
   async function excluirCarro(carro) {
-    if (!window.confirm("Tem certeza que deseja excluir este carro?")) {
-      return;
-    }
+    if (!window.confirm("Tem certeza que deseja excluir este carro?")) return;
 
     try {
       await api.delete(`/carros/${carro.id}`);
@@ -137,7 +133,7 @@ export default function Carros() {
     } catch (err) {
       console.log("Erro ao excluir carro:", err);
 
-      if (err.response && err.response.data) {
+      if (err.response?.data) {
         alert(err.response.data);
       } else {
         alert("Erro ao excluir carro.");
@@ -145,41 +141,39 @@ export default function Carros() {
     }
   }
 
-  // 👉 VER HISTÓRICO DE SERVIÇO DESTE CARRO
+  // ===== VER HISTÓRICO =====
   function verHistorico(carro) {
-    // vamos mandar o carroId na URL
     navigate(`/servicos?carroId=${carro.id}`);
   }
 
-  // 👉 NOVA ORDEM DE SERVIÇO PARA ESTE CARRO
+  // ===== NOVA OS =====
   function novaOrdemServico(carro) {
-    // abre a tela de nova OS com o carro já selecionado
     navigate(`/servicos/novo?carroId=${carro.id}`);
   }
 
-  // Filtro de carros
-  const carrosFiltrados = carros.filter((c) => {
+  // ===== FILTRO DE CARROS =====
+  const carrosFiltrados = listaCarros.filter((c) => {
     if (!buscaCarro.trim()) return true;
     const texto = buscaCarro.toLowerCase();
 
-    const placaMatch = c.placa?.toLowerCase().includes(texto);
-    const modeloMatch = c.modelo?.toLowerCase().includes(texto);
-    const marcaMatch = c.marca?.toLowerCase().includes(texto);
-    const donoMatch = c.cliente?.nome?.toLowerCase().includes(texto);
-
-    return placaMatch || modeloMatch || marcaMatch || donoMatch;
+    return (
+      c.placa?.toLowerCase().includes(texto) ||
+      c.modelo?.toLowerCase().includes(texto) ||
+      c.marca?.toLowerCase().includes(texto) ||
+      c.cliente?.nome?.toLowerCase().includes(texto)
+    );
   });
 
-  // Filtro de clientes (para selecionar dono)
-  const clientesFiltrados = clientes.filter((cli) => {
+  // ===== FILTRO DE CLIENTES =====
+  const clientesFiltrados = listaClientes.filter((cli) => {
     if (!buscaCliente.trim()) return true;
     const texto = buscaCliente.toLowerCase();
 
-    const nomeMatch = cli.nome?.toLowerCase().includes(texto);
-    const telefoneMatch = cli.telefone?.toLowerCase().includes(texto);
-    const cpfMatch = cli.cpf?.toLowerCase().includes(texto);
-
-    return nomeMatch || telefoneMatch || cpfMatch;
+    return (
+      cli.nome?.toLowerCase().includes(texto) ||
+      cli.telefone?.toLowerCase().includes(texto) ||
+      cli.cpf?.toLowerCase().includes(texto)
+    );
   });
 
   return (
@@ -188,7 +182,6 @@ export default function Carros() {
 
       {/* ===== FORMULÁRIO ===== */}
       <form className="form" onSubmit={salvarCarro}>
-        {/* Placa */}
         <label className="label">Placa :</label>
         <input
           className="input"
@@ -199,7 +192,6 @@ export default function Carros() {
           required
         />
 
-        {/* Modelo */}
         <label className="label">Modelo :</label>
         <input
           className="input"
@@ -210,8 +202,7 @@ export default function Carros() {
           required
         />
 
-        {/* Marca */}
-        <label className="label">Marca:</label>
+        <label className="label">Marca :</label>
         <input
           className="input"
           type="text"
@@ -220,8 +211,7 @@ export default function Carros() {
           onChange={(e) => setMarca(e.target.value)}
         />
 
-        {/* Cor */}
-        <label className="label">Cor (opcional):</label>
+        <label className="label">Cor :</label>
         <input
           className="input"
           type="text"
@@ -230,8 +220,7 @@ export default function Carros() {
           onChange={(e) => setCor(e.target.value)}
         />
 
-        {/* Foto */}
-        <label className="label">Foto do carro (URL opcional):</label>
+        <label className="label">Foto (URL opcional):</label>
         <input
           className="input"
           type="text"
@@ -245,14 +234,14 @@ export default function Carros() {
             <p>Pré-visualização:</p>
             <img
               src={fotoUrl}
-              alt="Pré-visualização"
+              alt="Foto"
               className="foto-preview"
               onClick={() => setFotoAmpliada(fotoUrl)}
             />
           </div>
         )}
 
-        {/* Dono */}
+        {/* DONO DO CARRO */}
         <div className="dono-container">
           <label className="label">Dono do carro :</label>
 
@@ -275,10 +264,11 @@ export default function Carros() {
               <input
                 className="input"
                 type="text"
-                placeholder="Buscar cliente por nome, telefone ou CPF"
+                placeholder="Buscar cliente..."
                 value={buscaCliente}
                 onChange={(e) => setBuscaCliente(e.target.value)}
               />
+
               <div className="lista-clientes">
                 {clientesFiltrados.slice(0, 5).map((cli) => (
                   <div
@@ -307,18 +297,14 @@ export default function Carros() {
           </button>
 
           {carroEditandoId && (
-            <button
-              type="button"
-              className="btn-cancelar"
-              onClick={limparCampos}
-            >
+            <button type="button" className="btn-cancelar" onClick={limparCampos}>
               Cancelar Edição
             </button>
           )}
         </div>
       </form>
 
-      {/* ===== BUSCA CARRO ===== */}
+      {/* ===== BUSCA ===== */}
       <div className="busca-container">
         <label className="label">Buscar carro:</label>
         <input
@@ -330,8 +316,9 @@ export default function Carros() {
         />
       </div>
 
-      {/* ===== TABELA ===== */}
+      {/* ===== LISTA DE CARROS ===== */}
       <h2 className="subtitulo">Carros cadastrados</h2>
+
       <table className="tabela">
         <thead>
           <tr>
@@ -344,6 +331,7 @@ export default function Carros() {
             <th>Ações</th>
           </tr>
         </thead>
+
         <tbody>
           {carrosFiltrados.map((carro) => (
             <tr key={carro.id}>
@@ -359,41 +347,27 @@ export default function Carros() {
                   "-"
                 )}
               </td>
+
               <td>{carro.placa}</td>
               <td>{carro.modelo}</td>
               <td>{carro.marca || "-"}</td>
               <td>{carro.cor || "-"}</td>
               <td>{carro.cliente ? carro.cliente.nome : "-"}</td>
+
               <td className="acoes-cell">
-                <button
-                  className="btn-historico"
-                  type="button"
-                  onClick={() => verHistorico(carro)}
-                >
+                <button className="btn-historico" onClick={() => verHistorico(carro)}>
                   Histórico
                 </button>
 
-                <button
-                  className="btn-os"
-                  type="button"
-                  onClick={() => novaOrdemServico(carro)}
-                >
+                <button className="btn-os" onClick={() => novaOrdemServico(carro)}>
                   Nova OS
                 </button>
 
-                <button
-                  className="btn-editar"
-                  type="button"
-                  onClick={() => prepararEdicao(carro)}
-                >
+                <button className="btn-editar" onClick={() => prepararEdicao(carro)}>
                   Editar
                 </button>
 
-                <button
-                  className="btn-excluir"
-                  type="button"
-                  onClick={() => excluirCarro(carro)}
-                >
+                <button className="btn-excluir" onClick={() => excluirCarro(carro)}>
                   Excluir
                 </button>
               </td>
@@ -413,11 +387,7 @@ export default function Carros() {
         <div className="modal-foto" onClick={() => setFotoAmpliada(null)}>
           <div className="modal-conteudo" onClick={(e) => e.stopPropagation()}>
             <img src={fotoAmpliada} alt="Foto ampliada" className="foto-grande" />
-            <button
-              className="btn-fechar-modal"
-              type="button"
-              onClick={() => setFotoAmpliada(null)}
-            >
+            <button className="btn-fechar-modal" onClick={() => setFotoAmpliada(null)}>
               Fechar
             </button>
           </div>
