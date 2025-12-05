@@ -1,321 +1,170 @@
 .estoque-container {
-  width: 100%;
-  min-height: calc(100vh - 70px);
-  display: flex;
-  flex-direction: column;
-  background-color: #d8ccb3;
+  padding: 20px;
+  width: 90%;
+  margin: auto;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-.estoque-content {
-  width: 100%;
-  max-width: 1100px;
-  margin: 0 auto;
-  padding-inline: 24px;
-  padding-bottom: 40px;
-}
-
-/* animação lateral */
-.page-transition-side {
-  opacity: 0;
-  transform: translateX(35px);
-  animation: estoque-slide 0.45s ease-out forwards;
-}
-
-@keyframes estoque-slide {
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-/* CABEÇALHO */
-.estoque-header {
-  text-align: center;
-  margin-top: 26px;
+.titulo-estoque {
+  font-size: 28px;
   margin-bottom: 20px;
+  color: #222;
 }
 
-.estoque-header h1 {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1f2933;
+.secao-estoque {
+  margin-bottom: 30px;
 }
 
-.estoque-header p {
-  font-size: 0.98rem;
-  color: #374151;
+.secao-titulo-estoque {
+  font-size: 22px;
+  margin-bottom: 10px;
+  color: #1c4d1c;
 }
 
-/* CARDS PRINCIPAIS */
-.estoque-grid-cards {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 18px;
-  justify-content: center;
-  margin-bottom: 26px;
-}
-
-.estoque-card {
-  width: 260px;
-  min-height: 120px;
-  border-radius: 14px;
-  padding: 14px;
-  border: none;
-  cursor: pointer;
-
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  text-align: left;
-
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
-}
-
-/* cores dos cards (não brancos) */
-.estoque-card--peca {
-  background: linear-gradient(135deg, #fee2e2, #fbbf24);
-}
-
-.estoque-card--produto {
-  background: linear-gradient(135deg, #bfdbfe, #a7f3d0);
-}
-
-.estoque-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
-  filter: brightness(1.03);
-}
-
-.estoque-card-icone {
-  width: 46px;
-  height: 46px;
-  border-radius: 999px;
-  background: rgba(15, 23, 42, 0.22);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #f9fafb;
-  font-size: 1.4rem;
-}
-
-.estoque-card-texto h2 {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: #111827;
-  margin-bottom: 4px;
-}
-
-.estoque-card-texto p {
-  font-size: 0.87rem;
-  color: #1f2937;
-}
-
-/* SEÇÃO PEÇAS / PRODUTOS */
-.estoque-section {
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 16px;
-  padding: 16px 16px 18px;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-  margin-top: 14px;
-}
-
-.estoque-section-header {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.estoque-section-header h2 {
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: #111827;
-}
-
-.estoque-section-header input {
-  flex: 1;
-  min-width: 220px;
-  border-radius: 999px;
-  border: 1px solid #d1d5db;
-  padding: 7px 12px;
-  font-size: 0.9rem;
-  background: #f9fafb;
-  color: #111827;
-}
-
-.estoque-section-header input:focus {
-  outline: none;
-  border-color: #0ea5e9;
-}
-
-/* LISTA / CARD DO ITEM */
-.estoque-lista {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.estoque-item-card {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  background: #f9fafb;
-  border-radius: 12px;
-  padding: 10px;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.3);
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
-}
-
-.estoque-item-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.4);
-}
-
-/* destaque quando quantidade <= mínimo */
-.estoque-item-card--critico {
-  border-left: 5px solid #ef4444;
-  background: #fee2e2;
-}
-
-.estoque-item-info {
-  flex: 1;
-}
-
-.estoque-item-nome {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 4px;
-}
-
-.estoque-item-icone {
-  font-size: 1.3rem;
-  color: #0ea5e9;
-}
-
-.estoque-item-linha {
-  font-size: 0.86rem;
-  color: #374151;
-}
-
-.texto-vazio-estoque {
-  font-size: 0.9rem;
-  color: #374151;
-}
-
-/* AÇÕES (editar/excluir) */
-.estoque-item-acoes {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  align-items: flex-end;
-}
-
-.btn-mini-edit,
-.btn-mini-delete {
-  border: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 999px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
-}
-
-.btn-mini-edit {
-  background: #0ea5e9;
-  color: #f9fafb;
-  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.6);
-}
-
-.btn-mini-delete {
-  background: #ef4444;
-  color: #f9fafb;
-  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.6);
-}
-
-.btn-mini-edit:hover,
-.btn-mini-delete:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.6);
-}
-
-/* FORMULÁRIO NO MODAL */
-.estoque-form label {
-  font-size: 0.95rem;
-  color: #374151;
-  font-weight: 500;
-  margin-top: 6px;
-}
-
-.estoque-form input,
-.estoque-form textarea {
-  width: 100%;
+/* FORM NOVO PRODUTO */
+.form-estoque {
+  background: #f8f8f8;
+  padding: 20px;
   border-radius: 8px;
-  border: 1px solid #d1d5db;
-  padding: 7px 10px;
-  font-size: 0.9rem;
-  background: #f9fafb;
-  color: #111827;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.estoque-form textarea {
-  min-height: 60px;
-  resize: vertical;
+.grupo-horizontal-estoque {
+  display: flex;
+  gap: 15px;
 }
 
-.estoque-form input:focus,
-.estoque-form textarea:focus {
+.campo-flex-estoque {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.label-estoque {
+  font-weight: bold;
+  color: #333;
+}
+
+.input-estoque {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #c7c7c7;
+  background: #ffffff;
+  font-size: 14px;
+  color: #333;
   outline: none;
-  border-color: #0ea5e9;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-/* reaproveita .btn-principal global se já existir, 
-   se não existir, este define */
-.btn-principal {
+.input-estoque:focus {
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.15);
+}
+
+.botoes-form-estoque {
+  display: flex;
+  justify-content: flex-start;
   margin-top: 10px;
-  border: none;
-  border-radius: 999px;
-  padding: 9px 14px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  background: linear-gradient(90deg, #0ea5e9, #22c55e);
-  color: #0f172a;
-  cursor: pointer;
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 
-.btn-principal:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 12px rgba(34, 197, 94, 0.4);
+.btn-salvar-estoque {
+  background: #1a73e8;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+/* LISTA / TABELA */
+.filtro-estoque {
+  margin-bottom: 10px;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tabela-estoque {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  background: #fff;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.tabela-estoque th {
+  background: #003300;
+  padding: 10px 12px;
+  color: #fff;
+  text-align: left;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.tabela-estoque td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #ddd;
+  font-size: 14px;
+}
+
+/* CAMPOS INLINE NA TABELA */
+.input-preco-tabela {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 4px 6px;
+  border-radius: 4px;
+  border: 1px solid #bbb;
+  font-size: 13px;
+}
+
+/* BOTÕES DE QUANTIDADE */
+.grupo-botoes-qtd {
+  display: flex;
+  gap: 5px;
+}
+
+.btn-qtd {
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  background: #1a73e8;
+  color: #fff;
+}
+
+.btn-salvar-linha {
+  padding: 5px 10px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  background: #2ecc71;
+  color: #fff;
 }
 
 /* RESPONSIVO */
-@media (max-width: 900px) {
-  .estoque-item-card {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .estoque-item-acoes {
-    flex-direction: row;
-    align-self: flex-end;
-  }
-}
-
-@media (max-width: 650px) {
-  .estoque-section-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .estoque-section-header input {
+@media (max-width: 768px) {
+  .estoque-container {
     width: 100%;
+    padding: 10px;
+  }
+
+  .grupo-horizontal-estoque {
+    flex-direction: column;
+  }
+
+  .tabela-estoque th,
+  .tabela-estoque td {
+    padding: 6px;
+    font-size: 12px;
   }
 }

@@ -1,496 +1,446 @@
+// src/pages/Estoque.jsx
 import React, { useEffect, useState } from "react";
 import "./Estoque.css";
-import Modal from "../../components/Modal";
-import {
-  FaCogs,
-  FaPlusCircle,
-  FaEdit,
-  FaTrash,
-  FaBoxOpen,
-  FaFlask,
-} from "react-icons/fa";
 
 export default function Estoque() {
-  // Lista geral de itens (peças e produtos)
-  const [itens, setItens] = useState([]);
-
-  // Tipo atual do modal ("peca" ou "produto")
-  const [tipoAtual, setTipoAtual] = useState("peca");
-
-  // Campos do formulário
-  const [nome, setNome] = useState("");
-  const [categoria, setCategoria] = useState("");
-  const [quantidade, setQuantidade] = useState("");
-  const [minimo, setMinimo] = useState("");
-  const [local, setLocal] = useState("");
-  const [observacao, setObservacao] = useState("");
-
-  // Busca
-  const [buscaPecas, setBuscaPecas] = useState("");
-  const [buscaProdutos, setBuscaProdutos] = useState("");
-
-  // Modais
-  const [modalCadastro, setModalCadastro] = useState(false);
-  const [modalEditar, setModalEditar] = useState(false);
-
-  // Item sendo editado
-  const [itemEditando, setItemEditando] = useState(null);
+  // ============================
+  // CHAVE DO LOCALSTORAGE
+  // ============================
+  const STORAGE_KEY = "estoqueOficinaSabino";
 
   // ============================
-  // LocalStorage
+  // FORMULÁRIO (NOVO ITEM)
+  // ============================
+  const [tipoItem, setTipoItem] = useState("PRODUTO"); // "PRODUTO" ou "PECA"
+  const [nome, setNome] = useState("");
+  const [descricao, setDescricao] = useState("");
+  const [precoCusto, setPrecoCusto] = useState("");
+  const [precoVenda, setPrecoVenda] = useState("");
+  const [quantidade, setQuantidade] = useState(0);
+
+  // ============================
+  // LISTA DE ITENS (PRODUTO + PEÇA)
+  // ============================
+  const [itens, setItens] = useState([]);
+  const [busca, setBusca] = useState("");
+
+  // ============================
+  // FUNÇÕES AUXILIARES LOCALSTORAGE
+  // ============================
+  function carregarDoStorage() {
+    try {
+      const dados = localStorage.getItem(STORAGE_KEY);
+      if (!dados) return [];
+      const parsed = JSON.parse(dados);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      console.log("Erro ao ler localStorage do estoque:", e);
+      return [];
+    }
+  }
+
+  function salvarNoStorage(lista) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(lista));
+    } catch (e) {
+      console.log("Erro ao salvar estoque no localStorage:", e);
+    }
+  }
+
+  // ============================
+  // CARREGAR AO ABRIR A PÁGINA
   // ============================
   useEffect(() => {
-    try {
-      const armazenados = JSON.parse(
-        localStorage.getItem("estoqueOficina") || "[]"
-      );
-      setItens(armazenados);
-    } catch (e) {
-      console.error("Erro ao carregar estoque:", e);
-      setItens([]);
-    }
+    const lista = carregarDoStorage();
+    setItens(lista);
   }, []);
 
-  const salvarItens = (lista) => {
-    setItens(lista);
-    localStorage.setItem("estoqueOficina", JSON.stringify(lista));
-  };
-
   // ============================
-  // Abrir modal de cadastro
+  // SALVAR NOVO PRODUTO / PEÇA (SOMENTE FRONT)
   // ============================
-  const abrirCadastro = (tipo) => {
-    setTipoAtual(tipo); // "peca" ou "produto"
-    // limpa campos
-    setNome("");
-    setCategoria("");
-    setQuantidade("");
-    setMinimo("");
-    setLocal("");
-    setObservacao("");
-    setModalCadastro(true);
-  };
-
-  // ============================
-  // Cadastrar novo item
-  // ============================
-  const cadastrarItem = (e) => {
+  function salvarNovoItem(e) {
     e.preventDefault();
 
-    if (!nome || !quantidade) {
-      alert("Nome e quantidade são obrigatórios.");
+    if (!nome.trim()) {
+      alert("Informe o nome.");
       return;
     }
+
+    // cria um id simples no front (timestamp + random)
+    const id = Date.now().toString() + Math.random().toString(16).slice(2);
 
     const novoItem = {
-      id: Date.now(),
-      tipo: tipoAtual, // "peca" ou "produto"
+      id,
+      tipoItem, // "PRODUTO" ou "PECA"
       nome,
-      categoria,
-      quantidade: Number(quantidade),
-      minimo: minimo ? Number(minimo) : 0,
-      local,
-      observacao,
+      descricao: descricao || null,
+      precoCusto: tipoItem === "PRODUTO" ? Number(precoCusto) || 0 : 0,
+      precoVenda: Number(precoVenda) || 0,
+      quantidade: Number(quantidade) || 0,
     };
 
-    const lista = [novoItem, ...itens];
-    salvarItens(lista);
+    const novaLista = [...itens, novoItem];
+    setItens(novaLista);
+    salvarNoStorage(novaLista);
 
-    setModalCadastro(false);
-  };
+    // limpa form
+    setTipoItem("PRODUTO");
+    setNome("");
+    setDescricao("");
+    setPrecoCusto("");
+    setPrecoVenda("");
+    setQuantidade(0);
+  }
 
   // ============================
-  // Editar item
+  // ATUALIZAR ITEM (PREÇO / QTD) NO FRONT
   // ============================
-  const abrirEdicao = (item) => {
-    setItemEditando(item);
-    setTipoAtual(item.tipo);
-    setNome(item.nome);
-    setCategoria(item.categoria || "");
-    setQuantidade(String(item.quantidade));
-    setMinimo(item.minimo != null ? String(item.minimo) : "");
-    setLocal(item.local || "");
-    setObservacao(item.observacao || "");
-    setModalEditar(true);
-  };
-
-  const salvarEdicao = (e) => {
-    e.preventDefault();
-    if (!nome || !quantidade) {
-      alert("Nome e quantidade são obrigatórios.");
-      return;
-    }
-
-    const listaAtualizada = itens.map((i) =>
-      i.id === itemEditando.id
-        ? {
-            ...i,
-            nome,
-            categoria,
-            quantidade: Number(quantidade),
-            minimo: minimo ? Number(minimo) : 0,
-            local,
-            observacao,
-          }
-        : i
+  function atualizarItem(itemAtualizado) {
+    const novaLista = itens.map((i) =>
+      i.id === itemAtualizado.id ? itemAtualizado : i
     );
+    setItens(novaLista);
+    salvarNoStorage(novaLista);
+  }
 
-    salvarItens(listaAtualizada);
-    setModalEditar(false);
-    setItemEditando(null);
-  };
-
-  // ============================
-  // Excluir item
-  // ============================
-  const excluirItem = (id) => {
-    if (!window.confirm("Deseja realmente excluir este item do estoque?"))
-      return;
-    const lista = itens.filter((i) => i.id !== id);
-    salvarItens(lista);
-  };
-
-  // ============================
-  // Filtros
-  // ============================
-  const pecas = itens.filter((i) => i.tipo === "peca");
-  const produtos = itens.filter((i) => i.tipo === "produto");
-
-  const aplicarBusca = (lista, termo) => {
-    if (!termo) return lista;
-    const t = termo.toLowerCase();
-    return lista.filter(
-      (i) =>
-        i.nome.toLowerCase().includes(t) ||
-        (i.categoria && i.categoria.toLowerCase().includes(t)) ||
-        (i.local && i.local.toLowerCase().includes(t))
+  // alterar preços (custo ou venda) só no state
+  function alterarPrecoLocal(idItem, campo, valor) {
+    const novaLista = itens.map((i) =>
+      i.id === idItem ? { ...i, [campo]: Number(valor) || 0 } : i
     );
-  };
+    setItens(novaLista);
+    salvarNoStorage(novaLista);
+  }
 
-  const pecasFiltradas = aplicarBusca(pecas, buscaPecas);
-  const produtosFiltrados = aplicarBusca(produtos, buscaProdutos);
+  // +1 / -1 na quantidade
+  function alterarQuantidade(idItem, delta) {
+    const novaLista = itens.map((i) => {
+      if (i.id !== idItem) return i;
+
+      const novaQtd = (i.quantidade || 0) + delta;
+      if (novaQtd < 0) return i; // não deixa negativo
+
+      return { ...i, quantidade: novaQtd };
+    });
+
+    setItens(novaLista);
+    salvarNoStorage(novaLista);
+  }
+
+  // botão "Salvar" da linha (na prática já está salvo, mas mantém padrão)
+  function salvarLinha(item) {
+    atualizarItem(item);
+    alert("Item atualizado no estoque (front)!");
+  }
+
+  // ============================
+  // FILTRO POR TEXTO
+  // ============================
+  const itensFiltrados = itens.filter((i) => {
+    if (!busca.trim()) return true;
+    const txt = busca.toLowerCase();
+    return (
+      i.nome?.toLowerCase().includes(txt) ||
+      i.descricao?.toLowerCase().includes(txt)
+    );
+  });
+
+  // separa em PRODUTOS e PEÇAS
+  const produtos = itensFiltrados.filter(
+    (i) => i.tipoItem === "PRODUTO" || !i.tipoItem // default produto
+  );
+  const pecas = itensFiltrados.filter((i) => i.tipoItem === "PECA");
 
   // ============================
   // JSX
   // ============================
   return (
     <div className="estoque-container">
-      <div className="estoque-content page-transition-side">
-        {/* Cabeçalho */}
-        <header className="estoque-header">
-          <h1>🧰 Estoque da Oficina Sabino</h1>
-          <p>Controle peças e produtos usados no dia a dia da oficina.</p>
-        </header>
+      <h1 className="titulo-estoque">Estoque</h1>
 
-        {/* Cards principais */}
-        <div className="estoque-grid-cards">
-          {/* Nova peça */}
-          <button
-            className="estoque-card estoque-card--peca"
-            onClick={() => abrirCadastro("peca")}
-          >
-            <div className="estoque-card-icone">
-              <FaCogs />
-            </div>
-            <div className="estoque-card-texto">
-              <h2>Nova Peça</h2>
-              <p>Cadastrar peças novas ou usadas no estoque.</p>
-            </div>
-          </button>
+      {/* ========== CADASTRO ========== */}
+      <div className="secao-estoque">
+        <h2 className="secao-titulo-estoque">Cadastrar produto / peça</h2>
 
-          {/* Novo produto */}
-          <button
-            className="estoque-card estoque-card--produto"
-            onClick={() => abrirCadastro("produto")}
-          >
-            <div className="estoque-card-icone">
-              <FaFlask />
+        <form className="form-estoque" onSubmit={salvarNovoItem}>
+          <div className="grupo-horizontal-estoque">
+            {/* Tipo: Produto ou Peça */}
+            <div className="campo-flex-estoque">
+              <label className="label-estoque">Tipo:</label>
+              <select
+                className="input-estoque"
+                value={tipoItem}
+                onChange={(e) => setTipoItem(e.target.value)}
+              >
+                <option value="PRODUTO">Produto</option>
+                <option value="PECA">Peça</option>
+              </select>
             </div>
-            <div className="estoque-card-texto">
-              <h2>Novo Produto</h2>
-              <p>Óleos, fluidos, produtos de limpeza e outros.</p>
-            </div>
-          </button>
-        </div>
 
-        {/* ============================
-            PEÇAS EM ESTOQUE
-        ============================ */}
-        <section className="estoque-section">
-          <div className="estoque-section-header">
-            <h2>🔩 Peças em Estoque</h2>
-            <input
-              type="text"
-              placeholder="Buscar por nome, categoria ou local..."
-              value={buscaPecas}
-              onChange={(e) => setBuscaPecas(e.target.value)}
-            />
+            {/* Nome */}
+            <div className="campo-flex-estoque">
+              <label className="label-estoque">Nome:</label>
+              <input
+                className="input-estoque"
+                type="text"
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+                placeholder="Ex: Óleo 5W30, Filtro de óleo..."
+              />
+            </div>
+
+            {/* Descrição só aparece para PEÇA */}
+            {tipoItem === "PECA" && (
+              <div className="campo-flex-estoque">
+                <label className="label-estoque">Descrição:</label>
+                <input
+                  className="input-estoque"
+                  type="text"
+                  value={descricao}
+                  onChange={(e) => setDescricao(e.target.value)}
+                  placeholder="Ex: dianteiro, traseiro, lado direito..."
+                />
+              </div>
+            )}
           </div>
 
-          {pecasFiltradas.length === 0 ? (
-            <p className="texto-vazio-estoque">
-              Nenhuma peça cadastrada no momento.
-            </p>
-          ) : (
-            <div className="estoque-lista">
-              {pecasFiltradas.map((i) => (
-                <div
-                  key={i.id}
-                  className={`estoque-item-card ${
-                    i.minimo && i.quantidade <= i.minimo
-                      ? "estoque-item-card--critico"
-                      : ""
-                  }`}
-                >
-                  <div className="estoque-item-info">
-                    <div className="estoque-item-nome">
-                      <FaBoxOpen className="estoque-item-icone" />
-                      <div>
-                        <strong>{i.nome}</strong>
-                        {i.categoria && (
-                          <p className="estoque-item-linha">
-                            Categoria: {i.categoria}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <p className="estoque-item-linha">
-                      Qtd:{" "}
-                      <strong>
-                        {i.quantidade}
-                        {i.minimo
-                          ? ` (mínimo recomendado: ${i.minimo})`
-                          : ""}
-                      </strong>
-                    </p>
-                    {i.local && (
-                      <p className="estoque-item-linha">
-                        Local: {i.local}
-                      </p>
-                    )}
-                    {i.observacao && (
-                      <p className="estoque-item-linha">
-                        Obs.: {i.observacao}
-                      </p>
-                    )}
-                  </div>
+          <div className="grupo-horizontal-estoque">
+            {/* Preço de custo só para PRODUTO */}
+            {tipoItem === "PRODUTO" && (
+              <div className="campo-flex-estoque">
+                <label className="label-estoque">Preço pago (custo):</label>
+                <input
+                  className="input-estoque"
+                  type="number"
+                  step="0.01"
+                  value={precoCusto}
+                  onChange={(e) => setPrecoCusto(e.target.value)}
+                  placeholder="0,00"
+                />
+              </div>
+            )}
 
-                  <div className="estoque-item-acoes">
-                    <button
-                      className="btn-mini-edit"
-                      onClick={() => abrirEdicao(i)}
-                    >
-                      <FaEdit />
-                    </button>
-                    <button
-                      className="btn-mini-delete"
-                      onClick={() => excluirItem(i.id)}
-                    >
-                      <FaTrash />
-                    </button>
-                  </div>
-                </div>
-              ))}
+            {/* Preço de venda / preço único */}
+            <div className="campo-flex-estoque">
+              <label className="label-estoque">
+                {tipoItem === "PRODUTO" ? "Preço de venda:" : "Preço:"}
+              </label>
+              <input
+                className="input-estoque"
+                type="number"
+                step="0.01"
+                value={precoVenda}
+                onChange={(e) => setPrecoVenda(e.target.value)}
+                placeholder="0,00"
+              />
             </div>
-          )}
-        </section>
 
-        {/* ============================
-            PRODUTOS EM ESTOQUE
-        ============================ */}
-        <section className="estoque-section">
-          <div className="estoque-section-header">
-            <h2>🛢️ Produtos em Estoque</h2>
-            <input
-              type="text"
-              placeholder="Buscar por nome, categoria ou local..."
-              value={buscaProdutos}
-              onChange={(e) => setBuscaProdutos(e.target.value)}
-            />
+            {/* Quantidade inicial */}
+            <div className="campo-flex-estoque">
+              <label className="label-estoque">Quantidade inicial:</label>
+              <input
+                className="input-estoque"
+                type="number"
+                value={quantidade}
+                onChange={(e) => setQuantidade(e.target.value)}
+                min="0"
+              />
+            </div>
           </div>
 
-          {produtosFiltrados.length === 0 ? (
-            <p className="texto-vazio-estoque">
-              Nenhum produto cadastrado no momento.
-            </p>
-          ) : (
-            <div className="estoque-lista">
-              {produtosFiltrados.map((i) => (
-                <div
-                  key={i.id}
-                  className={`estoque-item-card ${
-                    i.minimo && i.quantidade <= i.minimo
-                      ? "estoque-item-card--critico"
-                      : ""
-                  }`}
-                >
-                  <div className="estoque-item-info">
-                    <div className="estoque-item-nome">
-                      <FaBoxOpen className="estoque-item-icone" />
-                      <div>
-                        <strong>{i.nome}</strong>
-                        {i.categoria && (
-                          <p className="estoque-item-linha">
-                            Categoria: {i.categoria}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <p className="estoque-item-linha">
-                      Qtd:{" "}
-                      <strong>
-                        {i.quantidade}
-                        {i.minimo
-                          ? ` (mínimo recomendado: ${i.minimo})`
-                          : ""}
-                      </strong>
-                    </p>
-                    {i.local && (
-                      <p className="estoque-item-linha">
-                        Local: {i.local}
-                      </p>
-                    )}
-                    {i.observacao && (
-                      <p className="estoque-item-linha">
-                        Obs.: {i.observacao}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="estoque-item-acoes">
-                    <button
-                      className="btn-mini-edit"
-                      onClick={() => abrirEdicao(i)}
-                    >
-                      <FaEdit />
-                    </button>
-                    <button
-                      className="btn-mini-delete"
-                      onClick={() => excluirItem(i.id)}
-                    >
-                      <FaTrash />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
+          <div className="botoes-form-estoque">
+            <button className="btn-salvar-estoque" type="submit">
+              Salvar
+            </button>
+          </div>
+        </form>
       </div>
 
-      {/* ============================
-          MODAL CADASTRO
-      ============================ */}
-      <Modal
-        isOpen={modalCadastro}
-        onClose={() => setModalCadastro(false)}
-        title={
-          tipoAtual === "peca" ? "Cadastrar Nova Peça" : "Cadastrar Novo Produto"
-        }
-      >
-        <form className="estoque-form" onSubmit={cadastrarItem}>
-          <label>Nome:</label>
+      {/* ========== FILTRO GERAL ========== */}
+      <div className="secao-estoque">
+        <div className="filtro-estoque">
+          <label className="label-estoque">
+            Buscar por nome ou descrição:
+          </label>
           <input
+            className="input-estoque"
             type="text"
-            value={nome}
-            onChange={(e) => setNome(e.target.value)}
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+            placeholder="Digite para filtrar..."
           />
+        </div>
+      </div>
 
-          <label>Categoria (opcional):</label>
-          <input
-            type="text"
-            value={categoria}
-            onChange={(e) => setCategoria(e.target.value)}
-          />
+      {/* ========== TABELA PRODUTOS ========== */}
+      <div className="secao-estoque">
+        <h2 className="secao-titulo-estoque">Produtos cadastrados</h2>
 
-          <label>Quantidade:</label>
-          <input
-            type="number"
-            value={quantidade}
-            onChange={(e) => setQuantidade(e.target.value)}
-          />
+        <table className="tabela-estoque">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Preço pago</th>
+              <th>Preço venda</th>
+              <th>Quantidade</th>
+              <th>Ajustar</th>
+              <th>Salvar</th>
+            </tr>
+          </thead>
+          <tbody>
+            {produtos.map((p) => (
+              <tr key={p.id}>
+                <td>{p.nome}</td>
 
-          <label>Quantidade mínima (opcional):</label>
-          <input
-            type="number"
-            value={minimo}
-            onChange={(e) => setMinimo(e.target.value)}
-          />
+                {/* Preço pago (custo) editável */}
+                <td>
+                  <input
+                    className="input-preco-tabela"
+                    type="number"
+                    step="0.01"
+                    value={p.precoCusto != null ? p.precoCusto : ""}
+                    onChange={(e) =>
+                      alterarPrecoLocal(p.id, "precoCusto", e.target.value)
+                    }
+                  />
+                </td>
 
-          <label>Local no estoque (opcional):</label>
-          <input
-            type="text"
-            value={local}
-            onChange={(e) => setLocal(e.target.value)}
-          />
+                {/* Preço venda editável */}
+                <td>
+                  <input
+                    className="input-preco-tabela"
+                    type="number"
+                    step="0.01"
+                    value={p.precoVenda != null ? p.precoVenda : ""}
+                    onChange={(e) =>
+                      alterarPrecoLocal(p.id, "precoVenda", e.target.value)
+                    }
+                  />
+                </td>
 
-          <label>Observação (opcional):</label>
-          <textarea
-            value={observacao}
-            onChange={(e) => setObservacao(e.target.value)}
-          />
+                {/* Quantidade */}
+                <td>{p.quantidade != null ? p.quantidade : 0}</td>
 
-          <button type="submit" className="btn-principal">
-            Salvar
-          </button>
-        </form>
-      </Modal>
+                {/* Botões +1 / -1 */}
+                <td>
+                  <div className="grupo-botoes-qtd">
+                    <button
+                      type="button"
+                      className="btn-qtd"
+                      onClick={() => alterarQuantidade(p.id, -1)}
+                    >
+                      -1
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-qtd"
+                      onClick={() => alterarQuantidade(p.id, +1)}
+                    >
+                      +1
+                    </button>
+                  </div>
+                </td>
 
-      {/* ============================
-          MODAL EDIÇÃO
-      ============================ */}
-      <Modal
-        isOpen={modalEditar}
-        onClose={() => setModalEditar(false)}
-        title="Editar Item do Estoque"
-      >
-        <form className="estoque-form" onSubmit={salvarEdicao}>
-          <label>Nome:</label>
-          <input
-            type="text"
-            value={nome}
-            onChange={(e) => setNome(e.target.value)}
-          />
+                {/* Botão salvar */}
+                <td>
+                  <button
+                    type="button"
+                    className="btn-salvar-linha"
+                    onClick={() => salvarLinha(p)}
+                  >
+                    Salvar
+                  </button>
+                </td>
+              </tr>
+            ))}
 
-          <label>Categoria (opcional):</label>
-          <input
-            type="text"
-            value={categoria}
-            onChange={(e) => setCategoria(e.target.value)}
-          />
+            {produtos.length === 0 && (
+              <tr>
+                <td colSpan="6">Nenhum produto cadastrado.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
 
-          <label>Quantidade:</label>
-          <input
-            type="number"
-            value={quantidade}
-            onChange={(e) => setQuantidade(e.target.value)}
-          />
+      {/* ========== TABELA PEÇAS ========== */}
+      <div className="secao-estoque">
+        <h2 className="secao-titulo-estoque">Peças cadastradas</h2>
 
-          <label>Quantidade mínima (opcional):</label>
-          <input
-            type="number"
-            value={minimo}
-            onChange={(e) => setMinimo(e.target.value)}
-          />
+        <table className="tabela-estoque">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Descrição</th>
+              <th>Preço</th>
+              <th>Quantidade</th>
+              <th>Ajustar</th>
+              <th>Salvar</th>
+            </tr>
+          </thead>
+          <tbody>
+            {pecas.map((p) => (
+              <tr key={p.id}>
+                <td>{p.nome}</td>
+                <td>{p.descricao || "-"}</td>
 
-          <label>Local no estoque (opcional):</label>
-          <input
-            type="text"
-            value={local}
-            onChange={(e) => setLocal(e.target.value)}
-          />
+                {/* Preço único da peça */}
+                <td>
+                  <input
+                    className="input-preco-tabela"
+                    type="number"
+                    step="0.01"
+                    value={p.precoVenda != null ? p.precoVenda : ""}
+                    onChange={(e) =>
+                      alterarPrecoLocal(p.id, "precoVenda", e.target.value)
+                    }
+                  />
+                </td>
 
-          <label>Observação (opcional):</label>
-          <textarea
-            value={observacao}
-            onChange={(e) => setObservacao(e.target.value)}
-          />
+                {/* Quantidade */}
+                <td>{p.quantidade != null ? p.quantidade : 0}</td>
 
-          <button type="submit" className="btn-principal">
-            Salvar alterações
-          </button>
-        </form>
-      </Modal>
+                {/* Botões +1 / -1 */}
+                <td>
+                  <div className="grupo-botoes-qtd">
+                    <button
+                      type="button"
+                      className="btn-qtd"
+                      onClick={() => alterarQuantidade(p.id, -1)}
+                    >
+                      -1
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-qtd"
+                      onClick={() => alterarQuantidade(p.id, +1)}
+                    >
+                      +1
+                    </button>
+                  </div>
+                </td>
+
+                {/* Botão salvar */}
+                <td>
+                  <button
+                    type="button"
+                    className="btn-salvar-linha"
+                    onClick={() => salvarLinha(p)}
+                  >
+                    Salvar
+                  </button>
+                </td>
+              </tr>
+            ))}
+
+            {pecas.length === 0 && (
+              <tr>
+                <td colSpan="6">Nenhuma peça cadastrada.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
